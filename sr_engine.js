@@ -17,6 +17,20 @@ function itemKey(item) {
     return JSON.stringify(item).toLowerCase();
 }
 
+/**
+ * Normalised comparison for sentence-match CHECK handlers (2026-09-08,
+ * "Doris stuck CHECK"). Tile text is interpolated into HTML templates with
+ * surrounding whitespace/newlines, so a visually-correct placement can carry
+ * invisible characters (indentation, double spaces, &nbsp;) and fail strict
+ * equality FOREVER with no error shown. Collapse ALL whitespace runs
+ * (incl. non-breaking spaces) to single spaces + trim + lowercase — display
+ * text only, never used as a storage key (itemKey stays the canonical key).
+ */
+function normMatchText(s) {
+    if (s === null || s === undefined) return '';
+    return String(s).replace(/[\s\u00a0]+/g, ' ').trim().toLowerCase();
+}
+
 // 1 in 5 selected items should introduce NEW (never-seen) material, so review
 // backlogs can never fully starve forward progress through the book.
 const SR_NEW_CONTENT_RATIO = 0.2;
@@ -96,13 +110,20 @@ function sortPoolBySR(pool, srTypeState, currentSession, activePageIndex, inSess
     const annotated = pool.map(entry => ({
         ...entry,
         priority: getSRPriority(entry.key, srTypeState, currentSession, inSessionFailures, inSessionSuccesses)
-    })).filter(e => e.priority.group !== 4);   // drop cooldown items
+    }));
+    // Cooldown items (group 4) are dropped from the pickable order BUT kept on
+    // sorted._cooldown so pickWithNewQuota can serve the least-overdue ones as
+    // a floor when everything else is exhausted (2026-09-08 "Doris
+    // all-cooldown": without this, a long-term successful student gets NULL
+    // pools and dead sessions). Never mutate the caller's array.
+    const cooldown = annotated.filter(e => e.priority.group === 4);
+    const pickable = annotated.filter(e => e.priority.group !== 4);
 
-    const g0 = annotated.filter(e => e.priority.group === 0);
-    const g1 = annotated.filter(e => e.priority.group === 1);
-    const g2 = annotated.filter(e => e.priority.group === 2);
-    const g3 = annotated.filter(e => e.priority.group === 3);
-    const g5 = annotated.filter(e => e.priority.group === 5);
+    const g0 = pickable.filter(e => e.priority.group === 0);
+    const g1 = pickable.filter(e => e.priority.group === 1);
+    const g2 = pickable.filter(e => e.priority.group === 2);
+    const g3 = pickable.filter(e => e.priority.group === 3);
+    const g5 = pickable.filter(e => e.priority.group === 5);
 
     shuffleArray(g0);
     shuffleArray(g1);
@@ -122,7 +143,9 @@ function sortPoolBySR(pool, srTypeState, currentSession, activePageIndex, inSess
     });
     g3.sort((a, b) => b._randomScore - a._randomScore);
 
-    return [...g0, ...g1, ...g2, ...g3, ...g5];
+    const ordered = [...g0, ...g1, ...g2, ...g3, ...g5];
+    ordered._cooldown = cooldown; // floor for pickWithNewQuota (see above)
+    return ordered;
 }
 
 /**
@@ -151,7 +174,6 @@ function pickWithNewQuota(sorted, count) {
         else if (g === 3) fresh.push(e);
         else fallback.push(e);   // group 5
     });
-
     const picked = g0.slice(0, count);
     const remaining = count - picked.length;
     if (remaining <= 0) return picked;
@@ -171,7 +193,20 @@ function pickWithNewQuota(sorted, count) {
         if (picked.length >= count) break;
         picked.push(e);
     }
-    return picked;
+    // COOLDOWN FLOOR (2026-09-08, "Doris all-cooldown"): a long-term successful
+    // student can have EVERYTHING on cooldown (group 4, dropped by sortPoolBySR
+    // before pickWithNewQuota ever sees it — see below). Practice beats a dead
+    // session: serve the least-overdue cooldown items rather than starving the
+    // round. Callers pass the dropped entries via sorted._cooldown.
+    if (picked.length < count && sorted._cooldown && sorted._cooldown.length > 0) {
+        const rest = sorted._cooldown.slice().sort((a, b) =>
+            (a.priority.dueAfterSession || 0) - (b.priority.dueAfterSession || 0));
+        for (const e of rest) {
+            if (picked.length >= count) break;
+            picked.push(e);
+        }
+    }
+    return picked.slice(0, count);
 }
 
 /**

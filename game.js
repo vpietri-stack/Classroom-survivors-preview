@@ -2083,9 +2083,11 @@ function checkSentenceMatch() {
             anyPlaced = true;
             const targetIndex = parseInt(slot.dataset.targetIndex);
 
-            // Allow matching if the text matches the expected answer for this question
-            const placedText = tile.innerText.trim();
-            const expectedText = pairsData[targetIndex].b.trim();
+            // CHECK HARDENING (2026-09-08, "Doris stuck CHECK"): same
+            // whitespace-collapse as study checkRoundF — a visually-correct
+            // placement must never fail on invisible characters.
+            const placedText = normMatchText(tile.innerText);
+            const expectedText = normMatchText(pairsData[targetIndex].b);
 
             if (placedText === expectedText) {
                 tile.style.backgroundColor = '#10b981'; // green

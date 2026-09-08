@@ -423,6 +423,71 @@ function makeUser() {
   const diag2 = sandbox.analyticsQueue.find(e => e.diagnostic === 'restart');
   ok('restart diagnostic carries the device signature', !!diag2 && diag2.pageState.dev === 'iPhone|tp5|wx');
 
+  // ---- 4. sticky page-advance (2026-09-08, "Doris page-43 trap") ----
+  // The in-memory advance evaporated when updateStudent failed; the next
+  // finalizeSession re-ran the check at an incremented sessionCount, saw a
+  // trickle of newly-due items, and re-decided "stay". Now the pending page
+  // persists in localStorage and re-applies at login until confirmed.
+  store = {};
+  posts = [];
+  sandbox.authActiveUser = makeUser();
+  vm.runInContext('authActiveUser = __user; analyticsQueue = [];', Object.assign(sandbox, { __user: sandbox.authActiveUser }));
+  // Directly exercise the persist/confirm contract: simulate an advance that
+  // the server never confirms (fetch hang), then a fresh login.
+  vm.runInContext(`
+    authActiveUser.book = 'PU1'; authActiveUser.unit = '3'; authActiveUser.page = '43';
+    localStorage.setItem('csPendingPageAdvance', JSON.stringify({ book: 'PU1', unit: '4', page: '48' }));
+  `, sandbox);
+  ok('pending page-advance persists across page loads', store['csPendingPageAdvance'] !== undefined);
+  // Fresh login: reapply must restore the advanced page BEFORE the normal check.
+  vm.runInContext(`
+    authActiveUser.book = 'PU1'; authActiveUser.unit = '3'; authActiveUser.page = '43';
+    reapplyPendingPageAdvance();
+  `, sandbox);
+  ok('reapply restores the pending page (not re-litigated)',
+     sandbox.authActiveUser.unit === '4' && sandbox.authActiveUser.page === '48');
+  // reapply fires updateStudent fire-and-forget (async apiFetch chain resolves
+  // after getAppKey); flush microtasks before asserting the POST landed.
+  await new Promise(r => setTimeout(r, 50));
+  ok('reapply re-sends updateStudent until confirmed',
+     posts.some(p => p.url.includes('/updateStudent') && String(p.body).includes('"page":"48"')));
+
+  // ---- 5. drain report (2026-09-08, "session-1 ghost") ----
+  // At login, before this login's own events, a queueDrain snapshot describes
+  // the backlog (queue length, oldest timestamp, pending SR/increment) so the
+  // next login after any silent completion-flush failure is self-describing.
+  store = {};
+  posts = [];
+  sandbox.authActiveUser = makeUser();
+  vm.runInContext('authActiveUser = __user; analyticsQueue = [];', Object.assign(sandbox, { __user: sandbox.authActiveUser }));
+  // Backlog from a killed session: 1 session event + 2 exercises + pending SR.
+  vm.runInContext(`
+    queueSessionEvent('study', { durationMs: 425000, durationFormatted: '7m 5s' });
+    queueExerciseEvent('wordScramble', 'study');
+    queueExerciseEvent('spelling', 'study');
+    srPendingState = { vocab: {} }; srIncrementSession = true;
+    localStorage.setItem('csPendingSRState', JSON.stringify({ vocab: {} }));
+    localStorage.setItem('csPendingSRIncrement', '1');
+  `, sandbox);
+  const backlogLen = sandbox.analyticsQueue.length;
+  vm.runInContext('queueDrainReportEvent();', sandbox);
+  const drain = sandbox.analyticsQueue.find(e => e.diagnostic === 'queueDrain');
+  ok('drain report queued at login', !!drain);
+  ok('drain report counts the backlog (session + exercises)',
+     !!drain && drain.queueLen === backlogLen && drain.nSession === 1 && drain.nExercise === 2);
+  ok('drain report carries the oldest queued timestamp',
+     !!drain && typeof drain.oldestQueuedTs === 'string');
+  ok('drain report flags pending SR state + session increment',
+     !!drain && drain.pendingSR === true && drain.pendingIncr === true);
+  ok('drain report is dashboard-invisible (type device)', !!drain && drain.type === 'device');
+  // Clean device: no backlog, no pending SR -> silent (no noise in the diag doc).
+  vm.runInContext('analyticsQueue = []; srPendingState = null; srIncrementSession = false;', sandbox);
+  try { delete store['csPendingSRState']; delete store['csPendingSRIncrement']; } catch { /* noop */ }
+  const lenBefore = sandbox.analyticsQueue.length;
+  vm.runInContext('queueDrainReportEvent();', sandbox);
+  ok('drain report stays silent on a clean device',
+     sandbox.analyticsQueue.length === lenBefore);
+
   console.log('\n' + pass + ' passed, ' + fail + ' failed');
   process.exit(fail ? 1 : 0);
 })().catch(e => { console.error('TEST CRASH:', e); process.exit(1); });

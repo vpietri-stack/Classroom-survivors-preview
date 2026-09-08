@@ -71,7 +71,7 @@ vm.runInContext(src, sandbox);
 // so set it AFTER running via in-context assignment.
 vm.runInContext(`authActiveUser = { srState: { vocab: {}, sentences: {}, sentencePairs: {} } };`, sandbox);
 
-const { getStudySentencePairsSubRoundSR, itemKey } = sandbox;
+const { getStudySentencePairsSubRoundSR, itemKey, normMatchText } = sandbox;
 sandbox.selectedClassContent = { book: 'test', unit: 'u0', page: 'p3' };
 
 let pass = 0, fail = 0;
@@ -183,6 +183,48 @@ ok('Rule4: first-page student runs all 3 sub-rounds on the SAME first page',
   roundsF.length === 3 && roundsF.every(r => r.every(k => k.startsWith('p1'))), roundsF);
 ok('Rule4: first-page sub-rounds are FRESH & distinct (no repeats)',
   new Set(flatF).size === flatF.length && flatF.length === 9, { flatF });
+
+// ---------------------------------------------------------------------------
+// Rule 5 (2026-09-08, "Doris all-cooldown"): when EVERY pair up to the current
+// page is on SR cooldown, the selector must NOT return null (dead session).
+// It floors with the least-overdue cooldown pairs — practice beats a dead end.
+function cooldownSRState() {
+  const st = {};
+  // every pair on every page: due far in the future (interval 128, lastSession 190).
+  // Keys MUST match itemKey({a,b}) = "a | b".toLowerCase() (cf. keyOf above).
+  ['p1', 'p2', 'p3'].forEach(pg => {
+    for (let i = 1; i <= 9; i++) {
+      st[keyOf(`${pg}q${i}`, `${pg}a${i}`)] = { interval: 128, dueAfterSession: 318, lastSession: 190, lastResult: 'success' };
+    }
+  });
+  return st;
+}
+sandbox.selectedClassContent = { book: 'test', unit: 'u0', page: 'p3' };
+setSR(cooldownSRState());
+const usedC = new Set();
+const rC = getStudySentencePairsSubRoundSR('test', 'u0', 'p3', usedC, false);
+ok('Rule5: all-cooldown pool still serves 3 pairs (cooldown floor, no null)',
+  rC && rC.pairs && rC.pairs.length === 3, rC && rC.pairs && rC.pairs.length);
+// Cooldown floor serves the LEAST-overdue first: with EVERYTHING on cooldown,
+// make one pair slightly less overdue than the rest; it must surface in E1.
+setSR(Object.assign(cooldownSRState(), {
+  [keyOf('p3q2', 'p3a2')]: { interval: 4, dueAfterSession: 204, lastSession: 200, lastResult: 'success' }
+}));
+const usedC2 = new Set();
+const rC2 = getStudySentencePairsSubRoundSR('test', 'u0', 'p3', usedC2, false);
+ok('Rule5: least-overdue cooldown pair is preferred',
+  rC2 && rC2.pairs.some(p => itemKey(p) === keyOf('p3q2', 'p3a2')), rC2 && rC2.pairs.map(itemKey));
+
+// Rule 6 (2026-09-08, "Doris stuck CHECK"): normMatchText collapses
+// whitespace runs (incl. NBSP), trims, and lowercases — tile HTML
+// interpolation artifacts must never fail a visually-correct placement.
+ok('Rule6: normMatchText collapses indentation/newlines',
+  normMatchText('\n   My name is Sarah.  \n') === 'my name is sarah.');
+ok('Rule6: normMatchText collapses NBSP + double spaces',
+  normMatchText('The\u00a0\u00a0apple  is red.') === 'the apple is red.');
+ok('Rule6: symmetric use — template-indented tile matches content string',
+  normMatchText('\n                        I\'m seven years old.\n                    ') ===
+  normMatchText("I'm seven years old."));
 
 console.log('\n' + pass + ' passed, ' + fail + ' failed');
 process.exit(fail ? 1 : 0);

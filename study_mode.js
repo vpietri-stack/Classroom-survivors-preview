@@ -998,6 +998,11 @@ function nextRoundFSubRound() {
     if (result && result.pairs && result.pairs.length > 0) {
         pairs = result.pairs;
     } else {
+        // COOLDOWN FALLBACK (2026-09-08, "Doris all-cooldown"): every pair up
+        // to this page is on SR cooldown. Practice beats a dead session — the
+        // engine now floors with the least-overdue cooldown pairs, so a null
+        // here means TRULY no pairs exist (not merely all-cooldown). Only then
+        // end Round F cleanly.
         // No unseen pairs left anywhere up to the current page (rare: a first page
         // with only 3 pairs). Don't repeat already-seen pairs — end Round F cleanly.
         STUDY_STATE.subRound = 4;
@@ -1110,9 +1115,13 @@ function checkRoundF() {
             anyPlaced = true;
             const targetIndex = parseInt(slot.dataset.targetIndex);
 
-            // Allow matching if the text matches the expected answer for this question
-            const placedText = tile.innerText.trim();
-            const expectedText = pairs[targetIndex].b.trim();
+            // CHECK HARDENING (2026-09-08, "Doris stuck CHECK"): tile text is
+            // interpolated into HTML with surrounding whitespace/newlines, so a
+            // visually-correct placement can carry invisible characters and fail
+            // strict equality FOREVER (20+ min stuck, no error shown). Compare
+            // on whitespace-collapsed text instead.
+            const placedText = normMatchText(tile.innerText);
+            const expectedText = normMatchText(pairs[targetIndex].b);
 
             if (placedText === expectedText) {
                 // Correct match

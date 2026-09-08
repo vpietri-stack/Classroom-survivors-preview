@@ -13,7 +13,7 @@ const API_BASE = API_BASE_URL;
 // The version watchdog (startVersionWatchdog) compares this to the live
 // version.json; a mismatch means stale WeChat builds never self-heal or
 // permanently nag. See DEPLOY_VERSION_STAMP.md. Bump BOTH together.
-const APP_VERSION = '2026-09-04a';
+const APP_VERSION = '2026-09-08a';
 
 // --- SESSION TOKEN (c) design) ---
 // The server mints a signed token on login. We store it in localStorage
@@ -209,6 +209,10 @@ function queueSessionEvent(sessionType, data) {
 // iPadOS Safari masquerades as "Macintosh" — maxTouchPoints > 1 disambiguates.
 function queueDeviceInfoEvent() {
     if (!authActiveUser || isTestMode) return;
+    // DRAIN REPORT first (2026-09-08, "session-1 ghost"): describe the backlog
+    // BEFORE this login's own events join it — the next login after any silent
+    // completion-flush failure tells us exactly what the device was holding.
+    queueDrainReportEvent();
     const dayKey = 'csDeviceLogDay_' + authActiveUser.id;
     try { if (localStorage.getItem(dayKey) === new Date().toDateString()) return; } catch { /* log anyway */ }
     let uaData = null;
@@ -235,6 +239,52 @@ function queueDeviceInfoEvent() {
     saveActiveUserToCache();
     scheduleAnalyticsFlush();
     try { localStorage.setItem(dayKey, new Date().toDateString()); } catch { /* non-fatal */ }
+}
+
+/**
+ * DRAIN REPORT (2026-09-08, "session-1 ghost"): a self-describing backlog
+ * snapshot queued at login BEFORE this login's own events. type:'device' so
+ * dashboards ignore it; carries queue length, oldest queued timestamp, and
+ * whether a persisted SR/session increment is still awaiting delivery.
+ * Runs EVERY login (not day-capped like the census event above) — it is the
+ * permanent answer to "what was the device holding when it came back?".
+ */
+function queueDrainReportEvent() {
+    if (!authActiveUser || isTestMode) return;
+    try {
+        const q = (typeof analyticsQueue !== 'undefined' && Array.isArray(analyticsQueue)) ? analyticsQueue : [];
+        let oldestTs = null, nSession = 0, nExercise = 0;
+        for (const e of q) {
+            if (!e) continue;
+            if (e.type === 'session') nSession++;
+            else if (e.type === 'exercise') nExercise++;
+            if (e.timestamp && (!oldestTs || e.timestamp < oldestTs)) oldestTs = e.timestamp;
+        }
+        let pendingSR = false, pendingIncr = false;
+        try {
+            pendingSR = !!localStorage.getItem('csPendingSRState');
+            pendingIncr = localStorage.getItem('csPendingSRIncrement') === '1';
+        } catch { /* non-fatal */ }
+        // Silent when there is genuinely nothing to report (keeps the diag doc quiet).
+        if (q.length === 0 && !pendingSR && !pendingIncr) return;
+        const event = {
+            type: 'device',
+            diagnostic: 'queueDrain',
+            queueLen: q.length,
+            nSession, nExercise,
+            oldestQueuedTs: oldestTs,
+            pendingSR, pendingIncr,
+            appVersion: APP_VERSION,
+            timestamp: new Date().toISOString(),
+            eventId: 'dv_' + Date.now() + '_' + Math.random().toString(36).slice(2, 10),
+            ps: (typeof csPageSessionId !== 'undefined') ? csPageSessionId : null
+        };
+        analyticsQueue.push(event);
+        persistAnalyticsQueue();
+        if (!authActiveUser.analytics) authActiveUser.analytics = [];
+        authActiveUser.analytics.push(event);
+        saveActiveUserToCache();
+    } catch { /* telemetry must never break login */ }
 }
 
 function scheduleAnalyticsFlush() {
@@ -1500,6 +1550,9 @@ function finishLogin() {
         selectedStudent = authActiveUser.fullName || authActiveUser.name;
         if (authActiveUser.book && authActiveUser.unit && authActiveUser.page) {
             // Priority: Directly use content assigned from DB
+            // STICKY ADVANCE first (2026-09-08): a previously-decided advance
+            // is applied, not re-litigated — then the normal check runs.
+            if (typeof reapplyPendingPageAdvance === 'function') reapplyPendingPageAdvance();
             checkAndAdvancePageIfAllOnCooldown();
             loadContent();
         } else if (authActiveUser.classTime) {
@@ -1795,7 +1848,18 @@ function checkAndAdvancePageIfAllOnCooldown() {
         authActiveUser.unit = unit;
         authActiveUser.page = page;
         saveActiveUserToCache();
-        
+
+        // STICKY ADVANCE (2026-09-08, "Doris page-43 trap"): the in-memory
+        // advance used to evaporate when the fire-and-forget updateStudent
+        // below failed — then the next finalizeSession re-ran the check at an
+        // incremented sessionCount, saw a trickle of newly-due items, and
+        // re-decided "stay". Persist the pending page alongside the SR state
+        // so it survives app-kill AND re-applies on next login until the
+        // server confirms it.
+        try {
+            localStorage.setItem('csPendingPageAdvance', JSON.stringify({ book, unit, page }));
+        } catch { /* non-fatal */ }
+
         // Fire-and-forget update to backend
         apiFetch(`${API_BASE}/updateStudent`, {
             method: 'POST',
@@ -1804,11 +1868,50 @@ function checkAndAdvancePageIfAllOnCooldown() {
                 studentId: authActiveUser.id,
                 fields: { book, unit, page }
             })
-        }).catch(e => console.warn("Failed to auto-update student page", e));
-        
+        }).then(res => {
+            if (res && res.ok) {
+                try { localStorage.removeItem('csPendingPageAdvance'); } catch { /* non-fatal */ }
+            } else {
+                console.warn('auto page-advance not confirmed — will retry on next login');
+            }
+        }).catch(e => console.warn("Failed to auto-update student page (will retry on next login)", e));
+
         return true;
     }
-    
+
     return false;
+}
+
+/**
+ * Re-applies a pending page-advance that never reached the server (2026-09-08,
+ * "Doris page-43 trap"). Called at login after the user record loads, BEFORE
+ * the login-time checkAndAdvancePageIfAllOnCooldown, so a previously-decided
+ * advance isn't re-litigated against a newer sessionCount — it is applied and
+ * re-sent until confirmed.
+ */
+function reapplyPendingPageAdvance() {
+    try {
+        const raw = localStorage.getItem('csPendingPageAdvance');
+        if (!raw || !authActiveUser) return false;
+        const pending = JSON.parse(raw);
+        if (!pending || !pending.book) return false;
+        authActiveUser.book = pending.book;
+        authActiveUser.unit = pending.unit;
+        authActiveUser.page = pending.page;
+        saveActiveUserToCache();
+        apiFetch(`${API_BASE}/updateStudent`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                studentId: authActiveUser.id,
+                fields: { book: pending.book, unit: pending.unit, page: pending.page }
+            })
+        }).then(res => {
+            if (res && res.ok) {
+                try { localStorage.removeItem('csPendingPageAdvance'); } catch { /* non-fatal */ }
+            }
+        }).catch(() => {}); // stays pending; retried next login
+        return true;
+    } catch { return false; }
 }
 

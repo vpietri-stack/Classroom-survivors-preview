@@ -441,7 +441,11 @@ function getStudySentencePairsSubRoundSR(book, unit, page, usedPairKeys, preferP
         .map(p => {
             const unseen = p.items.filter(it => !usedPairKeys || !usedPairKeys.has(itemKey(it.item)));
             const sorted = sortPoolBySR(unseen, srTypeState, getCurrentSession(), activePageIndex, null, null);
-            const bestGroup = sorted.length > 0 ? sorted[0].priority.group : 6;
+            // bestGroup over PICKABLE items only; but an all-cooldown page still
+            // has material (the floor) — report group 4, not 6 ("empty"), so it
+            // can win the page race and serve its least-overdue pairs.
+            const bestGroup = sorted.length > 0 ? sorted[0].priority.group
+                : (sorted._cooldown && sorted._cooldown.length > 0 ? 4 : 6);
             const bestGroupCount = sorted.filter(e => e.priority.group === bestGroup).length;
             const proximity = 1 / (Math.abs(p.pageAbsIndex - activePageIndex) + 1);
             let randomScore = 0;
@@ -473,9 +477,24 @@ function getStudySentencePairsSubRoundSR(book, unit, page, usedPairKeys, preferP
     });
 
     const winner = pool[0];
+    const picked = pickWithNewQuota(winner.sorted, 3).map(e => e.item);
+    // COOLDOWN FLOOR top-up (2026-09-08): winner.sorted may hold fewer than 3
+    // pickable items while its _cooldown holds the rest. pickWithNewQuota
+    // already floors from _cooldown when IT receives the full sorted array —
+    // but bestGroupCount slicing above can narrow the race; top up here from
+    // the winner's own cooldown, least-overdue first.
+    if (picked.length < 3 && winner.sorted._cooldown && winner.sorted._cooldown.length > 0) {
+        const seen = new Set(picked.map(p => itemKey(p)));
+        const rest = winner.sorted._cooldown.slice().sort((a, b) =>
+            (a.priority.dueAfterSession || 0) - (b.priority.dueAfterSession || 0));
+        for (const e of rest) {
+            if (picked.length >= 3) break;
+            if (!seen.has(e.key)) { picked.push(e.item); seen.add(e.key); }
+        }
+    }
     return {
         pageAbsIndex: winner.page.pageAbsIndex,
-        pairs: pickWithNewQuota(winner.sorted, 3).map(e => e.item)
+        pairs: picked
     };
 }
 
