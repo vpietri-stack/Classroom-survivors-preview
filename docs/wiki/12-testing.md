@@ -43,7 +43,8 @@ These exist because their contracts were broken in production; treat failures as
 - `test_session_flush_deadline.js` — the completion-time flush (`flushAnalyticsWithDeadline`) must resolve true when drained and **never hang past the deadline**; cached-profile writer must survive quota errors. Also pins the 2026-09-03a **ack discipline**: full-ack drains the queue / silent-200 keeps the queue / partial-ack keeps the queue.
 - `test_auto_archive_analytics.js` — `splitAnalyticsForArchive` (700-trigger, 90-day sessions, 500-recent retention), fail-safe archive-then-trim, and `applyEventsWithAck` (added vs duplicate ack lists) — the server-side contract the client relies on.
 - `test_sr_once_per_session.js` — SR state written ONCE per session at first check; failure interval rules; leech handling; 1-in-5 new material.
-- `test_round_e_dedup.js` — due-status beats new material; E1 favors current page / E2-E3 avoid it; no repeat pairs in a session.
+- `test_round_e_dedup.js` — due-status beats new material; E1 favors current page / E2-E3 avoid it; no repeat pairs in a session. Since 2026-09-08a also pins **Rule5 (cooldown floor: all-cooldown pool still serves 3 least-overdue pairs, never null)** and **Rule6 (`normMatchText` whitespace/case normalization)**.
+- Since 2026-09-08a `test_session_flush_deadline.js` additionally pins the **sticky page-advance** (`csPendingPageAdvance` persists, `reapplyPendingPageAdvance()` restores pre-check, `updateStudent` re-sent until confirmed) and the **`queueDrain` login report** (backlog counts + oldest timestamp + pending SR/increment flags; silent on a clean device).
 
 ## Out-of-chain test families (not in `npm test`)
 

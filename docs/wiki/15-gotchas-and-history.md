@@ -24,6 +24,8 @@
 13. **Names lie:** Round B = word scramble; Round C = spelling (10-key); game `spelling` minigame = letter-based word scramble; game `scramble` = sentence reorder. Re-derive from code. See [Study Mode](05-study-mode.md)/[Game Modes](06-game-modes.md).
 14. **Tailwind CDN console warning is harmless** (local `lib/tailwind.js`); **iPadOS Safari masquerades as Macintosh** — use `maxTouchPoints > 1` to disambiguate (device events already do).
 15. **`?v=` cache busters:** every `<script src>` carries one; the auth stamp uses the deploy version, others use per-file counters/dates. When shipping a JS fix users must pick up, bump that file's `?v=` (and the three stamps per rule 1 for `frontend_auth.js`).
+16. **A null selector pool must never dead-end a session.** Success doubles SR intervals, so long-term students eventually put everything on cooldown — serve least-overdue cooldown items (the floor in `sortPoolBySR`/`pickWithNewQuota`) instead of returning null. See [Study Mode](05-study-mode.md).
+17. **CHECK handlers compare display text with `normMatchText`, never strict equality.** Tile HTML interpolation adds invisible whitespace; strict `===` can fail a visually-correct placement forever with no error shown. See [Study Mode](05-study-mode.md).
 
 ## Historical write-ups (repo root)
 
@@ -33,6 +35,7 @@ Context-rich incident documents. The wiki distills their conclusions; read the o
 |---|---|
 | `DEPLOY_VERSION_STAMP.md` | Root-cause writeup of the 2026-08-30 stamp-drift banner incident + bump discipline |
 | `HANDOFF_SESSION_REFRESH_FIX.md` / `HANDOFF_SESSION_FIX_FULL.md` / `SESSION_REFRESH_ROOTCAUSE_2026-08-25.md` | 2026-08 session-refresh / forced-refresh saga (login beacon, flush primitives) |
+| `HANDOFF_SESSION_REFRESH_FIX.md` R7–R9 | 2026-09 silent-200 → lost-update race → all-cooldown/page-43/stuck-CHECK incident set (per-event acks, IfMatch retry, cooldown floor, sticky advance, `normMatchText`, `queueDrain`) |
 | `PROJECT_STATE_HANDOFF.md` / `PROJECT_HANDOFF_2026-07-29.md` | Point-in-time project state snapshots (July 2026) |
 | `SECURITY_AUDIT_HANDOFF.md` | Security audit: token transport, plaintext-password trade-off, app-key threat model |
 | `TD_HANDOFF_QODERCN.md` | Tower Defense handoff (modes, gating, timers) |

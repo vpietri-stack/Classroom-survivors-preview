@@ -309,6 +309,28 @@ Read-only audit of every reload path in the app:
 - [x] No regressions in the mandatory suite (81+22+11+39+5+11+23+154).
 
 ---
-*Previous handoff in this lineage: `HANDOFF_SESSION_FIX_FULL.md` (July beacon-401 / WeChat fixes —
-all still in place and now on BOTH branches).*
+
+## R7. 2026-09-03 — ROUND 7: ack discipline ("Doris silent-200" fix, `2026-09-03a`)
+
+- 6-day blackout (08-28→09-03): client got ok-looking 200s, nothing persisted. Root cause: no per-event acks; client trusted 200s. Fix: server returns `addedEventIds`/`duplicateEventIds`; client drains queue ONLY on full ack; `delivery_diag_saveAnalytics` single-slot doc. Commits `574f820` (+`86363f0` addedCount hotfix). Fleet proof: Edge test 21/21 perfect while iPad silent.
+- 打卡记录 3/10→8/10 with zero server data: counter is LOCAL `srState.sessionCount`, not server — resurfaces in R9 as 2/10-vs-0/10.
+
+## R8. 2026-09-04 — ROUND 8: lost-update race + PK-safe writes + speech hygiene
+- Race proven live (15×2 concurrent POSTs → 50/150 acked events missing, 33%): read-modify-write whole-doc, crash-reload overlap. Fix: IfMatch(`_etag`) retry-merge ≤4 (`13dfae5`), zero loss post-fix. PK-safe writes for 93 legacy docs without `studentId` (`ed9a633`).
+- Problem-2 root cause: AudioContext leak per speech gate → iPadOS kills ~5 min in. Fix: `Recorder.stop()` closes ctx + releases refs/PCM; tensor disposal; sp* breadcrumbs into `csPageHeartbeat` (`fd3812c`, `2026-09-04a`). Fleet census: crashes NOT Doris-unique (ryan 15, apple 13). Minnie Sep-2 partial loss = race signature.
+- Docs: repo wiki `docs/wiki/` created + AGENTS.md pointer (`e5ea680`).
+
+## R9. 2026-09-08 — ROUND 9: all-cooldown dead end + page-43 trap + stuck CHECK (`2026-09-08a`, commit `3a088e8`, on `preview` — NOT yet deployed, see deploy below)
+- New incident set (Sep-7 iPad zeros + Sep-8 laptop trio). Server data: laptop delivery WORKS (exercises 09:04→09:10 UTC live); game-over banner showed **2/10 while the server replay computes 0/10** — device counts locally against events the server never got.
+- Harness-proven on her live data (PU1/u3/p43, sessionCount 200, 185 sentencePairs entries): **148/148 pairs on cooldown → E1 selector returned NULL → session dead-ended to menu.** Mechanism: interval-doubling (success → interval×2, up to 8192) outruns the session counter; structural, hits every long-term successful student eventually.
+- Page-advance fallback (`checkAndAdvancePageIfAllOnCooldown`) DID fire at 200 (→u4/p48) in the harness but the decision evaporated (updateStudent unconfirmed); at 201 five pairs become due → re-decides "stay" on u3/p43. Wall is 9 pages deep; one step can't clear it.
+- Fixes in `3a088e8`: (1) COOLDOWN FLOOR — `sortPoolBySR` keeps dropped group-4 on `sorted._cooldown`; `pickWithNewQuota` serves least-overdue; study selector reports group 4 (not 6-empty) + tops up to 3 pairs. (2) STICKY ADVANCE — `csPendingPageAdvance` persists, `reapplyPendingPageAdvance()` at login pre-check, clears on server confirm. (3) `normMatchText()` in both CHECK handlers (template-whitespace freeze class). (4) `queueDrain` device event at every login (backlog snapshot for the next silent-failure diagnosis).
+- Tests: Rule5/Rule6 in `test_round_e_dedup.js` (16), sticky+drain blocks in `test_session_flush_deadline.js` (65). Full suite green. Stamps → `2026-09-08a` (+ sr_engine/game/study per-file `?v=`).
+- Wiki updates (same commit series): `docs/wiki/05-study-mode.md` (cooldown floor + fallback), `docs/wiki/14-telemetry.md` (queueDrain), `docs/wiki/12-testing.md` (new rules), `docs/wiki/15-gotchas-and-history.md` (R9 index).
+- DEPLOY (do this next): merge `preview`→`main`, push `HEAD:refs/heads/main` to BOTH `origin` + `preview`, keep 4 refs equal; verify Pages build + live `version.json` = `2026-09-08a` + grep live `sr_engine.js` for `normMatchText`; SWA run green (api untouched but same push triggers it).
+- AFTER DEPLOY: Doris plays normally → E-rounds serve cooldown-floor pairs; next login carries a queueDrain report; re-run crash census in ~1 week for before/after numbers.
+
+---
+
+*Previous handoff in this lineage: `HANDOFF_SESSION_FIX_FULL.md` (July beacon-401 / WeChat fixes — all still in place and now on BOTH branches).*
 

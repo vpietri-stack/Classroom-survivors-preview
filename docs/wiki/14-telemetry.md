@@ -60,6 +60,7 @@ Full write-ups indexed in [Gotchas & History](15-gotchas-and-history.md). Summar
 | 2026-08-25 | "Forced-refresh" oddities after crashes | page-restart lifecycle | deadline flush primitives + self-breadcrumb guard |
 | 2026-08-28→09-03 | 6-day "silent-200" blackout: client got ok-looking 200s, nothing persisted server-side, queue drained on the lie | server had no per-event acks; client trusted 200s | per-event acks + ack discipline + delivery diagnostics (2026-09-03a) |
 | 2026-09-04 | Even acked events could vanish | lost-update race on whole-doc writes (no optimistic concurrency) | IfMatch/_etag retry-merge in saveAnalytics; PK-safe point-writes for legacy docs |
+| 2026-09-08 | Long-term successful student hits all-cooldown pool → session dead-ends to menu; page-advance decision evaporates; stuck CHECK on correct answers | interval-doubling outruns sessionCount; fire-and-forget `updateStudent`; strict-equality on HTML-interpolated tile text | cooldown floor (least-overdue pairs, never null) + sticky `csPendingPageAdvance` + `normMatchText` in both CHECK handlers + `queueDrain` login report (2026-09-08a) |
 
 ## Field-probing recipes (operator knowledge, sanitized)
 

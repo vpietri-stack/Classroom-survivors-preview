@@ -145,6 +145,23 @@ Letter slots in the answer rows are wrapped in `.word-group` divs so a word (e.g
 
 `finishStudySession (~1200)`: sets `srFinalized`, calls `finalizeSession(srStudyResults)`, queues the `study` session event, then **awaits `flushAnalyticsWithDeadline(4000)`** before showing the completion screen — the 2026-08-25 "Doris refresh" fix (iOS WebKit can restart the page within ~1s; a fire-and-forget flush lost the session).
 
+### Cooldown floor — a null pool must never dead-end a session (2026-09-08)
+
+Success doubles SR intervals, so a long-term successful student eventually has EVERYTHING on cooldown (proven on live data: 148/148 pairs, E1 returned null → session fell back to menu). The floor, in `sr_engine.js` + `teaching_content.js`:
+
+- `sortPoolBySR` drops group-4 from pick order but keeps it on `sorted._cooldown`.
+- `pickWithNewQuota` serves least-overdue cooldown items when pickable runs short.
+- The study pair selector reports group 4 (not 6-"empty") for all-cooldown pages and tops up to 3 pairs — a null now means TRULY no pairs exist.
+- Rule: practice beats a dead session. Pinned by Rule5 in `test_round_e_dedup.js`.
+
+### Sticky page-advance (2026-09-08)
+
+`checkAndAdvancePageIfAllOnCooldown` (frontend_auth.js ~1722) moves a fully-cooled student up one page — but the decision used to evaporate when `updateStudent` failed, then re-decide "stay" at an incremented sessionCount. The pending page now persists in `csPendingPageAdvance`, re-applies at login BEFORE the normal check (`reapplyPendingPageAdvance`), and clears only on server confirm.
+
+### CHECK comparison: `normMatchText` (2026-09-08)
+
+Tile text is interpolated into HTML with surrounding whitespace, so strict equality could fail a visually-correct placement forever. Both `checkRoundF` (study) and `checkSentenceMatch` (game) compare via `normMatchText()` (`sr_engine.js`: collapse whitespace runs incl. NBSP → trim → lowercase). Display-text only — `itemKey` stays the storage key. Pinned by Rule6.
+
 ### Exit path & the `STUDY_STATE.active` trap
 
 `exitStudyMode (~1250)` must do exactly three things, all load-bearing:
