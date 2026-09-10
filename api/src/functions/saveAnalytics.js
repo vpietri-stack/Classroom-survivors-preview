@@ -57,6 +57,21 @@ function splitAnalyticsForArchive(analytics, now = Date.now()) {
 }
 
 /**
+ * Decides whether an incoming SR update should be applied, given the stored
+ * sequence number. Monotonic: applies only if the incoming seq is newer.
+ * Legacy clients (no seq) always apply — today's behavior (2026-09-10,
+ * Doris stuck-flag fix). Exported pure so tests pin the contract.
+ *
+ * @param {number|undefined} storedSeq - user.srSeq on the doc (0/absent = never)
+ * @param {number|undefined} incomingSeq - body.srSeq from the client
+ * @returns {boolean}
+ */
+function shouldApplySr(storedSeq, incomingSeq) {
+    if (incomingSeq === undefined || incomingSeq === null) return true;
+    return (storedSeq || 0) < incomingSeq;
+}
+
+/**
  * Applies incoming events to an existing analytics array with idempotent
  * de-dup (stable eventId) and returns per-event acks. Exported pure so tests
  * can pin the contract the client relies on (2026-09-03a, "Doris silent-200").
@@ -151,7 +166,7 @@ app.http('saveAnalytics', {
             const token = authGate.token;
 
             const studentId = token ? token.sub : body.studentId; // scope to self only
-            const { events, srState, incrementSession } = body;
+            const { events, srState, incrementSession, srSeq } = body;
 
             if (!events || !Array.isArray(events) || events.length === 0) {
                 return { status: 400, body: 'Missing events array.' };
@@ -171,7 +186,7 @@ app.http('saveAnalytics', {
             // the winner already wrote), retry. Bounded, then 409.
             const container = getContainer();
             let added = 0, addedEventIds = [], duplicateEventIds = [];
-            let sessionCount = null;
+            let sessionCount = null, srApplied = false;
             const MAX_ATTEMPTS = 4;
             for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
                 let user, etag;
@@ -207,8 +222,22 @@ app.http('saveAnalytics', {
                 // concurrency retry the dedup also drops events the race winner
                 // already persisted — exactly the merge semantics we need.
                 ({ addedCount: added, addedEventIds, duplicateEventIds } = applyEventsWithAck(user.analytics, events));
-                if (srState && typeof srState === 'object') user.srState = srState;
-                if (incrementSession) user.sessionCount = (user.sessionCount || 0) + 1;
+                // SR newer-wins (2026-09-10, Doris stuck-flag fix): each client
+                // SR update carries a monotonic srSeq. Stale replays (lost
+                // response retried, beacon+fetch duplicates) must not re-apply
+                // old state or double-increment the session counter. Legacy
+                // clients without srSeq keep today's apply-always behavior.
+                // (srApplied is declared outside the loop so the response can
+                // report it; only the winning attempt's value escapes.)
+                if (srState && typeof srState === 'object' && shouldApplySr(user.srSeq, srSeq)) {
+                    user.srState = srState;
+                    if (srSeq !== undefined && srSeq !== null) user.srSeq = srSeq;
+                    if (incrementSession) user.sessionCount = (user.sessionCount || 0) + 1;
+                    srApplied = true;
+                } else if (incrementSession && (srSeq === undefined || srSeq === null)) {
+                    user.sessionCount = (user.sessionCount || 0) + 1;
+                    srApplied = true;
+                }
                 sessionCount = user.sessionCount || 0;
 
                 // Automatic rolling archival: if user.analytics gets too large (>=700 events),
@@ -264,7 +293,9 @@ app.http('saveAnalytics', {
                     message: `${added} event(s) saved (${events.length - added} duplicate(s) skipped).`,
                     addedEventIds,
                     duplicateEventIds,
-                    sessionCount: sessionCount !== null ? sessionCount : undefined
+                    sessionCount: sessionCount !== null ? sessionCount : undefined,
+                    srApplied,
+                    srSeq: srSeq !== undefined && srSeq !== null ? srSeq : undefined
                 }
             };
         } catch (error) {
@@ -278,6 +309,7 @@ module.exports = {
     splitAnalyticsForArchive,
     maybeArchiveAnalytics,
     applyEventsWithAck,
+    shouldApplySr,
     ARCHIVE_TRIGGER_COUNT,
     RETENTION_DAYS_MS,
     RETENTION_MAX_RECENT_EVENTS

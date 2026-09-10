@@ -13,7 +13,7 @@ const API_BASE = API_BASE_URL;
 // The version watchdog (startVersionWatchdog) compares this to the live
 // version.json; a mismatch means stale WeChat builds never self-heal or
 // permanently nag. See DEPLOY_VERSION_STAMP.md. Bump BOTH together.
-const APP_VERSION = '2026-09-08a';
+const APP_VERSION = '2026-09-10a';
 
 // --- SESSION TOKEN (c) design) ---
 // The server mints a signed token on login. We store it in localStorage
@@ -54,6 +54,8 @@ var isTestMode = false;
 // --- SR STATE (set on login, finalised at session end) ---
 var srPendingState = null;       // computed new srState waiting for the next flush
 var srIncrementSession = false;  // whether this flush should increment sessionCount
+var srPendingSeq = 0;            // monotonic seq tagging the pending SR update (2026-09-10)
+var confirmedSrSeq = 0;          // highest server-confirmed srSeq (persisted)
 
 /** Current session index = completed sessions so far (0-based). */
 function getCurrentSession() {
@@ -128,6 +130,7 @@ function finalizeSession(sessionResults, shouldIncrementSession = true) {
 
     // Queue for next flush
     srPendingState = newSRState;
+    srPendingSeq = Date.now(); // monotonic tag: server applies each seq at most once (2026-09-10)
     if (typeof persistPendingSR === 'function') persistPendingSR(); // survive app-kill between here and successful flush
 
     // Check if we need to auto-advance the page
@@ -514,12 +517,26 @@ async function flushAnalytics(opts = {}) {
     // Capture and clear pending SR update
     const srPayload = srPendingState;
     const incrementSession = srIncrementSession;
+    const srSeqAtSend = srPendingSeq;
     srPendingState = null;
     srIncrementSession = false;
+    srPendingSeq = 0;
+
+    // SR rides ONLY when newer than server-confirmed (2026-09-10, Doris
+    // stuck-flag fix): an obsolete pending update is dropped locally instead
+    // of re-sent; events still ship either way. The increment is created
+    // together with its state in finalizeSession, so it rides only with it —
+    // sending increment without its state is what double-counted across
+    // beacon+fetch duplicates.
+    const sendSr = !!(srPayload && srSeqAtSend && srSeqAtSend > (confirmedSrSeq || 0));
+    if (!sendSr && (srPayload || incrementSession)) persistPendingSR();
 
     const body = { studentId: authActiveUser.id, events };
-    if (srPayload)       body.srState          = srPayload;
-    if (incrementSession) body.incrementSession = true;
+    if (sendSr) {
+        body.srState = srPayload;
+        body.srSeq = srSeqAtSend;
+        if (incrementSession) body.incrementSession = true;
+    }
 
     try {
         // keepalive:true lets the browser complete the request even if the page
@@ -544,8 +561,9 @@ async function flushAnalytics(opts = {}) {
                 const relogged = await trySilentRelogin();
                 if (relogged) {
                     // Restore pending SR state for the retry, then re-flush.
-                    if (srPayload && !srPendingState) srPendingState = srPayload;
+                    if (srPayload && !srPendingState) { srPendingState = srPayload; srPendingSeq = srSeqAtSend; }
                     if (incrementSession) srIncrementSession = true;
+                    if (typeof persistPendingSR === 'function') persistPendingSR();
                     return await flushAnalytics({ ...opts, _retried: true });
                 }
                 // Even after a silent re-login we're still 401 — the running
@@ -573,18 +591,30 @@ async function flushAnalytics(opts = {}) {
             ...((resBody && resBody.duplicateEventIds) || [])
         ]);
         const accounted = events.every(e => !e.eventId || acked.has(e.eventId));
+        // Confirm-then-clear (2026-09-10, Doris stuck-flag fix): on a fully
+        // acked flush the persisted SR flag clears and the confirmed watermark
+        // advances past any seq the server reports. A stale resend can never
+        // loop forever because the server only ever applies newer seqs
+        // (shouldApplySr) and the client drops anything at/below confirmed.
+        const srvSeq = (resBody && typeof resBody.srSeq === 'number') ? resBody.srSeq : null;
         if (accounted) {
             const sentSet = new Set(events);
             analyticsQueue = analyticsQueue.filter(e => !sentSet.has(e));
             persistAnalyticsQueue();
-            if (typeof clearPersistedSR === 'function') clearPersistedSR(); // SR state delivered — remove from localStorage
+            // Confirmed (applied, obsolete, or legacy response): clear the
+            // persisted flag and advance the confirmed watermark.
+            if (typeof clearPersistedSR === 'function') clearPersistedSR();
+            if (srvSeq !== null && srvSeq > (confirmedSrSeq || 0)) {
+                confirmedSrSeq = srvSeq;
+                if (typeof persistConfirmedSrSeq === 'function') persistConfirmedSrSeq();
+            }
         } else {
             // Delivered-but-unacked: leave everything queued; the next login
             // beacon / debounce re-ships it and the server de-dups by eventId.
             // SR pending state was consumed at the top of this function —
             // restore it so the SR update rides the re-send too.
             console.warn('saveAnalytics 200 without full event ack — keeping queue for re-send');
-            if (srPayload && !srPendingState) srPendingState = srPayload;
+            if (srPayload && !srPendingState) { srPendingState = srPayload; srPendingSeq = srSeqAtSend; }
             if (incrementSession) srIncrementSession = true;
             persistAnalyticsQueue();
         }
@@ -592,7 +622,7 @@ async function flushAnalytics(opts = {}) {
         console.warn('Failed to flush analytics:', e);
         // Re-queue failed events and restore SR pending state.
         analyticsQueue = events.concat(analyticsQueue);
-        if (srPayload && !srPendingState) srPendingState = srPayload;
+        if (srPayload && !srPendingState) { srPendingState = srPayload; srPendingSeq = srSeqAtSend; }
         if (incrementSession) srIncrementSession = true;
         persistAnalyticsQueue();
     }

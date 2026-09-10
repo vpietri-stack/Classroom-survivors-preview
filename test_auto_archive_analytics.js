@@ -3,6 +3,7 @@ const {
     splitAnalyticsForArchive,
     maybeArchiveAnalytics,
     applyEventsWithAck,
+    shouldApplySr,
     ARCHIVE_TRIGGER_COUNT,
     RETENTION_DAYS_MS,
     RETENTION_MAX_RECENT_EVENTS
@@ -229,6 +230,28 @@ async function main() {
         assert.strictEqual(addedCount, 0);
         assert.deepStrictEqual(addedEventIds, []);
         assert.deepStrictEqual(duplicateEventIds, []);
+    });
+
+    // ---- shouldApplySr (2026-09-10, Doris stuck-flag fix) ----
+    // Each client SR update carries a monotonic srSeq; the server applies at
+    // most once. Legacy clients (no seq) keep apply-always behavior.
+    test('SR seq: legacy (no incoming seq) always applies', () => {
+        assert.strictEqual(shouldApplySr(undefined, undefined), true);
+        assert.strictEqual(shouldApplySr(0, undefined), true);
+        assert.strictEqual(shouldApplySr(999, null), true);
+    });
+    test('SR seq: first write applies (stored absent/0, incoming set)', () => {
+        assert.strictEqual(shouldApplySr(undefined, 123), true);
+        assert.strictEqual(shouldApplySr(0, 123), true);
+    });
+    test('SR seq: newer incoming applies', () => {
+        assert.strictEqual(shouldApplySr(100, 123), true);
+    });
+    test('SR seq: replay of same seq is ignored (no double increment)', () => {
+        assert.strictEqual(shouldApplySr(123, 123), false);
+    });
+    test('SR seq: stale resend is ignored', () => {
+        assert.strictEqual(shouldApplySr(200, 123), false);
     });
 
     console.log('\n--- AUTO-ARCHIVE ANALYTICS TEST RESULTS ---');

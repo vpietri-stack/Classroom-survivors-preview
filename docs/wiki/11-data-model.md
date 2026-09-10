@@ -51,7 +51,8 @@ Fields written by the API (addStudent.js ~40-57 + later mutations). Client-visib
   "classTime": "…", "book": "PU2", "unit": 3, "page": 12,   // teaching placement
   "avatar": null,                    // avatar id/url via updateAvatar
   "vsPromoSeen": false,              // Vampire Survivors promo dialog shown
-  "sessionCount": 7,                 // incremented via saveAnalytics incrementSession
+  "sessionCount": 7,                 // incremented via saveAnalytics incrementSession (rides only with an applied SR update, 2026-09-10)
+  "srSeq": 1789040382646,             // monotonic seq of last applied SR update; server applies only newer (shouldApplySr), client watermark confirmedSrSeq (2026-09-10)
   "analytics": [ /* event array — see below; auto-trimmed at 700 */ ],
   "srState": { "vocab": {}, "sentences": {}, "sentencePairs": {} },  // spaced-repetition state
   "targets": [

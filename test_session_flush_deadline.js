@@ -22,7 +22,8 @@ const path = require('path');
 const vm = require('vm');
 
 const root = __dirname;
-const src = fs.readFileSync(path.join(root, 'teaching_content.js'), 'utf8')
+const src = fs.readFileSync(path.join(root, 'sr_engine.js'), 'utf8')
+  + '\n' + fs.readFileSync(path.join(root, 'teaching_content.js'), 'utf8')
   + '\n' + fs.readFileSync(path.join(root, 'frontend_auth.js'), 'utf8');
 
 // --- controllable localStorage stub ------------------------------------------
@@ -62,7 +63,10 @@ function fetchStub(url, options = {}) {
       const b = JSON.parse(options.body || '{}');
       ack = {
         addedEventIds: (b.events || []).filter(e => e && e.eventId).map(e => e.eventId),
-        duplicateEventIds: []
+        duplicateEventIds: [],
+        // Echo the 2026-09-10 SR confirmation contract: applied + echo seq.
+        srApplied: !!b.srState,
+        srSeq: (b.srSeq !== undefined && b.srSeq !== null) ? b.srSeq : undefined
       };
     } catch { /* body-less request */ }
   }
@@ -121,8 +125,12 @@ function makeUser() {
   sandbox.analyticsQueue = [];
   vm.runInContext('authActiveUser = __user; analyticsQueue = [];', Object.assign(sandbox, { __user: sandbox.authActiveUser }));
   // Simulate the completion path: finalize-style SR pending + session event.
+  // (2026-09-10: the pending update needs its srSeq tag, as finalizeSession
+  // stamps it — a bare pending entry without seq is treated as legacy and
+  // suppressed by the newer-wins gate.)
   vm.runInContext(`
     srPendingState = { vocab: { cat: { interval: 2 } } };
+    srPendingSeq = Date.now();
     srIncrementSession = true;
     queueSessionEvent('study', { durationMs: 300000, durationFormatted: '5m 0s' });
   `, sandbox);
@@ -200,9 +208,10 @@ function makeUser() {
   fetchBehavior = 'silent200';
   posts = []; store = {};
   sandbox.authActiveUser = makeUser();
-  vm.runInContext('authActiveUser = __user; analyticsQueue = []; srPendingState = null; srIncrementSession = false;', sandbox);
+  vm.runInContext('authActiveUser = __user; analyticsQueue = []; srPendingState = null; srIncrementSession = false; srPendingSeq = 0; confirmedSrSeq = 0;', sandbox);
   vm.runInContext(`
     srPendingState = { vocab: { cat: { interval: 2 } } };
+    srPendingSeq = Date.now();
     srIncrementSession = true;
     queueSessionEvent('study', { durationMs: 3000 });
   `, sandbox);
@@ -487,6 +496,90 @@ function makeUser() {
   vm.runInContext('queueDrainReportEvent();', sandbox);
   ok('drain report stays silent on a clean device',
      sandbox.analyticsQueue.length === lenBefore);
+
+  // ---- 6. srSeq-tagged SR: suppress obsolete resends, confirm-then-clear ----
+  // (2026-09-10, Doris stuck-flag fix). finalizeSession stamps a monotonic
+  // srSeq; flush sends SR only when newer than server-confirmed; an accounted
+  // flush clears the persisted flag and advances the watermark.
+  store = {};
+  posts = [];
+  fetchBehavior = 'ok'; // Case C overrode sandbox.fetch; the flag may be stale
+  sandbox.fetch = fetchStub;
+  sandbox.authActiveUser = makeUser();
+  vm.runInContext('authActiveUser = __user; analyticsQueue = []; srPendingState = null; srIncrementSession = false; srPendingSeq = 0; confirmedSrSeq = 0;', Object.assign(sandbox, { __user: sandbox.authActiveUser }));
+
+  // (a) finalize stamps a monotonic srSeq and persists it.
+  vm.runInContext(`finalizeSession([{ type: 'vocab', key: 'cat', firstAttempt: true }]);`, sandbox);
+  const seq1 = vm.runInContext('srPendingSeq', sandbox);
+  ok('finalize stamps a nonzero srSeq', typeof seq1 === 'number' && seq1 > 0);
+  ok('srSeq persists across page loads', store['csPendingSRSeq'] === String(seq1));
+
+  // (b) flush attaches sr triple (state + seq + increment).
+  // finalizeSession queues no events itself — only the SR pending triple —
+  // so queue the session event as the send batch, then reset posts so the
+  // assertion reads THIS flush's body.
+  vm.runInContext(`queueSessionEvent('study', { durationMs: 1000 });`, sandbox);
+  posts = [];
+  await sandbox.flushAnalytics();
+  const sent1 = JSON.parse(posts.filter(p => p.url.includes('/saveAnalytics')).pop().body);
+  ok('flush sends srState + srSeq + incrementSession', !!sent1.srState && sent1.srSeq === seq1 && sent1.incrementSession === true);
+
+  // (c) accounted + srApplied:true advances the watermark and clears the flag.
+  ok('accounted flush clears persisted SR keys', !('csPendingSRState' in store) && !('csPendingSRSeq' in store));
+  const conf1 = vm.runInContext('confirmedSrSeq', sandbox);
+  ok('confirmed watermark advances to the applied seq', conf1 === seq1);
+
+  // (d) obsolete pending update is suppressed locally (no resend, events still go).
+  // Simulate: a NEWER update got confirmed elsewhere; an old one is pending.
+  vm.runInContext(`srPendingState = { vocab: { stale: 1 } }; srPendingSeq = ${seq1}; srIncrementSession = true; confirmedSrSeq = ${seq1} + 50;`, sandbox);
+  posts = [];
+  vm.runInContext(`queueExerciseEvent('spelling', 'study');`, sandbox);
+  await sandbox.flushAnalytics();
+  const sent2 = JSON.parse(posts.filter(p => p.url.includes('/saveAnalytics')).pop().body);
+  ok('obsolete SR is suppressed (state+seq+increment omitted), events still ship',
+     !('srState' in sent2) && !('srSeq' in sent2) && !('incrementSession' in sent2)
+     && Array.isArray(sent2.events) && sent2.events.length > 0);
+
+  // (e) legacy server (no srSeq in response) keeps clear-on-accounted behavior.
+  store = {};
+  posts = [];
+  vm.runInContext('authActiveUser = __user; analyticsQueue = []; srPendingState = null; srIncrementSession = false; srPendingSeq = 0; confirmedSrSeq = 0;', Object.assign(sandbox, { __user: sandbox.authActiveUser }));
+  vm.runInContext(`finalizeSession([{ type: 'vocab', key: 'dog', firstAttempt: true }]);`, sandbox);
+  vm.runInContext(`queueSessionEvent('study', { durationMs: 1000 });`, sandbox);
+  const realFetch = sandbox.fetch;
+  sandbox.fetch = function (url, options = {}) { // legacy: acks only, no srSeq/srApplied
+    posts.push({ url: String(url), body: options.body });
+    let ack = {};
+    try {
+      const b = JSON.parse(options.body || '{}');
+      ack = { addedEventIds: (b.events || []).filter(x => x && x.eventId).map(x => x.eventId), duplicateEventIds: [] };
+    } catch { /* body-less */ }
+    return Promise.resolve({ ok: true, status: 200, json: () => Promise.resolve({ success: true, ...ack }) });
+  };
+  await sandbox.flushAnalytics();
+  ok('legacy response still clears the flag on full ack', !('csPendingSRState' in store));
+  sandbox.fetch = realFetch;
+
+  // (f) lost response reuses the SAME seq (no new finalize): server sees a
+  // replay of the same seq, applies once, client converges on the confirm.
+  // NOTE: this models the PRE-confirm resend — the response never arrived,
+  // so the watermark never advanced. (If the confirm HAD arrived, the
+  // resend would carry no SR at all and the server would see no srSeq —
+  // covered by (d).) Restore pending state WITHOUT a new finalize, exactly
+  // as the network-error catch block does.
+  vm.runInContext('authActiveUser = __user; analyticsQueue = []; srPendingState = null; srIncrementSession = false; srPendingSeq = 0; confirmedSrSeq = 0;', Object.assign(sandbox, { __user: sandbox.authActiveUser }));
+  vm.runInContext(`finalizeSession([{ type: 'vocab', key: 'bird', firstAttempt: true }]);`, sandbox);
+  const seqF = vm.runInContext('srPendingSeq', sandbox);
+  const stateF = vm.runInContext('JSON.stringify(srPendingState)', sandbox);
+  vm.runInContext(`queueSessionEvent('study', { durationMs: 1000 });`, sandbox);
+  posts = [];
+  // Response lost -> pending triple restored for resend, watermark untouched:
+  vm.runInContext(`srPendingState = JSON.parse(${JSON.stringify(stateF)}); srPendingSeq = ${seqF}; srIncrementSession = true;`, sandbox);
+  vm.runInContext(`queueExerciseEvent('spelling', 'study');`, sandbox);
+  await sandbox.flushAnalytics();
+  const sentF = JSON.parse(posts.filter(p => p.url.includes('/saveAnalytics')).pop().body);
+  ok('resend after lost response reuses the same srSeq (server dedups by seq)',
+     sentF.srSeq === seqF && !!sentF.srState);
 
   console.log('\n' + pass + ' passed, ' + fail + ' failed');
   process.exit(fail ? 1 : 0);

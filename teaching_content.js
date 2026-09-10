@@ -64,6 +64,8 @@ function persistAnalyticsQueue() {
 // --- PERSISTENT SR STATE (survives app-kill between finalizeSession and flush) ---
 const PERSISTED_SR_KEY = 'csPendingSRState';
 const PERSISTED_SR_INCR_KEY = 'csPendingSRIncrement';
+const PERSISTED_SR_SEQ_KEY = 'csPendingSRSeq';       // seq of the pending update (2026-09-10)
+const CONFIRMED_SR_SEQ_KEY = 'csConfirmedSrSeq';     // highest server-confirmed seq (2026-09-10)
 
 function persistPendingSR() {
     try {
@@ -77,6 +79,17 @@ function persistPendingSR() {
         } else {
             localStorage.removeItem(PERSISTED_SR_INCR_KEY);
         }
+        if (srPendingSeq) {
+            localStorage.setItem(PERSISTED_SR_SEQ_KEY, String(srPendingSeq));
+        } else {
+            localStorage.removeItem(PERSISTED_SR_SEQ_KEY);
+        }
+    } catch { /* non-fatal */ }
+}
+
+function persistConfirmedSrSeq() {
+    try {
+        localStorage.setItem(CONFIRMED_SR_SEQ_KEY, String(confirmedSrSeq || 0));
     } catch { /* non-fatal */ }
 }
 
@@ -85,6 +98,10 @@ function loadPersistedSR() {
         const raw = localStorage.getItem(PERSISTED_SR_KEY);
         if (raw) srPendingState = JSON.parse(raw);
         if (localStorage.getItem(PERSISTED_SR_INCR_KEY) === '1') srIncrementSession = true;
+        const seq = parseInt(localStorage.getItem(PERSISTED_SR_SEQ_KEY) || '0', 10);
+        if (seq) srPendingSeq = seq;
+        const conf = parseInt(localStorage.getItem(CONFIRMED_SR_SEQ_KEY) || '0', 10);
+        if (conf) confirmedSrSeq = conf;
     } catch { /* non-fatal */ }
 }
 
@@ -92,7 +109,10 @@ function clearPersistedSR() {
     try {
         localStorage.removeItem(PERSISTED_SR_KEY);
         localStorage.removeItem(PERSISTED_SR_INCR_KEY);
+        localStorage.removeItem(PERSISTED_SR_SEQ_KEY);
     } catch { /* non-fatal */ }
+    // NOTE: CONFIRMED_SR_SEQ_KEY is intentionally kept — confirmation is monotonic.
+    srPendingSeq = 0;
 }
 var exerciseStartTime = 0;
 var exerciseAttempts = 0;
