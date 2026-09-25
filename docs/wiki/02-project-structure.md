@@ -56,7 +56,7 @@ directly with a `?v=` cache-buster; files share state through the global JS name
 
 | File | ~Lines | Role |
 |---|---|---|
-| `game.js` | 2348 | Dashboard/menu wiring + the three game-mode ESL minigames (`startMiniGame()` dispatcher: spelling→scramble, wordrec, scramble→sentence reorder, sentencematch), SFX sampling, global gesture unlock, `getLocalTranslation()`, `showVocabImage()` (incl. the 2026-09-16a apostrophe/comma filename strip). |
+| `game.js` | 2348 | Dashboard/menu wiring + the three game-mode ESL minigames (`startMiniGame()` dispatcher: spelling→scramble, wordrec, scramble→sentence reorder, sentencematch), SFX sampling, global gesture unlock, `getLocalTranslation()`, `showVocabImage()` (vocab filename rule — one of three copies pinned by `test_asset_manifest.js`, see [Frontend Core](03-frontend-core.md)). |
 | `study_mode.js` | 1369 | Study Mode rounds — internal functions A/C/D/E/F, on-screen labels A / B / C / D / Match (labels and internals disagree; see [Study Mode](05-study-mode.md)); `STUDY_STATE` global; `finishStudySession()` awaits the deadline flush. |
 | `vampire_survivors.js` | 4035 | The flagship Phaser run-and-gun: MainScene, enemies/bosses/items, character select, `populateGameOver()` (awaits deadline flush). |
 | `gomoku.js` | 781 | Five-in-a-row mode with ESL questions (`endGomokuGame()` awaits deadline flush). |
@@ -117,11 +117,11 @@ See [Frontend Core](03-frontend-core.md) for pack structure and selection flow.
 | 8 | `test_speech_hygiene.js` | 138 | 10 | `Recorder.stop()` AudioContext teardown + `sp*` crash breadcrumbs. |
 | 9 | `test_td_gate.js` | 71 | 11 | `TD_ENABLED` runtime gating. |
 | 10 | `test_td_core.js` | 163 | 23 | TD core logic. |
-| 11 | `test_asset_manifest.js` | 71 | 154 | `asset_cache.js` sprite lists cover every sprite on disk. |
+| 11 | `test_asset_manifest.js` | 161 | 171 | `asset_cache.js` sprite lists cover every sprite on disk + the three-way vocab filename contract (generator vs prefetcher vs display). |
 | — | `test_headless.js` | 54 | — | Standalone Playwright smoke (`file://` load, 0 pageerrors). Not in `npm test`. |
 | — | `test_settings_login_field.js` | 62 | — | One-off regression (login field), run manually. |
 
-**11 chained files, 423 assertions, 0 failures** as verified 2026-09-25.
+**11 chained files, 440 assertions, 0 failures** as verified 2026-09-25.
 
 ### VS / TD asset tools (root, one-off, not deployed)
 

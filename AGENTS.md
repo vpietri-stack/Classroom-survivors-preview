@@ -81,7 +81,7 @@ be committed. The workspace instruction forbids blanket adds; respect it.
   Pages deploy are **separate** Actions runs triggered by the same push.
 
 ## Tests (REQRED green before any commit)
-- `npm test` (root) — runs the whole suite (currently 10 files, ~360 tests).
+- `npm test` (root) — runs the whole suite (currently 11 files, 440 assertions).
   `test_deploy_stamp_sync.js` is first; it fails the whole run on stamp drift.
 - `cd api && npm test` — backend Functions tests.
 

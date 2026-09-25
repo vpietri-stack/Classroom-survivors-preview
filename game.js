@@ -33,8 +33,13 @@ function showVocabImage(elementId, word) {
     el.classList.add('hidden');
     if (!word) return;
 
-    const filename = word.trim().toLowerCase().replace(/ /g, '-')
-        .replace(/['',]/g, ''); // 2026-09-16: "we're" -> "were" (apostrophes/commas have no files)
+    // Apostrophes and commas are KEPT on purpose. slice_vocab_sheet.js names each
+    // file with only lowercase + spaces-to-hyphens (it never strips punctuation), so
+    // o'clock.png and chemist's.png really do exist on disk -- stripping them 404s
+    // an illustration that works. A 2026-09-16a strip did exactly that on the
+    // belief no such files existed; the vocab-naming block in
+    // test_asset_manifest.js now pins this against drifting again.
+    const filename = word.trim().toLowerCase().replace(/ /g, '-');
     const imagePath = `images/vocab/${filename}.png`;
 
     // Resolve through AssetCache (gh-proxy mirror + IndexedDB): instant blob:

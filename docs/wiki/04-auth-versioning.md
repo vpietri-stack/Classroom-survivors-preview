@@ -5,7 +5,7 @@
 **Owner files:** `frontend_auth.js`, `api/src/functions/login.js`, `api/src/functions/shared/auth.js`, `version.json`, `sw.js`, `DEPLOY_VERSION_STAMP.md`
 
 `frontend_auth.js` (2089 lines) owns login, the session token, every analytics flush path,
-restart telemetry, and the version watchdog. The current deploy stamp is **`2026-09-16c`**
+restart telemetry, and the version watchdog. The current deploy stamp is **`2026-09-25a`**
 (`version.json:2` = `frontend_auth.js:16` = `index.html:731`).
 
 ---
@@ -230,15 +230,16 @@ resets the streak and retries `flushAnalytics()`. Any successful flush zeroes th
 
 | # | Location | Current value (2026-09-25) |
 |---|---|---|
-| 1 | `version.json` `"version"` | `2026-09-16c` |
-| 2 | `frontend_auth.js:16` `const APP_VERSION` | `'2026-09-16c'` |
-| 3 | `index.html:731` `frontend_auth.js?v=` | `?v=2026-09-16c` |
+| 1 | `version.json` `"version"` | `2026-09-25a` |
+| 2 | `frontend_auth.js:16` `const APP_VERSION` | `'2026-09-25a'` |
+| 3 | `index.html:731` `frontend_auth.js?v=` | `?v=2026-09-25a` |
 
 Enforced by `test_deploy_stamp_sync.js` (73 lines, **first** in the `npm test` chain): parses all
 three, fails the run on drift, and is the reason a stamp drift cannot be committed through the
 normal test gate. Full write-up: `DEPLOY_VERSION_STAMP.md`. A mismatch = permanent red banner
 for everyone (live version stays "greater" than the running stamp) or stale builds that never
-self-heal. Verified 2026-09-25: all three = `2026-09-16c`.
+self-heal. Verified 2026-09-25: all three = `2026-09-25a` (bumped for the vocab-filename
+regression fix; see [Frontend Core](03-frontend-core.md)).
 
 **Sub-resource `?v=` counters are separate.** Non-`frontend_auth.js` scripts carry their own
 integer cache-buster, bumped by hand when that file changes. `speech_engine.js?v=11`

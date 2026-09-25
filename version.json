@@ -1,5 +1,5 @@
 {
-  "version": "2026-09-16c",
-  "deployedAt": "2026-09-16",
-  "notes": "SR delta sync (2026-09-16c, poisoned account: old account 65KB full-state packet exceeds ~64KB keepalive cap, EVERY flush Failed to fetch). finalizeSession ships only touched entries (extractSRDelta, lastSession===current); server merges delta onto stored state (srDelta flag; absent=legacy full replace). In-memory/persisted full state stays complete. Quota guard persists delta envelope on QuotaExceeded. Speech ?v=11 forces API-bypass deploy. Tests: block 9 (delta fraction/flag/single-entry), delta-merge contract; flush-deadline 84 pass."
+  "version": "2026-09-25a",
+  "deployedAt": "2026-09-25",
+  "notes": "Vocab image filename fix (2026-09-25a). The 2026-09-16a strip of apostrophes/commas in game.js showVocabImage was wrong on both counts: slice_vocab_sheet.js (the generator) never strips, so a stripped name can never match a generated file; and o'clock.png + chemist's.png have existed since 2026-07-27 as live PU3/Think1 vocab entries, so the strip 404'd two working illustrations. Strip removed; all three copies of the rule (generator / asset_cache prefetcher / game.js display) now agree. test_asset_manifest.js adds a three-way contract block over all 4339 content-pack vocab words - verified to fail against the old rule. game.js?v= bumped to deliver. Root suite 440 pass, 0 fail."
 }

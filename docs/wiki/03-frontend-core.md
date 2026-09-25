@@ -172,16 +172,31 @@ the 41 MB Whisper download (header comment asset_cache.js:1–29):
    `getBlobUrl()` (memory → IndexedDB → mirror; `null` if all fail), `prefetch(paths)`,
    plus path helpers `vocabImagePath()` / `audioPath()` matching game.js conventions
    (asset_cache.js:282–289).
-   **Vocab filename convention** (`showVocabImage`, game.js:36): lowercase, spaces → `-`,
-   and since 2026-09-16a apostrophes/commas are **stripped** — `we're` → `were.png`, not
-   `we-re.png`. No file was ever named with an apostrophe, so contracted vocab items silently
-   missed their illustration.
-   > ⚠️ **Known divergence (found 2026-09-25, unfixed):** `asset_cache.js vocabImagePath()`
-   > (asset_cache.js:283) still uses only `replace(/ /g,'-')`. For a contracted word the
-   > *prefetch* therefore requests `we're.png` (404) while *display* requests `were.png` — so
-   > contracted vocab images are never prefetched and fall back to a cold same-origin fetch on
-   > first show. Mirror the strip in `vocabImagePath()` (or, better, have both call one shared
-   > helper) before adding more filename rules.
+   **Vocab filename rule** (`showVocabImage`, game.js:36): lowercase, spaces → `-`,
+   and **apostrophes and commas are kept**.
+   > ⚠️ **Corrected 2026-09-25a — the opposite used to be documented here.** Commit
+   > `2026-09-16a` added `.replace(/['',]/g,'')` to `showVocabImage` on the stated
+   > belief that "apostrophes/commas have no files", and this page repeated that claim
+   > while blaming `asset_cache.js` for not following it. Both halves were wrong:
+   > - It fixed **nothing** — `slice_vocab_sheet.js` `fileFor()` (the generator that
+   >   decides what exists on disk) never strips punctuation, so a stripped name can
+   >   never match a generated file. `were.png` does not exist; neither did `we're.png`.
+   > - It **broke** the only two punctuation-bearing images that do exist,
+   >   `o'clock.png` and `chemist's.png` (added 2026-07-27, six weeks *before* the
+   >   strip, and live vocab entries in PU3 and Think1). Students on those pages lost
+   >   an illustration that had been working.
+   >
+   > The strip is now removed, so all three copies agree again. The durable lesson is
+   > in [Gotchas](15-gotchas-and-history.md) rule 25; the regression is pinned by the
+   > three-way contract block in [Testing](12-testing.md).
+   >
+   > Across the 280 punctuation-bearing vocab strings the packs do mix apostrophe
+   > codepoints (U+0027 and U+2019), so a filename must match the exact codepoint the
+   > pack uses — `slice_vocab_sheet.js` passes the word through untouched apart from
+   > case and spaces. For `chemist` specifically both PU3 and Think1 use U+0027, which
+   > makes the on-disk `chemist’s.png` (U+2019) a dead duplicate of the reachable
+   > `chemist's.png` (U+0027). Harmless, but check which codepoint each pack uses before
+   > deleting either file.
 4. **Manifests**: `TD_SPRITES` (asset_cache.js:58), `VS_SPRITES` (:79), `MUSIC` (:131),
    `SFX` (:138) list every runtime asset; `test_asset_manifest.js` asserts the lists cover every
    sprite on disk, so a new sprite **cannot** ship unprefetched.

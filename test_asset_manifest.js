@@ -65,6 +65,96 @@ checkGroup('VS_SPRITES', 'sprites/vs', '.png', f => !/_raw/.test(f));
 checkGroup('MUSIC', 'music', '.mp3');
 checkGroup('SFX', 'sfx', '.mp3');
 
+// ============================================================
+// VOCAB FILENAME CONTRACT — three independent copies of one rule
+// ============================================================
+// The vocab image filename rule exists in three places that never call each
+// other: slice_vocab_sheet.js fileFor() (the GENERATOR, which decides what is
+// on disk), asset_cache.js vocabImagePath() (the PREFETCHER), and game.js
+// showVocabImage() (the DISPLAY). When they disagree, images silently 404 in
+// front of a student.
+//
+// 2026-09-16a added an apostrophe/comma strip to game.js ONLY, believing no
+// such files existed. It fixed nothing (the generator never strips, so a
+// stripped name can never match a generated file) and broke o'clock.png and
+// chemist's.png, which have existed since 2026-07-27 and are real PU3/Think1
+// vocab entries. This block fails if the three copies ever drift again.
+const vm = require('vm');
+
+function fnFrom(expr, argName) {
+  try { return new Function(argName, 'return (' + expr + ');'); }
+  catch (e) { return null; }
+}
+
+const genSrc = fs.readFileSync(path.join(__dirname, 'slice_vocab_sheet.js'), 'utf8');
+const dispSrc = fs.readFileSync(path.join(__dirname, 'game.js'), 'utf8');
+
+const genM = genSrc.match(/const fileFor = w => ([^;]+);/);
+const dispM = dispSrc.match(/function showVocabImage[\s\S]*?const filename = ([^;]+);/);
+const prefM = src.match(/function vocabImagePath\(word\)\s*\{[\s\S]*?return 'images\/vocab\/' \+ ([^;]+);/);
+
+ok(!!genM, 'extracted the generator rule from slice_vocab_sheet.js');
+ok(!!dispM, 'extracted the display rule from game.js showVocabImage()');
+ok(!!prefM, 'extracted the prefetch rule from asset_cache.js vocabImagePath()');
+
+const genF  = genM && fnFrom(genM[1], 'w');
+const dispF = dispM && fnFrom(dispM[1], 'word');
+const prefF = prefM && fnFrom(prefM[1], 'word');
+
+// The three copies return slightly different shapes (the generator and the
+// prefetcher append '.png' and the prefetcher is prefixed at the call site,
+// while showVocabImage adds both afterwards). Normalise to a bare basename so
+// the comparison tests the RULE, not the string assembly around it.
+const base = fn => w => {
+  let s = fn(w);
+  s = s.replace(/^images\/vocab\//, '');
+  return s.replace(/\.png$/, '');
+};
+const genB  = genF  && base(genF);
+const dispB = dispF && base(dispF);
+const prefB = prefF && base(prefF);
+
+// Every vocab string across every content pack.
+const sandbox = { TEACHING_CONTENT: {} };
+vm.createContext(sandbox);
+for (const f of fs.readdirSync(__dirname).filter(n => /^content_.*\.js$/.test(n))) {
+  try { vm.runInContext(fs.readFileSync(path.join(__dirname, f), 'utf8'), sandbox, { filename: f }); }
+  catch (e) { /* a pack that will not eval is reported by the count check below */ }
+}
+const vocabWords = [];
+for (const book of Object.values(sandbox.TEACHING_CONTENT || {})) {
+  for (const unit of Object.values(book || {})) {
+    for (const page of Object.values(unit || {})) {
+      for (const v of (page && page.vocab) || []) if (typeof v === 'string') vocabWords.push(v);
+    }
+  }
+}
+ok(vocabWords.length > 100, 'collected vocab words from content packs (' + vocabWords.length + ')');
+
+const PUNCT = vocabWords.filter(w => /['’,]/.test(w));
+ok(PUNCT.length > 0, 'sample includes punctuation-bearing vocab words (' + PUNCT.length + ')');
+
+let dispVsGen = 0, prefVsGen = 0;
+for (const w of vocabWords) {
+  if (dispB && genB && dispB(w) !== genB(w)) dispVsGen++;
+  if (prefB && genB && prefB(w) !== genB(w)) prefVsGen++;
+}
+ok(dispVsGen === 0, 'game.js display rule matches the generator for all ' + vocabWords.length + ' vocab words (mismatches: ' + dispVsGen + ')');
+ok(prefVsGen === 0, 'asset_cache.js prefetch rule matches the generator for all ' + vocabWords.length + ' vocab words (mismatches: ' + prefVsGen + ')');
+
+// The two words the 2026-09-16a strip broke: the file exists ONLY with the apostrophe.
+for (const w of ["o'clock", "chemist's"]) {
+  if (!vocabWords.includes(w)) continue;
+  const want = 'images/vocab/' + w + '.png';
+  ok(fs.existsSync(path.join(__dirname, want)), 'generator-named file is on disk: ' + want);
+  if (dispB) ok(dispB(w) === w, 'game.js keeps the apostrophe in ' + JSON.stringify(w));
+  if (prefB) ok(prefB(w) === w, 'asset_cache.js keeps the apostrophe in ' + JSON.stringify(w));
+  if (dispB) ok(fs.existsSync(path.join(__dirname, 'images/vocab', dispB(w) + '.png')),
+    'game.js resolves ' + JSON.stringify(w) + ' to a file that exists');
+  if (prefB) ok(fs.existsSync(path.join(__dirname, 'images/vocab', prefB(w) + '.png')),
+    'asset_cache.js prefetches ' + JSON.stringify(w) + ' from a file that exists');
+}
+
 console.log('\n--- ASSET MANIFEST ---');
 console.log(pass + ' passed, ' + fail + ' failed');
 console.log('RESULT: ' + (fail === 0 ? 'PASS' : 'FAIL'));

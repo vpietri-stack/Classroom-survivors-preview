@@ -5,7 +5,7 @@
 **Owner files:** `package.json` (`test` script), `test_*.js` (root), `api/test_auth.js`, plus the out-of-chain `vs_*` test family.
 
 `npm test` (root) is the **required-green gate before any commit**. It chains 11 Node scripts
-(`package.json:7`). Verified 2026-09-25: **423 assertions, 0 failures** (counts per file below;
+(`package.json:7`). Verified 2026-09-25: **440 assertions, 0 failures** (counts per file below;
 the stamp guard prints no summary line).
 
 ```text
@@ -19,7 +19,7 @@ test_archive_merge_dashboard.js    # teacher_dashboard mergeAnalytics/getAnalyti
 test_speech_hygiene.js             # Recorder AudioContext teardown + sp* breadcrumbs (10)
 test_td_gate.js                    # Tower Defense live/preview URL gate (jsdom)      (11)
 test_td_core.js                    # Tower Defense core behaviors (Playwright + real Chrome) (23)
-test_asset_manifest.js             # sprites/music/sfx on disk vs AssetCache manifests (154)
+test_asset_manifest.js             # sprite/music/sfx lists + 3-way vocab naming contract (171)
 ```
 
 Two extra aliases: `npm run test:td` = `test_td_gate.js && test_td_core.js`. The backend has its own suite: `cd api && npm test` → `api/test_auth.js` (requires the local Functions runtime on `:7072` + an isolated test container — see [Backend API](10-backend-api.md)).
@@ -54,6 +54,7 @@ These exist because their contracts were broken in production; treat failures as
   - **Block 9 — SR delta sync:** `extractSRDelta` selects only `lastSession === currentSession` entries, the `srDelta` flag rides the body, and a single-entry delta survives — the guard against the 64KB keepalive failure returning.
 - `test_auto_archive_analytics.js` gained the **delta-merge contract** in 2026-09-16c (server merges a flagged delta onto stored state; an absent flag still means full replace).
 - `test_speech_hygiene.js` (2026-09-04) pins that `Recorder.stop()` closes its `AudioContext` and releases references — each sentence gate builds a fresh Recorder, and leaked contexts hit iPadOS Safari's hard limit, killing the WebContent process ~5 min into a session (the "forced refresh" that looked like a network bug). Also pins `csPageHeartbeat` merging `sp*` speech breadcrumbs and carrying them through the restart diagnostic.
+- **Three-way vocab filename contract** (added 2026-09-25a, in `test_asset_manifest.js`): the vocab-image naming rule exists as three *independent copies* that never call each other — `slice_vocab_sheet.js` `fileFor()` (the generator, which decides what is on disk), `asset_cache.js` `vocabImagePath()` (the prefetcher), and `game.js` `showVocabImage()` (the display). The block extracts all three expressions, evaluates them over every vocab string in the content packs, and fails if any disagrees with the generator. It exists because 2026-09-16a patched only the display copy and silently broke two images that worked.
 
 ## Out-of-chain test families (not in `npm test`)
 
