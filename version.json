@@ -1,5 +1,5 @@
 {
-  "version": "2026-09-25a",
+  "version": "2026-09-25b",
   "deployedAt": "2026-09-25",
-  "notes": "Vocab image filename fix (2026-09-25a). The 2026-09-16a strip of apostrophes/commas in game.js showVocabImage was wrong on both counts: slice_vocab_sheet.js (the generator) never strips, so a stripped name can never match a generated file; and o'clock.png + chemist's.png have existed since 2026-07-27 as live PU3/Think1 vocab entries, so the strip 404'd two working illustrations. Strip removed; all three copies of the rule (generator / asset_cache prefetcher / game.js display) now agree. test_asset_manifest.js adds a three-way contract block over all 4339 content-pack vocab words - verified to fail against the old rule. game.js?v= bumped to deliver. Root suite 440 pass, 0 fail."
+  "notes": "Passive ~1km student geolocation capture (frontend_auth.js) diverted by saveAnalytics extractGeoUpdates to the student doc's top-level geo field; teacher dashboard Settings-tab CSV + Baidu-map HTML export with driving-time analysis (geo_export.js). Coordinates rounded to 2 decimals client-side before enqueue and re-rounded server-side; raw GPS never stored."
 }
