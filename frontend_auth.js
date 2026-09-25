@@ -273,6 +273,55 @@ function queueDeviceInfoEvent() {
     try { localStorage.setItem(dayKey, new Date().toDateString()); } catch { /* non-fatal */ }
 }
 
+// --- PASSIVE GEOLOCATION CAPTURE (2026-09-25, campus-relocation survey) ------
+// One ~1km-rounded position fix per student, captured at login via the browser
+// Geolocation API. Privacy: coords are rounded to 2 decimals ON THE CLIENT
+// before enqueue and again server-side (saveAnalytics extractGeoUpdates); the
+// raw GPS fix never leaves the device. Ships as a type:'geo' analytics event
+// through the normal queue (retry/beacon/ack for free); the server diverts it
+// to the student doc's top-level `geo` field — it never enters the analytics
+// array. Retry policy (teacher-mandated): failures retry EVERY login until a
+// fix succeeds; only 'ok' is permanent. Caveats: WeChat Android webview often
+// lacks geolocation (fail flag, silent), and the browser's own permission
+// popup is the consent record.
+function csGeoRound(v) { return Math.round(Number(v) * 100) / 100; }
+function csGeoFlagKey() { return 'csGeoDone_' + (authActiveUser && authActiveUser.id ? authActiveUser.id : ''); }
+function csGeoGetFlag() {
+    try { return JSON.parse(localStorage.getItem(csGeoFlagKey()) || 'null'); } catch { return null; }
+}
+function csGeoSetFlag(status) {
+    try { localStorage.setItem(csGeoFlagKey(), JSON.stringify({ status: status, ts: new Date().toISOString() })); } catch { /* non-fatal */ }
+}
+function csMaybeCaptureGeo() {
+    if (!authActiveUser || isTestMode) return;
+    if (!navigator.geolocation) { csGeoSetFlag('fail'); return; }
+    const flag = csGeoGetFlag();
+    if (flag && flag.status === 'ok') return; // captured once — never ask again
+    navigator.geolocation.getCurrentPosition(
+        (pos) => {
+            if (!authActiveUser || !pos || !pos.coords) { csGeoSetFlag('fail'); return; }
+            const event = {
+                type: 'geo',
+                lat: csGeoRound(pos.coords.latitude),
+                lng: csGeoRound(pos.coords.longitude),
+                timestamp: new Date().toISOString(),
+                eventId: 'geo_' + Date.now() + '_' + Math.random().toString(36).slice(2, 10),
+                ownerId: authActiveUser.id,
+                ps: csPageSessionId
+            };
+            analyticsQueue.push(event);
+            persistAnalyticsQueue();
+            if (!authActiveUser.analytics) authActiveUser.analytics = [];
+            authActiveUser.analytics.push(event);
+            saveActiveUserToCache();
+            scheduleAnalyticsFlush();
+            csGeoSetFlag('ok');
+        },
+        () => { csGeoSetFlag('fail'); }, // retry on next login (per policy)
+        { enableHighAccuracy: false, timeout: 10000, maximumAge: 86400000 }
+    );
+}
+
 /**
  * DRAIN REPORT (2026-09-08, "session-1 ghost"): a self-describing backlog
  * snapshot queued at login BEFORE this login's own events. type:'device' so
@@ -1704,6 +1753,10 @@ function finishLogin() {
     // OS census: record what device/OS this student logs in from (once per
     // device per day). Runs after the teacher redirect so only students count.
     queueDeviceInfoEvent();
+
+    // Campus-relocation survey (2026-09-25): passive ~1km location fix, once
+    // per student until success. Fire-and-forget; rides the normal flush.
+    csMaybeCaptureGeo();
 
     // 2026-08-28a: ship the login event IMMEDIATELY (beacon, non-blocking) so a
     // startup kill leaves its login breadcrumb on the server instead of a total
