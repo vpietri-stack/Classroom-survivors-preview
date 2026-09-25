@@ -124,6 +124,14 @@ ${src}
   try { csMaybeCaptureGeo(); report('missing geolocation API: no throw, fail flag set',
       JSON.parse(localStorage.getItem('csGeoDone_stu1') || 'null').status === 'fail'); }
   catch (e) { report('missing geolocation API: no throw, fail flag set', false); }
+
+  // Tear down the debounced analytics flush timer armed by the success paths
+  // above (scheduleAnalyticsFlush -> setTimeout(flushAnalytics, 2000)). Without
+  // this it fires AFTER the summary prints, emitting a stray "saveAnalytics 200
+  // without full event ack" warning against the bare fetch stub and lingering
+  // ~2s. analyticsFlushTimer is a blob-global (teaching_content.js), so it is
+  // always declared here; clearTimeout(null) is a safe no-op.
+  clearTimeout(analyticsFlushTimer);
 })();
 `;
 
