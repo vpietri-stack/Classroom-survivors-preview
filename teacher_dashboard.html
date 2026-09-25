@@ -229,6 +229,20 @@
                     <span id="settingsSaveStatus" class="save-status"></span>
                 </div>
             </div>
+            <div class="admin-panel">
+                <h3 class="panel-title"><i class="fas fa-map-marker-alt"></i> Student Locations</h3>
+                <p id="geoCoverage" style="font-size:13px;color:#666;margin:4px 0 10px;"></p>
+                <div class="admin-form-grid">
+                    <div class="form-field"><label>百度地图 AK(浏览器端)</label>
+                        <input type="password" id="geoBaiduAk" class="form-input" placeholder="lbsyun.baidu.com → 创建应用 → 浏览器端" onchange="geoSaveAk(this.value)">
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button onclick="exportLocationsCsv()" class="dash-action-btn"><i class="fas fa-file-csv"></i> 导出位置 CSV</button>
+                    <button onclick="exportBaiduMapHtml()" class="dash-action-btn primary"><i class="fas fa-map-marked-alt"></i> 导出百度地图 HTML</button>
+                    <span id="geoExportStatus" class="save-status"></span>
+                </div>
+            </div>
         </div>
 
         <!-- TARGETS TAB (admin) -->
@@ -466,7 +480,8 @@
     <script src="content_think1.js?v=2026-08-01a"></script>
     <script src="content_think2.js?v=2026-08-01a"></script>
     <script src="content_test.js?v=2026-08-01a"></script>
-    <script src="teacher_dashboard.js?v=2026-08-30a"></script>
+    <script src="teacher_dashboard.js?v=2026-09-25b"></script>
+    <script src="geo_export.js?v=2026-09-25b"></script>
     <script src="admin_dashboard.js?v=2026-08-01a"></script>
 </body>
 </html>
