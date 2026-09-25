@@ -100,8 +100,8 @@ function buildBaiduMapHtml(students, ak) {
     return BAH_TEMPLATE
         .replace('__AK__', akSafe)
         .replace('__GENERATED__', generated)
-        .replace('"__STUDENTS__"', data)
-        .replace('"__NOSTUDENTS__"', String((students || []).length - points.length));
+        .replace('"__STUDENTS__"', function () { return data; })
+        .replace('__NOSTUDENTS__', String((students || []).length - points.length));
 }
 
 var BAH_TEMPLATE = [
@@ -259,7 +259,7 @@ function _todayStamp() { return new Date().toISOString().slice(0, 10); }
 function renderGeoCoverage() {
     var el = typeof document !== 'undefined' && document.getElementById('geoCoverage');
     if (!el || typeof allStudents === 'undefined') return;
-    var n = (allStudents || []).filter(function (s) { return s && s.geo && Number.isFinite(Number(s.geo.lat)); }).length;
+    var n = (allStudents || []).filter(function (s) { return s && s.geo && Number.isFinite(Number(s.geo.lat)) && Number.isFinite(Number(s.geo.lng)); }).length;
     el.textContent = n + '/' + (allStudents || []).length + ' students have location data';
 }
 

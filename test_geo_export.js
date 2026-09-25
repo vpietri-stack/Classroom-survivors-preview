@@ -85,8 +85,8 @@ test('HTML: embeds student points as BD-09, injects AK, escapes </script>', () =
     assert.ok(html.includes('const STUDENTS ='), 'data embedded');
     assert.ok(html.includes('"name":"Zhang, San"') || html.includes('\\"name\\":\\"Zhang'), 's1 embedded');
     assert.ok(!/const STUDENTS = [^;]*<\/script/.test(html), 'no raw </script> inside data');
-    assert.ok(html.includes('\\u003c') === false || true); // data JSON must not contain literal <
     const dataLine = html.split('\n').find(l => l.includes('const STUDENTS ='));
+    assert.ok(dataLine.includes('<') === false, 'data line contains no literal < (escaped to \\u003c)');
     assert.ok(!dataLine.includes('</'), 'no literal </ in embedded data line');
     // s2 (no geo) must NOT appear as a map point
     assert.ok(!dataLine.includes('s2') && !dataLine.includes('Lily'));
@@ -96,6 +96,22 @@ test('HTML: driving-time UI hooks present', () => {
     assert.ok(html.includes('DrivingRoute'));
     assert.ok(html.includes('计算驾车时间'));
     assert.ok(html.includes('csCampusPins'));
+});
+test('HTML: __NOSTUDENTS__ and __STUDENTS__ placeholders fully replaced', () => {
+    const html = G.buildBaiduMapHtml(students, 'AK');
+    assert.ok(html.includes('__NOSTUDENTS__') === false, 'no leftover __NOSTUDENTS__ token');
+    assert.ok(html.includes('__STUDENTS__') === false, 'no leftover __STUDENTS__ token');
+    // fixture: s1 has geo; s2 geo:null; s3 no geo field -> 2 without location
+    assert.ok(html.includes('2 名学生暂无位置数据'), 'no-location count is 2');
+});
+test('HTML: $& in student name survives String.replace (no $-pattern corruption)', () => {
+    const html = G.buildBaiduMapHtml(
+        [{ id: 'd1', fullName: 'A$&B', geo: { lat: 25.05, lng: 102.71, capturedAt: '2026-09-25T10:00:00.000Z' } }],
+        'AK');
+    const line = html.split('\n').find(l => l.includes('const STUDENTS ='));
+    const json = line.replace('const STUDENTS =', '').replace(/;\s*$/, '');
+    const arr = JSON.parse(json);
+    assert.strictEqual(arr[0].name, 'A$&B');
 });
 
 console.log(`\n${passed} passed, ${failed} failed`);
