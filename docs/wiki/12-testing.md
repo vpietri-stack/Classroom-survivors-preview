@@ -1,22 +1,25 @@
 # Testing
 
-> **Last verified:** 2026-09-04 · **Part of:** [Classroom-survivors Repo Wiki](README.md)
+> **Last verified:** 2026-09-25 · **Part of:** [Classroom-survivors Repo Wiki](README.md)
 
 **Owner files:** `package.json` (`test` script), `test_*.js` (root), `api/test_auth.js`, plus the out-of-chain `vs_*` test family.
 
-`npm test` (root) is the **required-green gate before any commit**. It chains 10 Node scripts (`package.json` ~7):
+`npm test` (root) is the **required-green gate before any commit**. It chains 11 Node scripts
+(`package.json:7`). Verified 2026-09-25: **423 assertions, 0 failures** (counts per file below;
+the stamp guard prints no summary line).
 
 ```text
-test_deploy_stamp_sync.js          # GUARD — runs FIRST, fails run on stamp drift
-test_widgets_regression.js         # jsdom — scramble/spelling widgets, real scripts
-test_sr_once_per_session.js        # SR spaced-repetition invariants (sr_engine)
-test_round_e_dedup.js              # Round E sub-round pair selection rules
-test_session_flush_deadline.js     # flush deadline + cache-writer hardening (vm)
-test_auto_archive_analytics.js     # saveAnalytics pure helpers (archive + acks)
-test_archive_merge_dashboard.js    # teacher_dashboard mergeAnalytics/getAnalyticsInRange
-test_td_gate.js                    # Tower Defense live/preview URL gate (jsdom)
-test_td_core.js                    # Tower Defense core behaviors (Playwright + real Chrome)
-test_asset_manifest.js             # sprites/music/sfx on disk vs AssetCache manifests
+test_deploy_stamp_sync.js          # GUARD — runs FIRST, fails run on stamp drift   (— )
+test_widgets_regression.js         # jsdom — scramble/spelling widgets, real scripts (81)
+test_sr_once_per_session.js        # SR spaced-repetition invariants (sr_engine)      (22)
+test_round_e_dedup.js              # Round E sub-round pair selection rules           (16)
+test_session_flush_deadline.js     # flush deadline + queue/SR sync contracts (vm)    (84)
+test_auto_archive_analytics.js     # saveAnalytics pure helpers (archive + acks)      (15)
+test_archive_merge_dashboard.js    # teacher_dashboard mergeAnalytics/getAnalyticsInRange (7)
+test_speech_hygiene.js             # Recorder AudioContext teardown + sp* breadcrumbs (10)
+test_td_gate.js                    # Tower Defense live/preview URL gate (jsdom)      (11)
+test_td_core.js                    # Tower Defense core behaviors (Playwright + real Chrome) (23)
+test_asset_manifest.js             # sprites/music/sfx on disk vs AssetCache manifests (154)
 ```
 
 Two extra aliases: `npm run test:td` = `test_td_gate.js && test_td_core.js`. The backend has its own suite: `cd api && npm test` → `api/test_auth.js` (requires the local Functions runtime on `:7072` + an isolated test container — see [Backend API](10-backend-api.md)).
@@ -45,6 +48,12 @@ These exist because their contracts were broken in production; treat failures as
 - `test_sr_once_per_session.js` — SR state written ONCE per session at first check; failure interval rules; leech handling; 1-in-5 new material.
 - `test_round_e_dedup.js` — due-status beats new material; E1 favors current page / E2-E3 avoid it; no repeat pairs in a session. Since 2026-09-08a also pins **Rule5 (cooldown floor: all-cooldown pool still serves 3 least-overdue pairs, never null)** and **Rule6 (`normMatchText` whitespace/case normalization)**.
 - Since 2026-09-08a `test_session_flush_deadline.js` additionally pins the **sticky page-advance** (`csPendingPageAdvance` persists, `reapplyPendingPageAdvance()` restores pre-check, `updateStudent` re-sent until confirmed) and the **`queueDrain` login report** (backlog counts + oldest timestamp + pending SR/increment flags; silent on a clean device).
+- `test_session_flush_deadline.js` is numbered by **block**, and blocks 7–9 pin the three 2026-09-16 sync rounds (test file :597, :639, :659):
+  - **Block 7 — blocker-era hardening:** the 500-event backpressure cap, the 200-event flush chunk, the stringify guard, foreign-`ownerId` dropping, and the save-blocked banner trigger.
+  - **Block 8 — session-first ordering:** session events must reach the head of the batch so a session ack never starves behind an exercise pile (two assertions).
+  - **Block 9 — SR delta sync:** `extractSRDelta` selects only `lastSession === currentSession` entries, the `srDelta` flag rides the body, and a single-entry delta survives — the guard against the 64KB keepalive failure returning.
+- `test_auto_archive_analytics.js` gained the **delta-merge contract** in 2026-09-16c (server merges a flagged delta onto stored state; an absent flag still means full replace).
+- `test_speech_hygiene.js` (2026-09-04) pins that `Recorder.stop()` closes its `AudioContext` and releases references — each sentence gate builds a fresh Recorder, and leaked contexts hit iPadOS Safari's hard limit, killing the WebContent process ~5 min into a session (the "forced refresh" that looked like a network bug). Also pins `csPageHeartbeat` merging `sp*` speech breadcrumbs and carrying them through the restart diagnostic.
 
 ## Out-of-chain test families (not in `npm test`)
 

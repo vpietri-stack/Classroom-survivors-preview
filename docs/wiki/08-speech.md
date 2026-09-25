@@ -1,6 +1,6 @@
 # Speech Recognition & Pronunciation Scoring
 
-> **Last verified:** 2026-09-04 · **Part of:** [Classroom-survivors Repo Wiki](README.md)
+> **Last verified:** 2026-09-25 · **Part of:** [Classroom-survivors Repo Wiki](README.md)
 
 **Owner files:** `speech_engine.js`, `speech_recorder.js`, `speech_scorer.js`, `speech_ui.js`, `speech_debug.js`, `speech_preload.js`, `sr_engine.js`, `test_sr_once_per_session.js`, `models/whisper-tiny.en/`, `api/tune_scorer.js`, `api/analyze_speech.js`, `gen_missing_audio.js`
 
@@ -69,7 +69,11 @@ Local dev / non-Pages hosts: same-origin first, ModelScope backstop.
 The Transformers.js bundle + matched ORT wasm are a **version-locked pair** served from a separate, never-redeployed repo: `vpietri-stack.github.io/Classroom-survivors-lib/tjs-v3/` (`STABLE_LIB_BASE`, `speech_engine.js:256`). Reason: GitHub Pages ETags change on every deploy, which invalidates the browser's *compiled-wasm* cache and forces a ~160 s recompile per device (field-measured 2026-07). `pickLibBase()` (:264) HEAD-probes the stable repo (6s timeout) and falls back to this repo's `lib/` copies. Rules: never edit the lib repo in place; upgrade = new `tjs-vN/` folder + bump `STABLE_LIB_BASE`.
 
 ### IndexedDB model cache
-`whisper-model-cache` DB (`speech_engine.js:31-33`) stores each model file as an ArrayBuffer keyed `whisper-tiny.en-model-v1/<basename>`. A patched `globalThis.fetch` (:159-184) intercepts any URL containing `models/whisper-tiny.en/` and serves from cache, else downloads with timeout+mirror-fallback and caches fire-and-forget. Critical for WeChat, which aggressively evicts the HTTP cache (without this, students re-download 41 MB every pageload).
+`whisper-model-cache` DB (`speech_engine.js:31-33`) stores each model file as an ArrayBuffer keyed `whisper-tiny.en-model-v1/<basename>`. A patched `globalThis.fetch` (`patchFetchForModel`, :159+) intercepts any URL containing `models/whisper-tiny.en/` and serves from cache, else downloads with timeout+mirror-fallback and caches fire-and-forget. Critical for WeChat, which aggressively evicts the HTTP cache (without this, students re-download 41 MB every pageload).
+
+**API bypass (2026-09-16a) — the patch must never see API traffic.** `patchedFetch` now short-circuits first: any URL matching `/api/(saveAnalytics|login|updateStudent|getStudents|changePassword)` goes straight to the raw `origFetch`, *before* the model-`rel` check. Motivation: in one student's network log **every** analytics failure stacked through `patchedFetch`, which made an unrelated speech-cache bug look like a saving bug — and left it capable of breaking saves. Because this module monkey-patches a *global* used by the whole app, the allow-list is the safety boundary: a cache-layer defect can now only ever affect model loading, never data delivery. When adding endpoints to `apiFetch` callers, consider whether they need to join that pattern.
+
+Delivery caveat: `speech_engine.js` is cache-busted by its own integer counter in `index.html` (`?v=11`, index.html:750), **not** by `APP_VERSION`. The API-bypass patch was merged and deployed but *not re-fetched* by real browsers until that counter moved in `2026-09-16c` — a fix behind a stale sub-resource stamp is an undelivered fix. Bump `?v=` whenever you change a non-`frontend_auth.js` script. See [Auth & Versioning](04-auth-versioning.md).
 
 ### Transcription details (`transcribe`, `speech_engine.js:492-545`)
 - Input: 16-bit PCM WAV Blob (hand-rolled `decodeWav`, handles float/16-bit/8-bit, true sample rate) or Float32Array; linear-resampled to 16 kHz.

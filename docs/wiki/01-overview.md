@@ -1,6 +1,6 @@
 # Classroom-survivors Repo Wiki
 
-> **Last verified:** 2026-09-04 · **Part of:** [Classroom-survivors Repo Wiki](README.md)
+> **Last verified:** 2026-09-25 · **Part of:** [Classroom-survivors Repo Wiki](README.md)
 
 **Purpose:** the single source of truth for what this project IS and HOW it works — architecture, data model, subsystems, deployment, telemetry, and history. Any agent (human or AI) working in this repo should start here.
 
@@ -27,13 +27,14 @@ A **vanilla-JS + Phaser ESL (English as a Second Language) learning game** for V
 | Understand telemetry / debug data loss | [Telemetry](14-telemetry.md) |
 | Avoid re-breaking something that shipped a bug before | [Gotchas & History](15-gotchas-and-history.md) |
 
-## The five load-bearing facts
+## The six load-bearing facts
 
 1. **Deploy version stamps must stay in sync** — three values (`version.json`, `frontend_auth.js` `APP_VERSION`, `index.html` `?v=`) must be byte-identical or every user gets a red "cannot save progress" banner. Enforced by `test_deploy_stamp_sync.js`. See [Auth/Versioning](04-auth-versioning.md) and [Deployment](13-deployment.md).
 2. **Never `git add -A` / `git add .`** — stage explicit paths. The repo has large untracked artifacts (`api/speech_events_dump_full.json`) and gitignored secrets (`app-config.json`).
 3. **Branch model:** work on `preview` → merge to `main` → push `HEAD:refs/heads/main` to **both** remotes (`origin` = production Pages + SWA, `preview` = preview site). All four refs end equal. See [Deployment](13-deployment.md).
 4. **Client data flow is queue → ack → flush** — events queue in localStorage with stable `eventId`s; the client only drains its queue when the server's response accounts for every shipped event (per-event acks). This exists because iPads die mid-flight constantly. See [Telemetry](14-telemetry.md).
 5. **Names lie** — "Round C = Spelling" is a 10-key random keyboard; the game-mode `spelling` minigame is actually a letter-based word scramble. Always re-derive behavior from code. See [Study Mode](05-study-mode.md) and [Game Modes](06-game-modes.md).
+6. **The sync path must stay bounded and small** — the queue is capped (500 events, 200-event batches, a stringify guard), SR updates travel as **per-session deltas** (a 65KB full-state packet exceeds Chromium's ~64KB keepalive cap and then *every* flush fails without server contact), and session-scoped localStorage keys are **per-student**. Any change that lets the queue or a request body grow without limit can freeze a child's page or silently poison a classmate's account. See [Telemetry](14-telemetry.md).
 
 ## System overview
 
@@ -42,7 +43,7 @@ flowchart LR
     subgraph Client ["Browser (GitHub Pages, static)"]
         UI["index.html + ~30 scripts<br/>game, study mode, minigames, speech"]
         AUTH["frontend_auth.js<br/>session + queue + flush + watchdog"]
-        LS[("localStorage<br/>savedUsers, event queue")]
+        LS[("localStorage<br/>savedUsers, per-account event queue")]
     end
     subgraph Azure ["Azure Static Web Apps"]
         FN["Azure Functions (Node)<br/>login, getStudents, saveAnalytics,<br/>addStudent, updateStudent, ..."]

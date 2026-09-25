@@ -82,7 +82,7 @@ Every deploy that clients must pick up requires the **three stamps** to be bumpe
 see [Auth & Versioning](04-auth-versioning.md) for the watchdog mechanics:
 
 1. Pick a stamp `YYYY-MM-DD` + optional lowercase letter (comparison: year → month → day →
-   letter). Current: `2026-09-03a`.
+   letter). Current: `2026-09-16c`.
 2. Set all three: `version.json` `"version"` · `frontend_auth.js` `const APP_VERSION` ·
    `index.html` `frontend_auth.js?v=` (script-tag line ~731).
 3. `npm test` must pass — `test_deploy_stamp_sync.js` runs **first** and exits non-zero on any

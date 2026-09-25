@@ -1,6 +1,6 @@
 # Project Structure & File Map
 
-> **Last verified:** 2026-09-04 · **Part of:** [Classroom-survivors Repo Wiki](README.md)
+> **Last verified:** 2026-09-25 · **Part of:** [Classroom-survivors Repo Wiki](README.md)
 
 **Owner files:** `index.html`, `package.json`, `.github/workflows/azure-static-web-apps-brave-bush-0438ab000.yml`, `AGENTS.md`
 
@@ -47,17 +47,17 @@ directly with a `?v=` cache-buster; files share state through the global JS name
 
 | File | ~Lines | Role |
 |---|---|---|
-| `frontend_auth.js` | 1814 | Login, session tokens, version watchdog, analytics queue + all flush paths, restart telemetry, offline banner. See [Auth & Versioning](04-auth-versioning.md). |
-| `teaching_content.js` | 545 | Declares the global shared state (`authActiveUser`, `analyticsQueue`, wizard selections) and all spaced-repetition content-selection helpers. despite the name, it holds **no** content data — packs do. |
-| `sr_engine.js` | 329 | Pure SR math (no DOM/Phaser): `itemKey()`, `getSRPriority()`, cooldown/priority groups, selection helpers. Loaded before `teaching_content.js`. |
-| `sw.js` | 49 | (above) registered with `?v=APP_VERSION` from `frontend_auth.js:855`. |
+| `frontend_auth.js` | 2089 | Login, session tokens, version watchdog, analytics queue + all flush paths, restart telemetry, offline banner, save-blocked banner. See [Auth & Versioning](04-auth-versioning.md). |
+| `teaching_content.js` | 667 | Declares the global shared state (`authActiveUser`, `analyticsQueue`, wizard selections), the **per-account localStorage scoping** (`persistedQueueKey`/`scopedKey`/`migrateScopedKey`, `resetInMemorySessionState`), and all spaced-repetition content-selection helpers. despite the name, it holds **no** content data — packs do. |
+| `sr_engine.js` | 418 | Pure SR math (no DOM/Phaser): `itemKey()`, `getSRPriority()`, cooldown/priority groups, selection helpers, and the 2026-09-16c delta pair `extractSRDelta()` / `mergeSRDelta()`. Loaded before `teaching_content.js`. |
+| `sw.js` | 49 | (above) registered with `?v=APP_VERSION` from `frontend_auth.js` (`registerAppUpdateServiceWorker`). |
 
 ### Study mode & game modes
 
 | File | ~Lines | Role |
 |---|---|---|
-| `game.js` | 2345 | Dashboard/menu wiring + the three game-mode ESL minigames (`startMiniGame()` dispatcher: spelling→scramble, wordrec, scramble→sentence reorder, sentencematch), SFX sampling, global gesture unlock, `getLocalTranslation()`. |
-| `study_mode.js` | 1360 | Study Mode rounds — internal functions A/C/D/E/F, on-screen labels A / B / C / D / Match (labels and internals disagree; see [Study Mode](05-study-mode.md)); `STUDY_STATE` global; `finishStudySession()` awaits the deadline flush. |
+| `game.js` | 2348 | Dashboard/menu wiring + the three game-mode ESL minigames (`startMiniGame()` dispatcher: spelling→scramble, wordrec, scramble→sentence reorder, sentencematch), SFX sampling, global gesture unlock, `getLocalTranslation()`, `showVocabImage()` (incl. the 2026-09-16a apostrophe/comma filename strip). |
+| `study_mode.js` | 1369 | Study Mode rounds — internal functions A/C/D/E/F, on-screen labels A / B / C / D / Match (labels and internals disagree; see [Study Mode](05-study-mode.md)); `STUDY_STATE` global; `finishStudySession()` awaits the deadline flush. |
 | `vampire_survivors.js` | 4035 | The flagship Phaser run-and-gun: MainScene, enemies/bosses/items, character select, `populateGameOver()` (awaits deadline flush). |
 | `gomoku.js` | 781 | Five-in-a-row mode with ESL questions (`endGomokuGame()` awaits deadline flush). |
 | `uno.js` | 1821 | UNO mode with ESL question cards (`endUno()` awaits deadline flush, tension/countdown overlays). |
@@ -68,12 +68,12 @@ directly with a `?v=` cache-buster; files share state through the global JS name
 
 | File | ~Lines | Role |
 |---|---|---|
-| `sr_engine.js` | 329 | (also listed above) spaced-repetition priority engine. |
+| `sr_engine.js` | 418 | (also listed above) spaced-repetition priority engine. |
 | `speech_preload.js` | 78 | Invisible first-load preload of the Whisper model so it's ready by a speech round. |
-| `speech_engine.js` | 557 | Engine: model load, transcription (`LocalEngine` global). Streams the 41 MB model via the gh-proxy mirror. |
-| `speech_recorder.js` | 161 | Microphone capture (`Recorder` global). |
+| `speech_engine.js` | 588 | Engine: model load, transcription (`LocalEngine` global). Streams the 41 MB model via the gh-proxy mirror. `patchedFetch` allow-list-bypasses `/api/*` so the model cache layer can never break saving (2026-09-16a). |
+| `speech_recorder.js` | 179 | Microphone capture (`Recorder` global). `stop()` must close its AudioContext — see [Testing](12-testing.md). |
 | `speech_scorer.js` | 191 | Pronunciation scoring (`Scorer` global). |
-| `speech_ui.js` | 566 | Inline recording UI (`.rec-inline` indicator that BGM ducks on). |
+| `speech_ui.js` | 585 | Inline recording UI (`.rec-inline` indicator that BGM ducks on). |
 | `speech_debug.js` | 153 | Temporary on-screen load diagnostics + `window.__speechLog`. |
 
 ### Dashboards
@@ -90,7 +90,7 @@ directly with a `?v=` cache-buster; files share state through the global JS name
 | File | ~Lines | Role |
 |---|---|---|
 | `translations.js` | 5318 | One flat object `LOCAL_TRANSLATIONS` (~5.1k `"english": "中文"` entries), grouped by comment banners; consumed by `getLocalTranslation()` in `game.js:10`. |
-| `teaching_content.js` | 545 | Declares `TEACHING_CONTENT = {}` / `AVAILABLE_CONTENT = {}` + shared wizard state + SR selection helpers (`getStudyContentSR`, `getGameItemSR`, …). |
+| `teaching_content.js` | 667 | Declares `TEACHING_CONTENT = {}` / `AVAILABLE_CONTENT = {}` + shared wizard state + per-account localStorage scoping + SR selection helpers (`getStudyContentSR`, `getGameItemSR`, …). |
 | `content_pu1.js` | 1689 | Pack PU1: `TEACHING_CONTENT["PU1"]` (units 0–9) + `AVAILABLE_CONTENT["PU1"]` (~1678). |
 | `content_pu2.js` | 1475 | Pack PU2 (units 0–9). |
 | `content_pu3.js` | 876 | Pack PU3 (units 0–8). |
@@ -105,20 +105,23 @@ See [Frontend Core](03-frontend-core.md) for pack structure and selection flow.
 
 `package.json` runs them in this exact order (`test_deploy_stamp_sync.js` first, non-skippable):
 
-| Order | File | ~Lines | Covers |
-|---|---|---|---|
-| 1 | `test_deploy_stamp_sync.js` | 73 | The three-stamp sync rule (see [Deployment](13-deployment.md)). |
-| 2 | `test_widgets_regression.js` | 570 | Study/game widget behaviors via jsdom. |
-| 3 | `test_sr_once_per_session.js` | 172 | SR once-per-session recording. |
-| 4 | `test_round_e_dedup.js` | 188 | Sentence-pair sub-round dedup/proximity (pairs logic now driven by internal Round F). |
-| 5 | `test_session_flush_deadline.js` | 428 | Flush deadline, beacon paths, restart diagnostics, ack discipline. |
-| 6 | `test_auto_archive_analytics.js` | 242 | Server-side analytics auto-archive logic. |
-| 7 | `test_archive_merge_dashboard.js` | 86 | Dashboard archive-merge. |
-| 8 | `test_td_gate.js` | 71 | `TD_ENABLED` runtime gating. |
-| 9 | `test_td_core.js` | 163 | TD core logic. |
-| 10 | `test_asset_manifest.js` | 71 | `asset_cache.js` sprite lists cover every sprite on disk. |
-| — | `test_headless.js` | 54 | Standalone Playwright smoke (`file://` load, 0 pageerrors). Not in `npm test`. |
-| — | `test_settings_login_field.js` | 62 | One-off regression (login field), run manually. |
+| Order | File | Lines | Assertions | Covers |
+|---|---|---|---|---|
+| 1 | `test_deploy_stamp_sync.js` | 73 | — (guard) | The three-stamp sync rule (see [Deployment](13-deployment.md)). |
+| 2 | `test_widgets_regression.js` | 570 | 81 | Study/game widget behaviors via jsdom. |
+| 3 | `test_sr_once_per_session.js` | 172 | 22 | SR once-per-session recording. |
+| 4 | `test_round_e_dedup.js` | 230 | 16 | Sentence-pair sub-round dedup/proximity (pairs logic now driven by internal Round F). |
+| 5 | `test_session_flush_deadline.js` | 688 | 84 | Flush deadline, beacon paths, restart diagnostics, ack discipline, sticky page-advance, `queueDrain`, `srSeq`, + blocks 7–9 (blocker-era hardening, session-first ordering, SR delta sync). |
+| 6 | `test_auto_archive_analytics.js` | 283 | 15 | Server-side analytics auto-archive + ack + SR delta-merge logic. |
+| 7 | `test_archive_merge_dashboard.js` | 86 | 7 | Dashboard archive-merge. |
+| 8 | `test_speech_hygiene.js` | 138 | 10 | `Recorder.stop()` AudioContext teardown + `sp*` crash breadcrumbs. |
+| 9 | `test_td_gate.js` | 71 | 11 | `TD_ENABLED` runtime gating. |
+| 10 | `test_td_core.js` | 163 | 23 | TD core logic. |
+| 11 | `test_asset_manifest.js` | 71 | 154 | `asset_cache.js` sprite lists cover every sprite on disk. |
+| — | `test_headless.js` | 54 | — | Standalone Playwright smoke (`file://` load, 0 pageerrors). Not in `npm test`. |
+| — | `test_settings_login_field.js` | 62 | — | One-off regression (login field), run manually. |
+
+**11 chained files, 423 assertions, 0 failures** as verified 2026-09-25.
 
 ### VS / TD asset tools (root, one-off, not deployed)
 

@@ -1,6 +1,6 @@
 # Backend API: Azure Functions
 
-> **Last verified:** 2026-09-04 · **Part of:** [Classroom-survivors Repo Wiki](README.md)
+> **Last verified:** 2026-09-25 · **Part of:** [Classroom-survivors Repo Wiki](README.md)
 
 **Owner files:** `api/src/functions/*.js`, `api/src/functions/shared/*.js`, `api/package.json`, `api/host.json`, `staticwebapp.config.json`, `.github/workflows/azure-static-web-apps-brave-bush-0438ab000.yml`
 
@@ -17,7 +17,7 @@ All HTTP triggers use `authLevel: 'anonymous'` — real gating is two applicatio
 | `getStudents.js` | GET | `getStudents` | List students (privileged: all, optional `?includeSecure=true` returns plaintext passwords for recovery). Student token: only own record, never password | App key + token (legacy no-token mode allowed when `REQUIRE_AUTH` off) |
 | `getStudentArchive.js` | GET | `getStudentArchive` | Fetch a student's `student_analytics_archive` docs (older trimmed events) | App key + privileged token or self |
 | `addStudent.js` | POST | `addStudent` | Create student doc (+ `bmActivity` audit log) | App key + privileged token |
-| `updateStudent.js` | POST | `updateStudent` | Edit whitelisted fields (`book, unit, page, classTime, password, needsPasswordChange, fullName, login, targets, teacher, vsPromoSeen`) + audit log | App key + privileged token |
+| `updateStudent.js` | POST | `updateStudent` | Edit whitelisted fields (`book, unit, page, classTime, password, needsPasswordChange, fullName, login, targets, teacher, vsPromoSeen`) + audit log | App key + privileged token — **or** a student's own token for `book`/`unit`/`page` on its own id (self-service auto-advance, 2026-09-16a) |
 | `setTargets.js` | POST | `setTargets` | Bulk-assign practice targets `{startTime, endTime, targetSessions}` to many students; replaces fully-covered existing targets | App key + privileged token |
 | `manageBms.js` | GET, POST | `manageBms` | GET `?action=list` (BM accounts) / `?action=logs` (`bmActivity` docs). POST `add` / `changePassword` (self only) / `delete` | App key + privileged token (self-scoped for `changePassword`) |
 | `changePassword.js` | POST | `changePassword` | Self-service password change; stores **scrypt hash**, clears `needsPasswordChange` | App key + self-or-role token |
@@ -30,6 +30,7 @@ All HTTP triggers use `authLevel: 'anonymous'` — real gating is two applicatio
 - **Identity is never client-supplied when a token exists.** `saveAnalytics` parses the body first because unload-time `sendBeacon`/`keepalive` flushes cannot set headers — the token rides in `body.authToken` (and the app key in `?appKey=`), but the acting identity is `token.sub`, never `body.studentId` (saveAnalytics.js ~141-153). Legacy no-token mode (REQUIRE_AUTH off) falls back to client-supplied ids for backward compat.
 - **Plaintext password policy (deliberate):** students' passwords are stored plaintext (addStudent.js ~43) so the teacher dashboard can display them for recovery — the student-facing `changePassword` endpoint stores a proper scrypt hash (`scrypt$salt$hash`, shared/auth.js ~155). On login, if a stored password is a hash or missing, the verified plaintext is transparently re-stored (`needsPlaintextRecovery`, login.js ~76). This is a conscious trade-off, not an oversight — don't "fix" it without replacing the dashboard recovery feature.
 - **BM = "branch manager"** — a helper role (e.g. a parent/assistant) that can manage students; privileged roles are `['teacher', 'BM', 'admin']` (`PRIV_ROLES`).
+- **Self-service placement is the one deliberate exception to privileged-write** (2026-09-16a). The SR auto-advance runs on the *student's* device and calls `updateStudent` with `{book, unit, page}` — which 403'd forever, so a 43→48 page move could never stick server-side (the client kept re-deriving the old page each login). A student token may now write **only** `SELF_PLACEMENT_FIELDS = ['book','unit','page']` and **only** when `token.sub === body.studentId`; the role check is skipped solely when every submitted key passes that test. Any other field, or a different `studentId`, still requires a privileged role.
 
 ## Auth layers in detail
 
@@ -64,8 +65,9 @@ Read-modify-write of the whole student doc; carries the hardest-won concurrency 
 6. **Delivery diagnostics (best-effort, never fails the save):** upserts a single-slot ring doc `delivery_diag_saveAnalytics` (`type: 'delivery_diagnostics'`) recording the last accepted request: `{ts, studentId, added, total, ua (≤120 chars), transport: 'header'|'body'}`. With no App Insights on the SWA, this doc is the only server-side trace of whether fetch-path flushes physically arrive. Absence of a device's UA here while its events keep arriving (via beacon) proves edge/network loss. It is a **single-slot** record — last request wins.
 7. **Response 200:** `{success, message, addedEventIds, duplicateEventIds, sessionCount, srApplied, srSeq}` — errors: 403 (app key), 400 (no events array), 404 (student not found), 409 (etag retries exhausted), 500 (unexpected).
 8. **SR newer-wins (2026-09-10):** each client SR update carries monotonic `body.srSeq` (stamped in `finalizeSession`); `shouldApplySr` (exported pure) applies only if newer than the doc's stored `user.srSeq`, so lost-response replays and beacon+fetch duplicates can never re-apply stale state or double-increment `sessionCount`. Legacy bodies without `srSeq` keep apply-always. The response confirms `srApplied` + echoes `srSeq`; the client advances its `confirmedSrSeq` watermark and suppresses anything at/below it.
+9. **SR delta merge (2026-09-16c):** `body.srDelta: true` means `srState` holds only the entries touched this session, so the server **merges** it onto the stored doc (key-overwrite per `vocab`/`sentences`/`sentencePairs`) instead of replacing. Absent flag = legacy full replace, so an old client keeps working unchanged. The merge is inlined in `saveAnalytics.js` because the client-side `mergeSRDelta` helper in `sr_engine.js` is not importable from the Function. This exists because a long-enrolled student's full SR state grew to 65KB and blew Chromium's ~64KB keepalive cap — see [Telemetry](14-telemetry.md#sr-delta-sync-why-the-completion-packet-is-a-few-kb).
 
-Also supports `srState` (speech-recognition state) and `incrementSession` (bumps `sessionCount`, rides only with an applied SR update).
+`srState` is the **spaced-repetition** state (`sr_engine.js`), *not* speech recognition — the abbreviation collision is a known readability trap. `incrementSession` bumps `sessionCount` and rides only with an applied SR update.
 
 ## Environment variables (names only)
 

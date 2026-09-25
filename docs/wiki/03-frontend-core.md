@@ -1,6 +1,6 @@
 # Frontend Core: Boot, Config, Content & Assets
 
-> **Last verified:** 2026-09-04 · **Part of:** [Classroom-survivors Repo Wiki](README.md)
+> **Last verified:** 2026-09-25 · **Part of:** [Classroom-survivors Repo Wiki](README.md)
 
 **Owner files:** `boot.js`, `config.js`, `class_config.js`, `teaching_content.js`, `content_*.js`, `translations.js`, `asset_cache.js`, `bgm.js`, `sr_engine.js`, `gen_missing_audio.js`
 
@@ -172,6 +172,16 @@ the 41 MB Whisper download (header comment asset_cache.js:1–29):
    `getBlobUrl()` (memory → IndexedDB → mirror; `null` if all fail), `prefetch(paths)`,
    plus path helpers `vocabImagePath()` / `audioPath()` matching game.js conventions
    (asset_cache.js:282–289).
+   **Vocab filename convention** (`showVocabImage`, game.js:36): lowercase, spaces → `-`,
+   and since 2026-09-16a apostrophes/commas are **stripped** — `we're` → `were.png`, not
+   `we-re.png`. No file was ever named with an apostrophe, so contracted vocab items silently
+   missed their illustration.
+   > ⚠️ **Known divergence (found 2026-09-25, unfixed):** `asset_cache.js vocabImagePath()`
+   > (asset_cache.js:283) still uses only `replace(/ /g,'-')`. For a contracted word the
+   > *prefetch* therefore requests `we're.png` (404) while *display* requests `were.png` — so
+   > contracted vocab images are never prefetched and fall back to a cold same-origin fetch on
+   > first show. Mirror the strip in `vocabImagePath()` (or, better, have both call one shared
+   > helper) before adding more filename rules.
 4. **Manifests**: `TD_SPRITES` (asset_cache.js:58), `VS_SPRITES` (:79), `MUSIC` (:131),
    `SFX` (:138) list every runtime asset; `test_asset_manifest.js` asserts the lists cover every
    sprite on disk, so a new sprite **cannot** ship unprefetched.

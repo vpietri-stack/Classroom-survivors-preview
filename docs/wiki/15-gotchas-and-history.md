@@ -1,6 +1,6 @@
 # Gotchas & Project History
 
-> **Last verified:** 2026-09-04 · **Part of:** [Classroom-survivors Repo Wiki](README.md)
+> **Last verified:** 2026-09-25 · **Part of:** [Classroom-survivors Repo Wiki](README.md)
 
 **Purpose:** the "don't re-break this" page. Every entry here cost a real bug, a lost deploy, or lost student data. Subsystem-specific gotchas live on their pages ([Study Mode](05-study-mode.md), [Game Modes](06-game-modes.md), [Backend API](10-backend-api.md), [Telemetry](14-telemetry.md)); this page holds the cross-cutting rules, the deploy/process discipline, and the index of historical write-ups.
 
@@ -27,6 +27,16 @@
 16. **A null selector pool must never dead-end a session.** Success doubles SR intervals, so long-term students eventually put everything on cooldown — serve least-overdue cooldown items (the floor in `sortPoolBySR`/`pickWithNewQuota`) instead of returning null. See [Study Mode](05-study-mode.md).
 17. **CHECK handlers compare display text with `normMatchText`, never strict equality.** Tile HTML interpolation adds invisible whitespace; strict `===` can fail a visually-correct placement forever with no error shown. See [Study Mode](05-study-mode.md).
 
+### Added after the 2026-09-16 sync rounds
+
+18. **A synchronous throw inside `try` can escape its own `catch`.** `JSON.stringify(body)` ran *before* the first `await`, so an `Invalid string length` on a huge backlog skipped the network-error handler entirely and wedged the page. Guard serialization in its own `try`, and size-limit the payload. See [Telemetry](14-telemetry.md#boundedness-the-queue-must-never-be-able-to-wedge-the-page).
+19. **`fetch(keepalive)` bodies are capped at ~64KB (Chromium) and fail with no server contact.** Over the cap you get `Failed to fetch`, which looks *identical* to a blocked/offline network — but retrying never helps, and because the pending SR update rides along, one oversized field can break **every** flush for that account. Anything that grows monotonically per student (SR history) must go over the wire as a **delta**. This is the single most counter-intuitive delivery failure in the project.
+20. **Anything persisted to localStorage on a shared device must be scoped to the student id.** Global keys (`csAnalyticsQueue`, `csPendingSRState`, …) let one login inherit and flush another child's data — reproduced when test accounts were served a classmate's vocabulary. Keys are now `_<id>`-suffixed via `scopedKey()`/`migrateScopedKey()`, events carry `ownerId`, and `saveUserToLocalAndStart()` resets in-memory state *before* assigning `authActiveUser`. Device-wide keys (`savedUsers`, `activeUserId`, `csSessionToken`, page-heartbeat) are the deliberate exception. See [Data Model](11-data-model.md#client-persistence-localstorage-keys).
+21. **A module that monkey-patches a global owns every later caller.** `speech_engine.js` replaced `globalThis.fetch` for model caching; every API failure then stacked through that patch, making a speech bug look like a saving bug. API routes now bypass it explicitly. When patching `fetch`/`XMLHttpRequest`/`AudioContext`, add an allow-list bypass and keep the patch's blast radius to its own resource class.
+22. **Banner wording must match the failure mode.** The red banner says "re-enter your password"; a student whose saves are being eaten by uBlock/AdGuard who follows that advice breaks their own session for nothing. Network-throw streaks (page loads fine, `/api` unreachable) get the distinct orange save-blocked banner telling them to check their blocker. Do not merge these two banners.
+23. **A fix that isn't re-fetched isn't deployed.** `speech_engine.js` carries its own integer `?v=` counter, not `APP_VERSION`; the API-bypass patch sat in production, edited-but-undelivered, until `?v=11` moved in `2026-09-16c`. Extends rule 15 — when you touch *any* script whose URL has its own counter, bump that counter, not just the three stamps.
+24. **Student tokens may write their own placement.** `updateStudent` was privileged-only, so the client-side SR auto-advance 403'd forever and a page move could never stick. A login may now update `book`/`unit`/`page` for **its own** id only. Tighten this only with a matching client-side re-check — the auto-advance has no other path to the server. See [Backend API](10-backend-api.md).
+
 ## Historical write-ups (repo root)
 
 Context-rich incident documents. The wiki distills their conclusions; read the originals for full detail.
@@ -35,7 +45,8 @@ Context-rich incident documents. The wiki distills their conclusions; read the o
 |---|---|
 | `DEPLOY_VERSION_STAMP.md` | Root-cause writeup of the 2026-08-30 stamp-drift banner incident + bump discipline |
 | `HANDOFF_SESSION_REFRESH_FIX.md` / `HANDOFF_SESSION_FIX_FULL.md` / `SESSION_REFRESH_ROOTCAUSE_2026-08-25.md` | 2026-08 session-refresh / forced-refresh saga (login beacon, flush primitives) |
-| `HANDOFF_SESSION_REFRESH_FIX.md` R7–R9 | 2026-09 silent-200 → lost-update race → all-cooldown/page-43/stuck-CHECK incident set (per-event acks, IfMatch retry, cooldown floor, sticky advance, `normMatchText`, `queueDrain`) |
+| `HANDOFF_SESSION_REFRESH_FIX.md` R6–R9 | 2026-09 silent-200 → ack discipline → lost-update race + PK-safe writes + speech hygiene → all-cooldown/page-43/stuck-CHECK (per-event acks, IfMatch retry, cooldown floor, sticky advance, `normMatchText`, `queueDrain`) |
+| *(no root handoff doc)* `2026-09-16a/b/c` | 2026-09-16 sync rounds: blocker-era freeze → session starvation → 64KB keepalive cap. **Distilled into [Telemetry](14-telemetry.md) and the R11–R13 rows of [Auth/Versioning §4](04-auth-versioning.md)** — those wiki sections are currently the only write-up. |
 | `PROJECT_STATE_HANDOFF.md` / `PROJECT_HANDOFF_2026-07-29.md` | Point-in-time project state snapshots (July 2026) |
 | `SECURITY_AUDIT_HANDOFF.md` | Security audit: token transport, plaintext-password trade-off, app-key threat model |
 | `TD_HANDOFF_QODERCN.md` | Tower Defense handoff (modes, gating, timers) |

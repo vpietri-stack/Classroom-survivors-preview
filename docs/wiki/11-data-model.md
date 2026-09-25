@@ -1,6 +1,6 @@
 # Data Model: Cosmos DB & Client Persistence
 
-> **Last verified:** 2026-09-04 · **Part of:** [Classroom-survivors Repo Wiki](README.md)
+> **Last verified:** 2026-09-25 · **Part of:** [Classroom-survivors Repo Wiki](README.md)
 
 **Owner files:** `api/src/functions/shared/db.js`, `api/src/functions/saveAnalytics.js`, `teaching_content.js`, `frontend_auth.js`, `api/src/functions/shared/auth.js`
 
@@ -54,7 +54,7 @@ Fields written by the API (addStudent.js ~40-57 + later mutations). Client-visib
   "sessionCount": 7,                 // incremented via saveAnalytics incrementSession (rides only with an applied SR update, 2026-09-10)
   "srSeq": 1789040382646,             // monotonic seq of last applied SR update; server applies only newer (shouldApplySr), client watermark confirmedSrSeq (2026-09-10)
   "analytics": [ /* event array — see below; auto-trimmed at 700 */ ],
-  "srState": { "vocab": {}, "sentences": {}, "sentencePairs": {} },  // spaced-repetition state
+  "srState": { "vocab": {}, "sentences": {}, "sentencePairs": {} },  // spaced-repetition state (server holds the FULL state; client ships per-session deltas)
   "targets": [
     { "id": "t_<ts>_<rand>", "startTime": "ISO", "endTime": "ISO",
       "targetSessions": 5, "manualOffset": 0 }   // manualOffset: teacher-adjusted counter delta
@@ -64,17 +64,18 @@ Fields written by the API (addStudent.js ~40-57 + later mutations). Client-visib
 
 Notes:
 - `targets.manualOffset` exists because teachers manually adjust a student's practice counter (offline sessions reported out-of-band). Completion = server-counted `type:'session'` events in range **+** `manualOffset` (admin_dashboard.js ~234-236, teacher_dashboard.js ~359-361, frontend_auth.js ~1608).
-- `srState` shape is owned by `sr_engine.js` (spaced repetition); `saveAnalytics` overwrites the whole object from the client payload when present.
+- `srState` shape is owned by `sr_engine.js` (spaced repetition). `saveAnalytics` **replaces** the whole object from the client payload when `srDelta` is absent (legacy), but **merges it key-by-key** onto the stored state when `body.srDelta === true` (2026-09-16c) — which is what the current client always sends. Each entry records `lastSession`, and the client's `extractSRDelta` ships only entries whose `lastSession === currentSession`. Consequence for readers: the server copy is the authoritative *full* state, so never assume a delta-only write lost the untouched entries.
+- A per-item entry carries lapse counts too — at `SR_LEECH_LAPSES = 4` an item becomes a "leech" and returns every other session instead of every session, so long-lived docs accumulate items with irregular cadence by design ([SR engine](05-study-mode.md)).
 - `updateStudent` whitelists editable fields (add new fields there or they silently don't persist).
 
 ## Analytics event shapes (client-queued)
 
-All events are created in `frontend_auth.js` and share: `timestamp` (ISO), `eventId` (stable, prefix + ts + random — the dedup key), `ps` (page-session id for restart correlation). Enrichment: `itemDetails` may carry `ua` (device UA captured with speech events — used for fleet delivery surveys).
+All events are created in `frontend_auth.js` and share: `timestamp` (ISO), `eventId` (stable, prefix + ts + random — the dedup key), `ps` (page-session id for restart correlation), **`ownerId`** (the `authActiveUser.id` that queued it — added 2026-09-16a; `flushAnalytics` drops foreign-owned events rather than shipping them under the wrong login). Enrichment: `itemDetails` may carry `ua` (device UA captured with speech events — used for fleet delivery surveys).
 
 | type | Emitted by | Payload |
 |---|---|---|
-| `exercise` | `queueExerciseEvent(exerciseType, mode, itemDetails?, customAttempts?)` (frontend_auth.js ~146) | `exerciseType`, `mode`, `attempts`, `durationMs`, `itemDetails?` (word/sentence + exercise-specific fields, may include `ua`) |
-| `session` | `queueSessionEvent(sessionType, data)` (~180) | `sessionType`, `data` — counts toward weekly targets (dashboards filter on this type) |
+| `exercise` | `queueExerciseEvent(exerciseType, mode, itemDetails?, customAttempts?)` (frontend_auth.js :164) | `exerciseType`, `mode`, `attempts`, `durationMs`, `itemDetails?` (word/sentence + exercise-specific fields, may include `ua`) |
+| `session` | `queueSessionEvent(sessionType, data)` (:211) | `sessionType`, `data` — counts toward weekly targets (dashboards filter on this type). Sorted to the **front** of the queue at flush time (2026-09-16b) so its ack never starves behind an exercise pile. |
 | `device` | `queueDeviceInfoEvent()` (~210) — once per student/device/calendar day | `ua` (≤300ch), `platform`, `maxTouchPoints`, `uaData`, `screen`, `appVersion` — OS census; invisible to dashboards' exercise/session tables by design |
 | (crash breadcrumb) | `csPageHeartbeat` on next launch detecting a dirty kill (~317) | synthesized `exercise`/session events describing the previous page's last activity |
 
@@ -84,13 +85,22 @@ Target-counting only ever uses `type:'session'` events in a date range; exercise
 
 | Key | Owner | Contents |
 |---|---|---|
-| `csAnalyticsQueue` | `teaching_content.js` (`PERSISTED_QUEUE_KEY`, ~40) | The unsent event queue, mirrored on every enqueue/failed flush; removed when the server's ack accounts for every event. Hydrated at script load (`loadPersistedAnalyticsQueue`) — deliberately NOT reset on load. |
-| `csSessionToken` | `frontend_auth.js` (`SESSION_TOKEN_KEY`, ~23) | Current session token (JWT-shaped) |
-| `savedUsers` | `frontend_auth.js` | Array of cached user profiles (incl. plaintext password for quick re-login); `activeUserId` selects |
-| `csPendingSRState` / `csPendingSRIncrement` | `teaching_content.js` (~65-66) | SR state in flight to the server — survives an app-kill between finalize and flush; cleared on ack |
-| `csPageHeartbeat` | `frontend_auth.js` (`CS_HB_KEY`, ~261) | `{ps, state, ts}` breadcrumb of last activity — used to detect hard kills and emit crash breadcrumbs |
-| `csCleanUnload` | `frontend_auth.js` (`CS_UNLOAD_KEY`, ~262) | `'1'` on graceful `pagehide` — absence + stale heartbeat = dirty kill |
-| `csDeviceLogDay_<id>` | `frontend_auth.js` (~212) | Day-key de-dup for `device` events |
+| `csAnalyticsQueue_<id>` | `teaching_content.js` (`persistedQueueKey()`) | The unsent event queue, mirrored on every enqueue/failed flush; removed when the server's ack accounts for every event. Hydrated at script load (`loadPersistedAnalyticsQueue`) — deliberately NOT reset on load. **Per-student since 2026-09-16a** (the global `csAnalyticsQueue` was how one login flushed another student's data); `loadPersistedAnalyticsQueue` still reads the legacy key when the scoped one is absent. Capped at **500** events in memory (oldest shed). |
+| `csSessionToken` | `frontend_auth.js` (`SESSION_TOKEN_KEY`, ~23) | Current session token (JWT-shaped). Device-wide by design, not scoped. |
+| `savedUsers` | `frontend_auth.js` | Array of cached user profiles (incl. plaintext password for quick re-login); `activeUserId` selects. Device-wide by design — it *is* the profile picker. |
+| `csPendingSRState_<id>` | `teaching_content.js` (`persistPendingSR`) | SR state in flight to the server — survives an app-kill between finalize and flush; cleared on ack. Under **quota pressure** this may instead hold a delta envelope `{__srDelta:true, delta:{…}}`, which `loadPersistedSR` merges onto the cached full profile state (or holds alone). |
+| `csPendingSRIncrement_<id>` | `teaching_content.js` | `'1'` when the pending SR update should also bump `sessionCount` |
+| `csPendingSRSeq_<id>` / `csConfirmedSrSeq_<id>` | `teaching_content.js` | Monotonic seq of the pending SR update / highest server-confirmed seq (newer-wins gate, 2026-09-10) |
+| `csPageHeartbeat` | `frontend_auth.js` (`CS_HB_KEY`) | `{ps, state, ts}` breadcrumb of last activity — used to detect hard kills and emit crash breadcrumbs. Page-lifecycle, not per-account. |
+| `csCleanUnload` | `frontend_auth.js` (`CS_UNLOAD_KEY`) | `'1'` on graceful `pagehide` — absence + stale heartbeat = dirty kill |
+| `csDeviceLogDay_<id>` | `frontend_auth.js` | Day-key de-dup for `device` events |
+
+All `_<id>` keys are produced by `scopedKey(base)` and adopted from the legacy global name by
+`migrateScopedKey(base)` (copy once, then delete the global). On every login
+`saveUserToLocalAndStart()` calls `resetInMemorySessionState()` → assigns `authActiveUser` →
+`reloadAnalyticsQueueForActiveUser()` + `loadPersistedSR()`, in that order — the order matters,
+because the scoped-key helpers resolve the suffix from `authActiveUser`. See
+[Auth & Versioning](04-auth-versioning.md).
 
 Queue lifecycle: enqueue → `persistAnalyticsQueue()` → 2s debounced `flushAnalytics()` → on response, drain only if acked fully (see [Telemetry](14-telemetry.md)). `saveActiveUserToCache()` (frontend_auth.js ~1402) is the hardened profile writer (quota-failure path trims the analytics mirror to 500, retries once).
 
