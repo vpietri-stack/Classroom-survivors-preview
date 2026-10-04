@@ -1,6 +1,6 @@
 # Speech Recognition & Pronunciation Scoring
 
-> **Last verified:** 2026-09-25 · **Part of:** [Classroom-survivors Repo Wiki](README.md)
+> **Last verified:** 2026-10-05 · **Part of:** [Classroom-survivors Repo Wiki](README.md)
 
 **Owner files:** `speech_engine.js`, `speech_recorder.js`, `speech_scorer.js`, `speech_ui.js`, `speech_debug.js`, `speech_preload.js`, `sr_engine.js`, `test_sr_once_per_session.js`, `models/whisper-tiny.en/`, `api/tune_scorer.js`, `api/analyze_speech.js`, `gen_missing_audio.js`
 
@@ -12,8 +12,8 @@ The app does **fully in-browser speech recognition** (no server round-trip, no A
 |------|--------|------|
 | `speech_engine.js` (557 ln) | `window.LocalEngine` | Loads Whisper tiny.en (Transformers.js v3, WASM backend), transcribes WAV/Float32 → text |
 | `speech_recorder.js` (161 ln) | `window.Recorder` | Mic capture via getUserMedia + ScriptProcessor → 16-bit mono WAV (VAD-trimmed) |
-| `speech_scorer.js` (191 ln) | `window.Scorer` | Pass/fail decision: char-accuracy OR WER OR phonetic coverage, per level + per book |
-| `speech_ui.js` (566 ln) | `window.SpeechUI` | Record button, sentence gates, junk-audio/hallucination gates, permission recovery, telemetry |
+| `speech_scorer.js` (274 ln) | `window.Scorer` | Pass/fail decision: char-accuracy OR WER OR phonetic coverage, per level + per book + **per try** |
+| `speech_ui.js` (601 ln) | `window.SpeechUI` | Record button, sentence gates, junk-audio/hallucination gates, permission recovery, telemetry |
 | `speech_preload.js` (78 ln) | `window.SpeechStatus` | Eager model preload before login; state machine for UI |
 | `speech_debug.js` (153 ln) | `window.__speechLog` + debug panel | On-screen load diagnostics + rolling log + Retry |
 | `sr_engine.js` (329 ln) | pure functions | ⚠️ **Not speech** — "SR" = *Spaced Repetition*. Item selection + SR interval math (see §7) |
@@ -36,7 +36,7 @@ flowchart TD
     G --> H[collapseRepetition\nstrip echo loops]
     H --> I{Hallucination gate\nisHallucination}
     I -->|junk: Music / Bye| G3[Coach, don't grade\ncounts toward Skip]
-    I -->|real text| J[Scorer.scoreForBook\ntarget × transcript × book tier]
+    I -->|real text| J[Scorer.scoreForBook\ntarget × transcript × book tier × try number]
     J -->|pass| K[Pure celebration\nContinue button → onDone]
     J -->|fail| L[Heard + % shown\nafter 3 fails → Skip appears]
     K & L & G1 & G2 & G3 --> M[Telemetry: speech_attempt /\ngated / error / skip → Cosmos]
@@ -123,10 +123,32 @@ pass if  charAcc >= minAccuracy  OR  WER <= maxWER  OR  phoneticRatio >= phonPas
 
 Threshold provenance: `minAccuracy 0.75` is the lowest floor that still rejects template swaps like "The kite is a triangle." → "The guide is a rectangle." (acc 0.71 — sentence frames share most characters).
 
+### Per-try leniency ladder (`RETRY_LADDER`, :81-92)
+
+A student who fails twice is then handed the Skip button, which reads as failure — so the gate gets progressively easier within one sentence. `scoreForBook(target, transcript, book, attempt)` takes a 1-based `attempt`; `cfgForTry(book, attempt)` (:100) resolves the rung. **`attempt` omitted or garbage = 1 = the untouched `BOOK_TIERS` entry**, so every pre-ladder verdict is preserved bit-for-bit.
+
+| rung | how it's derived |
+|------|------------------|
+| try 1 | the book's own `BOOK_TIERS` entry, returned by identity |
+| try 2 | book tier **minus a per-book delta** (−0.07…−0.03 acc, +0.10…+0.05 WER, −0.07…−0.03 phonetic) — bigger step for the little-kid books |
+| try 3 | **absolute grace floor** per book, independent of the tier: `PU0 0.25/0.85/0.20` → `PU1 0.28/0.82/0.22` → `PU2 0.32/0.78/0.26` → `Think0 0.36/0.74/0.30` → `PU3 = Think1 0.40/0.70/0.34` → `PU4 0.45/0.65/0.40` → `Think2 0.50/0.60/0.45` |
+
+Try numbers above 3 clamp to the try-3 rung. Unknown books fall back to the `pu3` rung at every try.
+
+**Why back-loaded rather than uniform.** Replaying the 3067-attempt field dump showed that relaxing thresholds evenly across all three tries converts only ~10% of double-failures — most of them are Whisper mis-hearing the child *entirely*, not near-misses sitting just under a line. Concentrating the leniency on try 3 is what actually moves the number. Share of students who failed tries 1 **and** 2 and then win at try 3: `PU1 71% · PU2 70% · PU0/Think0 68% · PU3/Think1 61% · PU4 59% · Think2 56%`.
+
+**`requireWordEvidence` — the chance-overlap guard (:224).** Char similarity between two *unrelated* strings of comparable length sits around 0.35-0.40 purely by chance. A low grace floor on the accuracy path alone therefore passes hallucinations: `"[speaking in foreign language]"` against `"The kite is a triangle."` scores **acc 0.367** while WER is 1.00 and phonetic is 0.00. The try-3 rung sets `requireWordEvidence: true`, which makes the accuracy path additionally demand ≥1 phonetically-matched target word. Tries 1-2 do not set it (their floors are already above the chance band), so existing behaviour is untouched. Cost: PU0 try-3 wins 83% → 68%; Think2 unchanged. `phoneticHits` is now computed when *either* `allowPhonetic` or `requireWordEvidence` is set.
+
+**Accepted trade.** Wrong-content-but-frame-correct sentences (acc 0.71-0.74) *do* pass at try 3. This is unavoidable — they out-score the genuine mis-heard near-misses (acc 0.66), so no threshold choice separates them. It is deliberate: by the third try the goal is confidence, not assessment. Every attempt logs its rung as `attempt` so the leak stays measurable. Junk is unaffected at every rung (`[Music]`, `[BLANK_AUDIO]`, `Bye!`, `(upbeat music)`, `me?` all fail at every try for every book) — and in the live app `isHallucination` rejects it before the scorer ever sees it.
+
+**The ladder is invisible to the student.** Feedback text is identical on every try (deliberate: an explicit "this one's easier" would teach kids to phone in the first two).
+
 ### Tuning & analysis tooling (api/)
 - `api/tune_scorer.js` — parameter sweep (minAcc × maxWER × phonPass) over the untracked `api/speech_events_dump_full.json` telemetry dump, constrained by 5 must-pass / 6 must-fail regression pairs; prints only configs satisfying all constraints, sorted by real-speech pass yield. **Do not commit the JSON dump** (AGENTS.md Rule 2).
 - `api/analyze_speech.js` — pulls `speech_*` events from Cosmos (needs `api/local.settings.json`; default window 48 h, `--hours N`, `--json out.json`). Mirrors the scorer so it can replay attempts under alternative tiers ("what-if" per book). Core value: **failure-mode classifier** (:103-115) — `near-miss` dominant ⇒ scorer too strict (cheap fix); `wrong` dominant ⇒ ASR mis-hears children (model problem); `garbage` dominant ⇒ recording/environment. Also reports per-student and **per-device (from UA)** pass rates, audio sanity (median recording length, ≥14.5 s auto-stop hits, median transcribe time), and the worst transcript/target pairs.
-- `api/whatif_scorer.js`, `api/deep_dive_speech.js`, `api/test_scorer_regression.js` — companion experiment/regression scripts (same folder).
+  ⚠️ **Post-ladder reading:** the headline rates read the *recorded* `pass` field, so they now mix all three rungs and will sit higher than the scorer's try-1 strictness. Its own `BOOK_TIERS` mirror is try-1 only. Filter on the `attempt` field (§6) to isolate try-1 behaviour — that's what the failure-mode classifier still means.
+- `api/whatif_scorer.js`, `api/deep_dive_speech.js` — companion experiment scripts (same folder).
+- `api/test_scorer_regression.js` — the scorer's regression suite: the 11 must-pass/must-fail field cases, anchor equivalence, gibberish-fails-everywhere, ladder monotonicity, and the retry-ladder invariants (try-1 zero-drift over the full dump × 8 books, chance-overlap guard, clamping, unknown-book fallback). **Run it manually** (`cd api && node test_scorer_regression.js`, ~10 s): it is in *neither* `npm test` chain because it requires the untracked `api/speech_events_dump_full.json`. Run it after any threshold or ladder edit.
 
 ## 6. UI integration (`speech_ui.js`)
 
@@ -148,10 +170,12 @@ Field data (2026-07-27): 46 recordings < 1.2 s were 100% Whisper hallucinations 
 - `micHelpHTML` (:289) gives per-browser Chinese instructions (WeChat ⋯→设置→麦克风; iOS 设置→Safari→麦克风; desktop 🔒→网站设置).
 - Permission-denied inside a gate (`showMicHelp`, :378): help shown once, record button swapped for a visible "✅ 已允许，重试" button, Skip revealed immediately; **telemetry capped at 2 error events per gate** (3rd sends one "repeats suppressed" marker) after 4 students generated 435 of 861 permission errors by re-tapping (2026-08).
 
-### Sentence gate (`makeSentenceGate`, :345-541)
+### Sentence gate (`makeSentenceGate`, :362-598)
 Self-contained "🎙️ Now say it: <sentence>" node used after a correct unscramble. Flow: record → transcribe → hallucination check → `Scorer.scoreForBook` (falls back to `score` for old builds) → **pass = pure celebration** (no score, no transcript — a student passing at 70% under their book's leniency should feel a win; full breakdown still goes to telemetry) → Continue button. **Fail = "heard: … % — try again"** (no threshold internals; WER/phonetic reasons stay in telemetry). **Skip appears only after 3 failed attempts** (`SKIP_AFTER_FAILS = 3`) so students genuinely try before bypassing; a skip logs `failsBeforeSkip`. Pass and Skip both fire the single `onDone()` advance callback. Errors count toward Skip; "Microphone unavailable" reveals Skip immediately.
 
-Telemetry is defensive (never breaks the exercise): every attempt logs target/transcript/pass/accuracy/phoneticRatio/edits/level/book/details/audioMs/transcribeMs/blobBytes + **`ua` (navigator.userAgent truncated to 160 chars)** via `queueExerciseEvent('speech_'+kind, mode, …)` → the standard analytics flush → Cosmos (`speech_ui.js:304-318`). The `ua` field rides in `itemDetails`, which makes speech events usable for **fleet delivery surveys** (per-device breakdowns in `analyze_speech.js:117-122`, and cross-referencing the server-side `delivery_diag_saveAnalytics` doc's UA ring — see [Backend API](10-backend-api.md)).
+**Two counters, two jobs** (:388-391). `failCount` drives the Skip reveal and counts *every* way an attempt can go wrong — graded fail, junk transcript, too quiet, mic error. `gradedTries` counts only attempts that were actually transcribed and scored, and is what feeds the leniency ladder (§5). They must stay separate: a kid who double-taps and gets "太短啦" three times has not spoken three times, so they must not reach the lenient try-3 rung without ever being heard. The try number is computed as `gradedTries + 1` and incremented immediately before scoring, so a cancelled recording or a gated one never consumes a rung.
+
+Telemetry is defensive (never breaks the exercise): every attempt logs target/transcript/pass/accuracy/phoneticRatio/edits/level/book/**attempt**/details/audioMs/transcribeMs/blobBytes + **`ua` (navigator.userAgent truncated to 160 chars)** via `queueExerciseEvent('speech_'+kind, mode, …)` → the standard analytics flush → Cosmos (`speech_ui.js:478-500`). `attempt` is the 1-based rung that graded it — without it, dashboard pass rates mix strict and grace verdicts and the failure-mode classifier loses its meaning. The `ua` field rides in `itemDetails`, which makes speech events usable for **fleet delivery surveys** (per-device breakdowns in `analyze_speech.js:117-122`, and cross-referencing the server-side `delivery_diag_saveAnalytics` doc's UA ring — see [Backend API](10-backend-api.md)).
 
 ### Where speech plugs into rounds/minigames
 - **Study Mode Round E (sentence scramble), `study_mode.js:902-939`**: after the sentence is built correctly, CHECK/CLEAR controls hide and the gate is inserted into the emptied word-bank area. `level: 2`, mode `'study'`. If the model isn't ready the gate is **skipped silently** (1 s timeout to advance) — never blocks progression, never shows a spinner; the reason is written to `__speechLog` so field skips are debuggable.

@@ -101,5 +101,144 @@ for (const book of LADDER) {
     prev = p;
 }
 
+// ---- Per-try leniency ladder (retry grace) --------------------------------
+// A student who fails twice then has to press Skip experiences the gate as a
+// wall. Try 2 takes a modest step down; try 3 drops to a grace floor that still
+// rejects silence/noise/hallucination but passes any real voiced attempt, and
+// tightens as you go up the book ladder. Try 1 must never move.
+console.log('\n--- RETRY LADDER ---');
+
+const BOOKS = ['PU0', 'PU1', 'PU2', 'Think0', 'PU3', 'Think1', 'PU4', 'Think2'];
+const LADDER_ORDER = ['pu0', 'pu1', 'pu2', 'think0', 'pu3', 'think1', 'pu4', 'think2'];
+
+function assert(cond, msg) {
+    if (!cond) { ok = false; console.log('WRONG ' + msg); }
+    else console.log('OK    ' + msg);
+}
+function countPass(book, attempt) {
+    let p = 0;
+    for (const a of d.attempts) if (S.scoreForBook(a.target, a.transcript, book, attempt).pass) p++;
+    return p;
+}
+
+if (typeof S.cfgForTry !== 'function' || !S.RETRY_LADDER) {
+    ok = false;
+    console.log('WRONG scorer exposes neither cfgForTry() nor RETRY_LADDER');
+} else {
+    // 1. Try 1 is byte-identical to the book tier — the field-tuned anchor and
+    //    every existing verdict above must not drift.
+    let cfgDrift = 0;
+    for (const book of BOOKS) {
+        if (JSON.stringify(S.cfgForTry(book, 1)) !== JSON.stringify(S.tierForBook(book))) cfgDrift++;
+    }
+    assert(cfgDrift === 0, 'try 1 cfg equals the untouched book tier for all ' + BOOKS.length + ' books');
+
+    let verdictDrift = 0;
+    for (const book of BOOKS)
+        for (const a of d.attempts)
+            if (S.scoreForBook(a.target, a.transcript, book, 1).pass !== S.scoreForBook(a.target, a.transcript, book).pass) verdictDrift++;
+    assert(verdictDrift === 0, 'try 1 verdicts unchanged across all ' + d.attempts.length + ' field attempts x ' + BOOKS.length + ' books');
+
+    for (const [t, g, want, why] of CASES)
+        for (const book of ['PU3', 'Think1'])
+            if (S.scoreForBook(t, g, book, 1).pass !== want) { ok = false; console.log('WRONG try-1 anchor verdict moved [' + book + '] ' + why); }
+    console.log('OK    all ' + CASES.length + ' must-pass/must-fail cases hold at try 1');
+
+    // 2. Each rung is looser than the one before it, per book.
+    let nonMono = [];
+    for (const book of BOOKS) {
+        const c = [1, 2, 3].map(n => countPass(book, n));
+        if (!(c[0] <= c[1] && c[1] <= c[2])) nonMono.push(book + '(' + c.join('<') + ')');
+    }
+    assert(nonMono.length === 0, 'field pass count rises try1 <= try2 <= try3 for every book' + (nonMono.length ? ': ' + nonMono.join(' ') : ''));
+
+    // 3. The book ladder still orders at try 3 (most lenient book passes most).
+    let prev3 = Infinity, ladderBad = [];
+    for (const book of LADDER_ORDER) {
+        const p = countPass(book, 3);
+        if (p > prev3) ladderBad.push(book);
+        prev3 = p;
+    }
+    assert(ladderBad.length === 0, 'try-3 leniency still ordered down the book ladder' + (ladderBad.length ? ': broke at ' + ladderBad.join(',') : ''));
+
+    // 4. Gibberish — including Whisper's parenthesised sound-effect tags — must
+    //    fail at EVERY try for EVERY book, however lenient the grace floor.
+    const JUNK = GIBBERISH.concat([
+        ['His teddy is blue.', '(upbeat music)'],
+        ['Tom is on the bike.', '(singing)'],
+        ['A circle is a shape.', '(mumbles)'],
+        ['The kite is a triangle.', '[speaking in foreign language]']
+    ]);
+    let junkLeak = [];
+    for (const book of BOOKS)
+        for (const attempt of [1, 2, 3])
+            for (const [t, g] of JUNK)
+                if (S.scoreForBook(t, g, book, attempt).pass) junkLeak.push(book + '/try' + attempt + ':"' + g + '"');
+    assert(junkLeak.length === 0, 'junk + hallucinations fail at every try for every book' + (junkLeak.length ? ': ' + junkLeak.join(' ') : ''));
+
+    // 4b. The chance-overlap guard specifically. Two unrelated strings of
+    //     comparable length share ~37% of their characters, so a low accuracy
+    //     floor alone would rescue "[speaking in foreign language]" against
+    //     "The kite is a triangle" (acc 0.37, WER 1.00, phonetic 0.00).
+    const OVERLAP = ['The kite is a triangle.', '[speaking in foreign language]'];
+    assert(S.cfgForTry('PU0', 3).requireWordEvidence === true, 'try-3 rung sets requireWordEvidence');
+    assert(!S.cfgForTry('PU0', 1).requireWordEvidence && !S.cfgForTry('PU0', 2).requireWordEvidence,
+        'try 1 and try 2 do NOT set it (existing behaviour untouched)');
+    assert(S.scoreForBook(OVERLAP[0], OVERLAP[1], 'PU0', 3).pass === false,
+        'chance character overlap alone cannot rescue a try-3 pass');
+
+    // 5. Try 3 is a grace floor, not a free pass: real speech with no word
+    //    overlap still fails everywhere.
+    const FREEBIE = ['Do they like salad? Yes, they do.', 'Oh, I got this. A sheep belt.'];
+    let freeLeak = [];
+    for (const book of BOOKS) if (S.scoreForBook(FREEBIE[0], FREEBIE[1], book, 3).pass) freeLeak.push(book);
+    assert(freeLeak.length === 0, 'unrelated speech is NOT a free pass at try 3' + (freeLeak.length ? ': passed at ' + freeLeak.join(',') : ''));
+
+    // 6. The ladder has a real gradient: the same weak attempt wins for the
+    //    little kids and still fails for the oldest.
+    const WEAK = ["His teddy's blue.", 'This is the world!'];
+    assert(S.scoreForBook(WEAK[0], WEAK[1], 'PU0', 3).pass === true, 'weak attempt passes try 3 at PU0 (most lenient)');
+    assert(S.scoreForBook(WEAK[0], WEAK[1], 'Think2', 3).pass === false, 'same weak attempt still fails try 3 at Think2 (strictest)');
+
+    // 7. The case this whole change exists for: a kid who genuinely tried and
+    //    was mis-heard. Fails try 1 at the anchor and above, wins at try 3
+    //    everywhere. (PU0 already passes it at try 1 — its floor is 0.62.)
+    const MISHEARD = ['He wants a small white helicopter.', 'Peace warmed up more white helicopter!'];
+    let t1 = 0, t3 = 0;
+    for (const book of BOOKS) {
+        if (S.scoreForBook(MISHEARD[0], MISHEARD[1], book, 1).pass) t1++;
+        if (S.scoreForBook(MISHEARD[0], MISHEARD[1], book, 3).pass) t3++;
+    }
+    assert(t1 === 1, 'mis-heard effort fails try 1 at every book except PU0 (got ' + t1 + '/8)');
+    assert(t3 === BOOKS.length, 'mis-heard effort passes try 3 at all ' + BOOKS.length + ' books (got ' + t3 + ')');
+    for (const book of ['PU3', 'Think1', 'PU4', 'Think2'])
+        assert(S.scoreForBook(MISHEARD[0], MISHEARD[1], book, 1).pass === false, 'mis-heard effort still fails try 1 at ' + book);
+
+    // 8. Clamping: junk/absent try numbers fall back to try 1, huge ones cap at
+    //    the try-3 rung, numeric strings coerce.
+    const probe = ['He wants a small white helicopter.', 'Peace warmed up more white helicopter!'];
+    const atTry = n => S.scoreForBook(probe[0], probe[1], 'PU3', n).pass;
+    assert(atTry(undefined) === false && atTry(0) === false && atTry(-3) === false && atTry(NaN) === false,
+        'absent/zero/negative/NaN try number behaves as try 1');
+    assert(atTry(3) === true && atTry(99) === true, 'try numbers above the ladder cap at the try-3 rung');
+    assert(S.scoreForBook(probe[0], probe[1], 'PU3', '2').pass === S.scoreForBook(probe[0], probe[1], 'PU3', 2).pass,
+        'string try number coerces to the same rung');
+
+    // 9. Unknown/missing books ride the anchor rung at every try.
+    for (const attempt of [1, 2, 3]) {
+        const a = S.cfgForTry('SomeFutureBook', attempt), b = S.cfgForTry(undefined, attempt), c = S.cfgForTry('PU3', attempt);
+        if (JSON.stringify([a.minAccuracy, a.maxWER, a.phonPass]) !== JSON.stringify([c.minAccuracy, c.maxWER, c.phonPass]) ||
+            JSON.stringify([b.minAccuracy, b.maxWER, b.phonPass]) !== JSON.stringify([c.minAccuracy, c.maxWER, c.phonPass])) {
+            ok = false; console.log('WRONG unknown-book fallback != PU3 anchor at try ' + attempt);
+        }
+    }
+    console.log('OK    unknown/missing book falls back to the PU3 anchor rung at every try');
+
+    // 10. No target is never a pass, at any try.
+    let emptyLeak = 0;
+    for (const book of BOOKS) for (const attempt of [1, 2, 3]) if (S.scoreForBook('', '', book, attempt).pass) emptyLeak++;
+    assert(emptyLeak === 0, 'empty target never auto-passes at any try');
+}
+
 console.log(ok ? '\nALL REGRESSION CASES PASS' : '\nREGRESSIONS REMAIN');
 process.exit(ok ? 0 : 1);

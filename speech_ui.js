@@ -348,6 +348,9 @@
   // unscramble). Returns a DOM node with: prompt, hold-to-talk record button,
   // heard-feedback line, and a Skip button that appears only after 3 failed
   // attempts (so students genuinely try before they can bypass).
+  // Each graded try is scored against a progressively more lenient rung of
+  // Scorer.RETRY_LADDER — deliberately invisible to the student, whose feedback
+  // text is identical on every try.
   // On a pass it plays the success sound, shows the score, and swaps in a
   // Continue button so the student controls when to advance.
   // Callers should only build this when SpeechStatus.isReady() is already true.
@@ -378,6 +381,13 @@
     const feedback = wrap.querySelector('.heard-feedback');
     let done = false;
     let failCount = 0;
+    // Two counters, two jobs. failCount drives the Skip reveal and counts every
+    // way an attempt can go wrong (graded fail, junk transcript, too quiet, mic
+    // error). gradedTries counts only attempts that were actually transcribed
+    // and scored, and drives the scorer's leniency ladder — a kid who
+    // double-taps and gets "太短啦" three times has not spoken three times, so
+    // they must not arrive at the lenient try-3 rung without ever being heard.
+    let gradedTries = 0;
     const SKIP_AFTER_FAILS = 3; // let the student try 3 times before offering Skip
 
     spHeartbeat({ spFails: 0 }); // gate opened (module-level spHeartbeat merges state)
@@ -458,8 +468,10 @@
         // NOTE: feedback text is set INSIDE the pass/fail branches below —
         // pass hides transcript+score entirely (pure celebration), fail shows
         // only "heard + score" (no threshold internals).
+        const tryNo = gradedTries + 1;
+        gradedTries++;
         const res = global.Scorer.scoreForBook
-          ? global.Scorer.scoreForBook(target, text, book)
+          ? global.Scorer.scoreForBook(target, text, book, tryNo)
           : global.Scorer.score(target, text, level);
         // Log EVERY attempt (pass or fail) with the full score breakdown — the
         // transcript is the diagnostic gold for the children's-voices problem.
@@ -472,6 +484,10 @@
           edits: typeof res.edits === 'number' ? res.edits : null,
           level: level,
           book: book,
+          // Which rung of the leniency ladder graded this. Without it the
+          // dashboard pass rate mixes strict and grace verdicts and
+          // api/analyze_speech.js can no longer isolate scorer strictness.
+          attempt: tryNo,
           details: res.details || '',
           audioMs: meta && typeof meta.audioMs === 'number' ? meta.audioMs : null,
           transcribeMs: meta && typeof meta.transcribeMs === 'number' ? meta.transcribeMs : null,

@@ -56,6 +56,77 @@
     return BOOK_TIERS[String(book || '').toLowerCase().trim()] || BOOK_TIERS.pu3;
   }
 
+  // --- per-try leniency ladder ----------------------------------------------
+  // A student who fails twice and then has to press Skip experiences the gate
+  // as a wall, and stops volunteering to speak. Replaying the 3067-attempt
+  // field dump showed that relaxing thresholds *uniformly* converts only ~10%
+  // of double-failures, because most of them are Whisper mis-hearing the child
+  // entirely rather than near-misses sitting just under a line. So the ramp is
+  // deliberately back-loaded:
+  //   try 1 — untouched BOOK_TIERS entry (every existing verdict preserved)
+  //   try 2 — modest step down, expressed as deltas on the book's own tier
+  //   try 3 — absolute grace floor: still rejects silence/noise/hallucination
+  //           (those score acc<0.17, WER=1.0, phonetic=0), but passes any real
+  //           voiced attempt at the sentence
+  // The try-3 floor tightens up the book ladder exactly as BOOK_TIERS does, so
+  // PU0/PU1 little kids are rescued most often and Think2 keeps real teeth.
+  // Measured on the field dump, of students who failed BOTH try 1 and try 2,
+  // the share who win at try 3:
+  //   PU1 71% · PU2 70% · PU0/Think0 68% · PU3/Think1 61% · PU4 59% · Think2 56%
+  // Wrong-content sentences (acc 0.71-0.74, e.g. "The kite is a triangle" →
+  // "The guide is a rectangle") do pass at try 3 — unavoidable, since they
+  // out-score the genuine near-misses (acc 0.66). That trade is intentional:
+  // by the third try the goal is confidence, not assessment, and every pass
+  // carries its try number in telemetry so it stays measurable.
+  const RETRY_LADDER = {
+    //          try 2: deltas on the book tier      try 3: absolute floors
+    pu0:    { t2: { minAccuracy: -0.07, maxWER: +0.10, phonPass: -0.07 }, t3: { minAccuracy: 0.25, maxWER: 0.85, phonPass: 0.20 } },
+    pu1:    { t2: { minAccuracy: -0.07, maxWER: +0.10, phonPass: -0.07 }, t3: { minAccuracy: 0.28, maxWER: 0.82, phonPass: 0.22 } },
+    pu2:    { t2: { minAccuracy: -0.06, maxWER: +0.09, phonPass: -0.06 }, t3: { minAccuracy: 0.32, maxWER: 0.78, phonPass: 0.26 } },
+    think0: { t2: { minAccuracy: -0.05, maxWER: +0.08, phonPass: -0.05 }, t3: { minAccuracy: 0.36, maxWER: 0.74, phonPass: 0.30 } },
+    pu3:    { t2: { minAccuracy: -0.05, maxWER: +0.07, phonPass: -0.05 }, t3: { minAccuracy: 0.40, maxWER: 0.70, phonPass: 0.34 } },
+    think1: { t2: { minAccuracy: -0.05, maxWER: +0.07, phonPass: -0.05 }, t3: { minAccuracy: 0.40, maxWER: 0.70, phonPass: 0.34 } },
+    pu4:    { t2: { minAccuracy: -0.04, maxWER: +0.06, phonPass: -0.04 }, t3: { minAccuracy: 0.45, maxWER: 0.65, phonPass: 0.40 } },
+    think2: { t2: { minAccuracy: -0.03, maxWER: +0.05, phonPass: -0.03 }, t3: { minAccuracy: 0.50, maxWER: 0.60, phonPass: 0.45 } }
+  };
+  const MAX_LENIENT_TRY = 3;
+
+  // Rounds to 2dp as well as clamping: every ladder delta is 2dp, but float
+  // subtraction otherwise leaves artifacts like 0.6499999999999999 in the cfg
+  // that surfaces in the debug panel and telemetry.
+  function clamp01(n) { return Math.max(0, Math.min(1, Math.round(n * 100) / 100)); }
+
+  // Resolve the threshold config for a given book + try number.
+  // try 1 returns the BOOK_TIERS entry itself (identity — no drift possible);
+  // absent/garbage try numbers fall back to 1, anything above the ladder caps
+  // at the try-3 rung.
+  function cfgForTry(book, attempt) {
+    const base = tierForBook(book);
+    const n = Math.floor(Number(attempt));
+    const tryNo = Number.isFinite(n) ? Math.max(1, Math.min(MAX_LENIENT_TRY, n)) : 1;
+    if (tryNo === 1) return base;
+    const rung = RETRY_LADDER[String(book || '').toLowerCase().trim()] || RETRY_LADDER.pu3;
+    if (tryNo === 2) {
+      return {
+        label: base.label + ' (try 2)',
+        minAccuracy: clamp01(base.minAccuracy + rung.t2.minAccuracy),
+        maxWER: clamp01(base.maxWER + rung.t2.maxWER),
+        phonPass: clamp01(base.phonPass + rung.t2.phonPass),
+        allowPhonetic: base.allowPhonetic,
+        exact: base.exact
+      };
+    }
+    return {
+      label: base.label + ' (try 3 grace)',
+      minAccuracy: rung.t3.minAccuracy,
+      maxWER: rung.t3.maxWER,
+      phonPass: rung.t3.phonPass,
+      allowPhonetic: base.allowPhonetic,
+      exact: base.exact,
+      requireWordEvidence: true
+    };
+  }
+
   function normalize(s) {
     return (s || '')
       .toLowerCase()
@@ -129,7 +200,7 @@
     // Evaluated even when edit-distance accuracy is low, so heavily accented
     // but phonetically-close single words still pass at low levels.
     let phoneticHits = 0;
-    if (cfg.allowPhonetic && tTok.length && gTok.length) {
+    if ((cfg.allowPhonetic || cfg.requireWordEvidence) && tTok.length && gTok.length) {
       for (const tw of tTok) {
         if (gTok.some(gw => phoneticMatch(tw, gw))) phoneticHits++;
       }
@@ -145,7 +216,15 @@
     const wer = tTok.length ? edits / tTok.length : 1;
     let pass = false, details = '';
 
-    const accuracyOk = accuracy >= cfg.minAccuracy;
+    // requireWordEvidence (grace rung only): char similarity between two
+    // UNRELATED strings of comparable length sits around 0.35-0.40 purely by
+    // chance, so a low accuracy floor on its own would pass Whisper junk like
+    // "[speaking in foreign language]" against "The kite is a triangle"
+    // (acc 0.37, WER 1.00, phonetic 0.00). Requiring at least one matched
+    // target word before accuracy can rescue the attempt closes that hole
+    // while keeping every genuine mis-heard effort, which by definition has
+    // word overlap. Measured cost: PU0 try-3 wins 83% -> 68%, Think2 unchanged.
+    const accuracyOk = accuracy >= cfg.minAccuracy && (!cfg.requireWordEvidence || phoneticHits > 0);
     const werOk = wer <= cfg.maxWER;
     const phoneticOk = cfg.allowPhonetic && phoneticRatio >= cfg.phonPass;
 
@@ -160,7 +239,11 @@
       details = `phonetic match ${(phoneticRatio * 100).toFixed(0)}% (accent tolerant)`;
     } else {
       const reasons = [];
-      reasons.push(`accuracy ${(accuracy * 100).toFixed(0)}% < ${(cfg.minAccuracy * 100).toFixed(0)}%`);
+      if (accuracy >= cfg.minAccuracy) {
+        reasons.push(`accuracy ${(accuracy * 100).toFixed(0)}% but no target word matched`);
+      } else {
+        reasons.push(`accuracy ${(accuracy * 100).toFixed(0)}% < ${(cfg.minAccuracy * 100).toFixed(0)}%`);
+      }
       reasons.push(`WER ${(wer * 100).toFixed(0)}% > ${(cfg.maxWER * 100).toFixed(0)}%`);
       if (cfg.allowPhonetic) reasons.push(`phonetic ${(phoneticRatio * 100).toFixed(0)}% < ${(cfg.phonPass * 100).toFixed(0)}%`);
       details = reasons.join('; ');
@@ -182,10 +265,13 @@
    * Book-aware scoring: same three-path decision, thresholds from the
    * student's book tier (see BOOK_TIERS). book comes from the student's DB
    * record (authActiveUser.book), e.g. 'PU1', 'Think2'.
+   * attempt is the 1-based try number within one sentence gate; tries 2 and 3
+   * score against progressively looser rungs (see RETRY_LADDER). Omitted = 1,
+   * i.e. exactly the pre-ramp behavior.
    */
-  function scoreForBook(target, transcript, book) {
-    return scoreWithCfg(tierForBook(book), target, transcript);
+  function scoreForBook(target, transcript, book, attempt) {
+    return scoreWithCfg(cfgForTry(book, attempt), target, transcript);
   }
 
-  global.Scorer = { score, scoreForBook, LEVELS, BOOK_TIERS, tierForBook, normalize, phoneticMatch, levenshtein };
+  global.Scorer = { score, scoreForBook, LEVELS, BOOK_TIERS, RETRY_LADDER, tierForBook, cfgForTry, normalize, phoneticMatch, levenshtein };
 })(window);
