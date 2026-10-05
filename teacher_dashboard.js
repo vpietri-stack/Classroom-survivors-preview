@@ -250,7 +250,6 @@ function exerciseTypeLabel(type) {
     const map = {
         'wordScramble': 'Word Scramble',
         'spelling': 'Spelling',
-        'handwriting': 'Handwriting',
         'sentenceScramble': 'Sentence Scramble',
         'sentenceMatch': 'Sentence Match'
     };
