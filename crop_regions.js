@@ -35,19 +35,36 @@ const RECTS = (() => {
   });
 })();
 
+// Optional --clear "x,y,w,h;x,y,w,h" paints those source rectangles pure white
+// before anything is measured or cropped. Needed when the generator's
+// "Qoder AI 生成" watermark lands on top of artwork rather than in dead space.
+const CLEARS = (() => {
+  const i = process.argv.indexOf('--clear');
+  if (i < 0) return [];
+  return process.argv[i + 1].split(';').filter(Boolean).map(r => {
+    const [x, y, w, h] = r.split(',').map(Number);
+    return { x, y, w, h };
+  });
+})();
+
 (async () => {
   const b64 = 'data:image/png;base64,' + fs.readFileSync(path.resolve(sheetPath)).toString('base64');
   const browser = await chromium.launch({ executablePath: CHROME_PATH, headless: true, args: ['--no-sandbox'] });
   const page = await browser.newPage({ viewport: { width: 900, height: 900 } });
   await page.setContent('<body></body>');
 
-  const res = await page.evaluate(async ({ b64, MIN, rects }) => {
+  const res = await page.evaluate(async ({ b64, MIN, rects, clears }) => {
     const img = new Image();
     await new Promise((r, j) => { img.onload = r; img.onerror = j; img.src = b64; });
     const W = img.naturalWidth, H = img.naturalHeight;
     const c = document.createElement('canvas'); c.width = W; c.height = H;
     const ctx = c.getContext('2d', { willReadFrequently: true });
     ctx.drawImage(img, 0, 0);
+    // Paint the watermark rectangles pure white, then work from THIS canvas for
+    // every later read and every crop — drawing from the original `img` again
+    // would put the mark back.
+    (clears || []).forEach(c => { ctx.fillStyle = '#ffffff'; ctx.fillRect(c.x, c.y, c.w, c.h); });
+    const src = c;
     const d = ctx.getImageData(0, 0, W, H).data;
 
     // coarse mask: a CELL is ink if enough of its pixels are non-near-white
@@ -120,7 +137,7 @@ const RECTS = (() => {
       const sc = Math.min(512 / r.w, 512 / r.h);
       const w = r.w * sc, h = r.h * sc;
       o.imageSmoothingQuality = 'high';
-      o.drawImage(img, r.x, r.y, r.w, r.h, (512 - w) / 2, (512 - h) / 2, w, h);
+      o.drawImage(src, r.x, r.y, r.w, r.h, (512 - w) / 2, (512 - h) / 2, w, h);
       shots.push({ url: out.toDataURL('image/png'), box: r });
     }
 
@@ -141,7 +158,7 @@ const RECTS = (() => {
       cc.fillText(String(i + 1), cx + 10, cyy + 214);
     }
     return { shots: shots.map(s => s.url), boxes: shots.map(s => s.box), contact: cs.toDataURL('image/png') };
-  }, { b64, MIN, rects: RECTS });
+  }, { b64, MIN, rects: RECTS, clears: CLEARS });
 
   res.shots.forEach((url, i) => {
     const out = path.join('images', 'vocab', prefix + '-' + (i + 1) + '.png');

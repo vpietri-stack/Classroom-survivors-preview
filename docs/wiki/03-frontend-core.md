@@ -141,6 +141,16 @@ violation shows up as a student getting a correct answer marked wrong.
   `// --- <Book> Unit N Page P ---` section (pairs need no translation), bump that pack's
   own `?v=` in `index.html`, and re-run `npm test` (the asset-manifest test re-derives
   `images/vocab/<word>.png` for every vocab string in every pack).
+- **Judge a new vocab image at 140px and 80px, not at full size.** `.vocab-image` renders at
+  `clamp(80px, 25vw, 140px)`, so a busy illustration that looks fine on a 1024 master is mush
+  on a phone. Run `node preview_at.js 140,80 images/vocab/<x>.png` before accepting it. When a
+  diagram has too many parts, crop it to the branch that carries the word rather than shipping
+  the whole thing (that is why the PU3 family-tree set is nine crops of one tree).
+- **Draw label-bearing diagrams with canvas, don't generate them.** The image generator garbles
+  short text ("STSEE", "WECIAL"), so day-of-week and frequency icons go through
+  `build_calendar.js`. The teacher's rule for those: the picture may contain text, but never
+  the word the pupil is meant to recognise — so `monday.png` shows a starred card where
+  "Mon" would be, and the other six cards name themselves.
 
 `class_config.js:6–74` carries a comment block mapping every book/unit to page-number lists —
 this mirrors `AVAILABLE_CONTENT`.
