@@ -76,6 +76,50 @@ Runtime feature gating is what makes this merge-safe: `TD_ENABLED` / `THREE_TD_E
 (`config.js:45/61`) are detected **at runtime from the URL path** (preview path or
 localhost/file:// or `?td=`/`?3d=`), so a merge never flips a per-branch flag.
 
+## 2a. Worktrees — one per concurrent feature
+
+The working directory is shared by several sessions at once, so `git checkout`
+in it rewrites files under whatever else is running. That has already cost real
+work: on 2026-10-05 another session's `branch: Reset to d3014dc` discarded an
+agent's uncommitted ~250-line `handwriting.js` edit. It had never been staged,
+so `git fsck --unreachable` held no blob for it, `hw/main` already equalled the
+local tip, and Qoder local history had no snapshot — unrecoverable.
+
+`wt.sh` (repo root, Git Bash) gives each feature its own checkout over the one
+shared `.git`:
+
+| Command | Does |
+|---|---|
+| `./wt.sh new <branch> [base]` | Creates `../Classroom-survivors-wt/<branch>` off `refs/heads/preview` by default, and junctions `node_modules/` + `api/node_modules/`. |
+| `./wt.sh ls` / `path <b>` | List worktrees / print a directory for scripting. |
+| `./wt.sh rm <branch>` | **Unlinks the junctions first**, then `git worktree remove`. Refuses if the worktree has uncommitted work. Keeps the branch. |
+| `./wt.sh clean` | `git worktree prune` for worktrees deleted by hand. |
+
+Design decisions worth not re-litigating:
+
+- **Worktrees are siblings (`<repo>-wt/`), not `.worktrees/` inside the repo.**
+  No `.gitignore` change is needed, and a stray `git add` in the main checkout
+  can never swallow a second copy of the project. Both GitHub repos are public.
+- **Dependencies are junctioned, not installed.** `node_modules/` and
+  `api/node_modules/` are gitignored, so a fresh worktree has neither and
+  `npm test` fails with a misleading `Cannot find module '@azure/functions'`
+  (it comes from `api/src/functions/saveAnalytics.js`, not from a missing root
+  dep). One junction each: identical versions everywhere, ~37 MB saved per
+  feature. Verified 2026-10-05: `npm test` in a fresh worktree, 485 assertions,
+  0 failures.
+- **`wt.sh rm` exists because `rm -rf` is dangerous here.** `git worktree
+  remove` walks the tree; a walk that follows a junction deletes the real
+  `node_modules`. The script calls PowerShell's `$item.Delete()` on the reparse
+  point before removing anything.
+- **Bare `preview` is ambiguous** (local branch *and* remote name — see §2), so
+  `wt.sh` resolves names through `refs/heads/<x>` first. Without that,
+  `wt.sh new x preview` dies with `fatal: ambiguous object name`.
+
+Split work along **files**, not topics: `images/vocab/*.png` is conflict-free
+(new filenames), while `index.html`, `content_<book>.js` and the stamp trio are
+where parallel agents collide. Agents never touch the stamp trio; the integrator
+bumps all three once on the merged result (§2b).
+
 ## 2b. The version bump checklist (the gate)
 
 Every deploy that clients must pick up requires the **three stamps** to be bumped together —

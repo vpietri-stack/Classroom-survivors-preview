@@ -1,2 +1,6 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Shell scripts must keep LF: autocrlf checks them out with CRLF on Windows and
+# Git Bash then fails on every line ("$'\r': command not found").
+*.sh text eol=lf

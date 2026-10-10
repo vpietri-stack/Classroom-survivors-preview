@@ -24,6 +24,7 @@ A **vanilla-JS + Phaser ESL (English as a Second Language) learning game** for V
 | Touch the dashboards | [Dashboards](09-dashboards.md) |
 | Touch `api/src/functions/*` or Cosmos | [Backend API](10-backend-api.md), [Data Model](11-data-model.md) |
 | Write or run tests | [Testing](12-testing.md) |
+| Work on two features at once, or share this directory with another agent | [Deployment §2a — Worktrees](13-deployment.md), and `wt.sh` at the repo root |
 | Understand telemetry / debug data loss | [Telemetry](14-telemetry.md) |
 | Avoid re-breaking something that shipped a bug before | [Gotchas & History](15-gotchas-and-history.md) |
 

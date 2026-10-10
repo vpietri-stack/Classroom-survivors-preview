@@ -62,6 +62,53 @@ be committed. The workspace instruction forbids blanket adds; respect it.
 
 ---
 
+## 🌳 RULE 3 — One feature, one worktree. Never `git checkout` to "borrow" this directory
+
+This working directory is shared by **more than one session at once**, and
+`git checkout` rewrites the files under whatever is already running here. On
+2026-10-05 another session's `branch: Reset to d3014dc` silently discarded an
+agent's ~250-line uncommitted edit to `handwriting.js`. It was never staged,
+never pushed, and had no editor local-history entry — it was unrecoverable.
+
+**Use `wt.sh` (repo root, Git Bash):**
+
+```bash
+./wt.sh new speech-ladder        # -> ../Classroom-survivors-wt/speech-ladder, off preview
+cd ../Classroom-survivors-wt/speech-ladder && npm test
+./wt.sh rm speech-ladder         # unlinks deps FIRST, then removes the worktree
+```
+
+`wt.sh new` also junctions `node_modules/` and `api/node_modules/` (both
+gitignored, so a fresh worktree has neither and `npm test` dies with a
+misleading `Cannot find module '@azure/functions'`).
+
+**Hard rules:**
+- Work on your own feature **inside your own worktree**. Do not switch the main
+  checkout to your branch, and do not commit in it because "it was already
+  checked out" — it belongs to whoever is using it.
+- **Never `rm -rf` a worktree.** Use `wt.sh rm`, which deletes the junctions
+  before removing the directory. A recursive delete that follows a junction
+  deletes the real `node_modules`.
+- Prefer dispatching parallel agents with the harness's own worktree isolation
+  over hand-creating them.
+
+**Parallelise along files, not topics.** `images/vocab/*.png` is near-conflict
+free (new filenames). `index.html`, `content_<book>.js` and the stamp trio are
+not — two agents editing them will collide. Split by file or don't split.
+
+**Agents never bump the deploy stamps.** `version.json`, `APP_VERSION` and the
+`index.html` `?v=` must stay byte-identical (RULE 1); if two features each bump
+them you get a conflict on precisely the three lines that may not conflict, and
+a bad resolution puts the red banner on every student. The integrator bumps,
+once, on the merged result, at ship time.
+
+**State the push target.** `origin` is production (Pages + the Azure Functions);
+`preview` and `hw` are preview sites. An agent that "just pushes its branch" to
+`origin/main` has shipped to every class. Never push to `origin/main` without an
+explicit instruction for that deploy.
+
+---
+
 ## Deploy pipeline (preview-first, additive)
 
 - Source branch for GitHub Pages **and** the SWA Functions is `main`.

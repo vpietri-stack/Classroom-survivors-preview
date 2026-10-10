@@ -1,6 +1,6 @@
 # Classroom-survivors Repo Wiki
 
-> **Last verified:** 2026-09-04 · Maintained by every agent that works here. **Start:** [01-overview.md](01-overview.md)
+> **Last verified:** 2026-10-05 · Maintained by every agent that works here. **Start:** [01-overview.md](01-overview.md)
 
 The single source of truth for this repository: what the project is, how each subsystem works, where the bodies are buried, and how to deploy without breaking things. Committed in-repo so every tool and clone gets it.
 
@@ -20,7 +20,7 @@ The single source of truth for this repository: what the project is, how each su
 | 10 | [Backend API](10-backend-api.md) | Azure Functions, auth layers, saveAnalytics |
 | 11 | [Data Model](11-data-model.md) | Cosmos docs, event shapes, localStorage keys |
 | 12 | [Testing](12-testing.md) | The required-green gate, harness styles, contract tests |
-| 13 | [Deployment](13-deployment.md) | Branch model, dual remotes, Pages wedge, stamp trio |
+| 13 | [Deployment](13-deployment.md) | Branch model, dual remotes, worktrees, Pages wedge, stamp trio |
 | 14 | [Telemetry & Data Delivery](14-telemetry.md) | Queue/ack/flush, crash forensics, diagnostics |
 | 15 | [Gotchas & Project History](15-gotchas-and-history.md) | Don't-re-break-it list + handoff doc index |
 
