@@ -62,7 +62,7 @@ be committed. The workspace instruction forbids blanket adds; respect it.
 
 ---
 
-## 🌳 RULE 3 — One feature, one worktree. Never `git checkout` to "borrow" this directory
+## 🌳 RULE 3 — One feature per conversation, in its own worktree
 
 This working directory is shared by **more than one session at once**, and
 `git checkout` rewrites the files under whatever is already running here. On
@@ -70,31 +70,49 @@ This working directory is shared by **more than one session at once**, and
 agent's ~250-line uncommitted edit to `handwriting.js`. It was never staged,
 never pushed, and had no editor local-history entry — it was unrecoverable.
 
-**Use `wt.sh` (repo root, Git Bash):**
+**The model:** the Qoder workspace folder stays `Classroom-survivors` (so this
+file, the wiki and project memory all load), but each feature gets its **own
+conversation** and its **own checkout** in `../Classroom-survivors-wt/<feature>`.
+One conversation, one feature. Do not fold a second feature into a conversation
+that is already carrying one — start a new conversation instead.
+
+**Opening a feature.** The operator names it; create it if it doesn't exist:
 
 ```bash
-./wt.sh new speech-ladder        # -> ../Classroom-survivors-wt/speech-ladder, off preview
-cd ../Classroom-survivors-wt/speech-ladder && npm test
-./wt.sh rm speech-ladder         # unlinks deps FIRST, then removes the worktree
+# works from the main checkout whatever branch it is on, even before wt.sh lands there
+git show refs/heads/preview:wt.sh > /tmp/wt.sh && bash /tmp/wt.sh new <feature>
+cd "../Classroom-survivors-wt/<feature>"
 ```
 
 `wt.sh new` also junctions `node_modules/` and `api/node_modules/` (both
 gitignored, so a fresh worktree has neither and `npm test` dies with a
 misleading `Cannot find module '@azure/functions'`).
 
-**Hard rules:**
-- Work on your own feature **inside your own worktree**. Do not switch the main
-  checkout to your branch, and do not commit in it because "it was already
-  checked out" — it belongs to whoever is using it.
-- **Never `rm -rf` a worktree.** Use `wt.sh rm`, which deletes the junctions
-  before removing the directory. A recursive delete that follows a junction
-  deletes the real `node_modules`.
-- Prefer dispatching parallel agents with the harness's own worktree isolation
-  over hand-creating them.
+**Before the first write, assert where you are:**
 
-**Parallelise along files, not topics.** `images/vocab/*.png` is near-conflict
-free (new filenames). `index.html`, `content_<book>.js` and the stamp trio are
-not — two agents editing them will collide. Split by file or don't split.
+```bash
+./wt.sh where     # exits 3 and shouts if you are standing in the MAIN checkout
+```
+
+This is not ceremony. The workspace root is the main repo while the work lives
+in a sibling folder, so every default path resolves to the **wrong** tree. An
+agent that edits `frontend_auth.js` without checking has edited the copy
+another session is running. Use absolute paths into the worktree, or `cd` there
+and stay there.
+
+**Hard rules:**
+- Never switch the main checkout to your branch, and never commit in it because
+  "it was already checked out" — it belongs to whoever is using it.
+- **Never `rm -rf` a worktree.** Use `wt.sh rm`, which deletes the junctions
+  first. A recursive delete that follows a junction deletes the real
+  `node_modules`.
+- Finish the feature in its own worktree and merge it deliberately. Leave
+  `wt.sh ls` showing only the worktrees still in flight.
+
+**Split along files, not topics.** `images/vocab/*.png` is near-conflict free
+(new filenames). `index.html`, `content_<book>.js` and the stamp trio are not —
+two features editing them will collide. If two conversations must touch the same
+file, sequence them rather than running them in parallel.
 
 **Agents never bump the deploy stamps.** `version.json`, `APP_VERSION` and the
 `index.html` `?v=` must stay byte-identical (RULE 1); if two features each bump

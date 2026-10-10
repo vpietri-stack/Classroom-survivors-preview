@@ -76,7 +76,7 @@ Runtime feature gating is what makes this merge-safe: `TD_ENABLED` / `THREE_TD_E
 (`config.js:45/61`) are detected **at runtime from the URL path** (preview path or
 localhost/file:// or `?td=`/`?3d=`), so a merge never flips a per-branch flag.
 
-## 2a. Worktrees — one per concurrent feature
+## 2a. Worktrees — one per feature, one feature per conversation
 
 The working directory is shared by several sessions at once, so `git checkout`
 in it rewrites files under whatever else is running. That has already cost real
@@ -85,18 +85,30 @@ agent's uncommitted ~250-line `handwriting.js` edit. It had never been staged,
 so `git fsck --unreachable` held no blob for it, `hw/main` already equalled the
 local tip, and Qoder local history had no snapshot — unrecoverable.
 
+The model is **one conversation per feature**, each in its own checkout, while
+the Qoder workspace folder stays the main repo so `AGENTS.md`, this wiki and
+project memory still load. Opening a worktree as its own workspace instead gives
+it a fresh project key with **zero** memory — the ~126 accumulated notes would
+simply not be there.
+
 `wt.sh` (repo root, Git Bash) gives each feature its own checkout over the one
 shared `.git`:
 
 | Command | Does |
 |---|---|
 | `./wt.sh new <branch> [base]` | Creates `../Classroom-survivors-wt/<branch>` off `refs/heads/preview` by default, and junctions `node_modules/` + `api/node_modules/`. |
+| `./wt.sh where` | Prints the current checkout + branch; **exits 3 with a warning if you are standing in the main checkout.** Run before the first write. |
 | `./wt.sh ls` / `path <b>` | List worktrees / print a directory for scripting. |
 | `./wt.sh rm <branch>` | **Unlinks the junctions first**, then `git worktree remove`. Refuses if the worktree has uncommitted work. Keeps the branch. |
 | `./wt.sh clean` | `git worktree prune` for worktrees deleted by hand. |
 
 Design decisions worth not re-litigating:
 
+- **`where` exists because this model has a sharp edge.** The workspace root is
+  the main repo while the work lives in a sibling folder, so every default
+  relative path resolves to the **wrong** tree. An agent that edits
+  `frontend_auth.js` without checking has edited the copy another session is
+  running. Assert the location; don't assume it.
 - **Worktrees are siblings (`<repo>-wt/`), not `.worktrees/` inside the repo.**
   No `.gitignore` change is needed, and a stray `git add` in the main checkout
   can never swallow a second copy of the project. Both GitHub repos are public.
@@ -117,8 +129,14 @@ Design decisions worth not re-litigating:
 
 Split work along **files**, not topics: `images/vocab/*.png` is conflict-free
 (new filenames), while `index.html`, `content_<book>.js` and the stamp trio are
-where parallel agents collide. Agents never touch the stamp trio; the integrator
-bumps all three once on the merged result (§2b).
+where features collide — sequence those two conversations rather than running
+them at once. Agents never touch the stamp trio; the integrator bumps all three
+once on the merged result (§2b).
+
+Verified end to end on 2026-10-05: created a worktree through the bootstrap from
+a branch that did not yet contain `wt.sh`, ran the suite through the junctions
+(485 assertions, 0 failures), removed it, and confirmed the main checkout's real
+`node_modules` survived.
 
 ## 2b. The version bump checklist (the gate)
 

@@ -5,6 +5,7 @@
 # each other's files.
 #
 #   wt.sh new <branch> [base]     create ../<repo>-wt/<branch> (default base: preview)
+#   wt.sh where                   what checkout am I actually in? run before the first write
 #   wt.sh ls                      every worktree and the branch it holds
 #   wt.sh path <branch>           print the directory, for scripting
 #   wt.sh rm <branch>             remove it (refuses if it has uncommitted work)
@@ -96,6 +97,19 @@ case "$cmd" in
     fi
     link_deps "$dest"
     echo "$dest"
+    ;;
+
+  where)
+    # The workspace root stays the MAIN checkout while work happens in a sibling
+    # worktree, so an agent can write to the wrong tree without noticing. Assert
+    # the location before the first edit instead of assuming it.
+    root=$(git rev-parse --show-toplevel)
+    printf '%s\nbranch: %s\n' "$root" "$(git branch --show-current || echo detached)"
+    if [ "$root" = "$MAIN_ROOT" ]; then
+      echo "!! this is the MAIN checkout - shared with every other session." >&2
+      echo "!! if you were told to work in a feature worktree, you are in the wrong place." >&2
+      exit 3
+    fi
     ;;
 
   ls)
