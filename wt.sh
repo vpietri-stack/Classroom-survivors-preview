@@ -89,7 +89,12 @@ case "$cmd" in
     mkdir -p "$WT_ROOT"
     if [ -e "$dest" ]; then echo "wt.sh: $dest already exists" >&2; exit 1; fi
     if git show-ref --verify --quiet "refs/heads/$branch"; then
-      git worktree add "$dest" "refs/heads/$branch"
+      # Pass the BARE name. `git worktree add <path> refs/heads/<x>` treats the
+      # full ref as a commit-ish and DETACHES HEAD - a later merge then moves
+      # HEAD and silently leaves the real branch where it was. Bare names
+      # attach, and git resolves refs/heads/ first, so the ambiguous
+      # `preview` warning here is cosmetic.
+      git worktree add "$dest" "$branch"
     else
       git rev-parse --verify --quiet "$base" >/dev/null || {
         echo "wt.sh: base '$base' is not a known ref; pass an explicit base" >&2; exit 1; }
@@ -104,7 +109,16 @@ case "$cmd" in
     # worktree, so an agent can write to the wrong tree without noticing. Assert
     # the location before the first edit instead of assuming it.
     root=$(git rev-parse --show-toplevel)
-    printf '%s\nbranch: %s\n' "$root" "$(git branch --show-current || echo detached)"
+    printf '%s\n' "$root"
+    if ! sym=$(git symbolic-ref -q HEAD); then
+      # A blank branch name is not "unknown", it means "you are on no branch at
+      # all". Printing an empty field is how the detached-HEAD merge accident
+      # happens: the merge moves HEAD and the real branch never moves.
+      echo "branch: *** DETACHED HEAD *** - commits here belong to no branch" >&2
+      echo "          checkout -b or re-attach the branch before trusting a merge" >&2
+      exit 4
+    fi
+    echo "branch: ${sym#refs/heads/}"
     if [ "$root" = "$MAIN_ROOT" ]; then
       echo "!! this is the MAIN checkout - shared with every other session." >&2
       echo "!! if you were told to work in a feature worktree, you are in the wrong place." >&2
