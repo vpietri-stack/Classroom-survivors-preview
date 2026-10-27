@@ -2100,6 +2100,7 @@
                 priority: status || priority(key, bucket), score: Math.random() * weight, varietyEligible });
         };
         for (const p of pages.slice(0, activeIndex + 1).reverse()) {
+            if (options.pageOnly && (String(p.unit) !== String(unit) || String(p.page) !== String(page))) continue;
             // Availability can include not-yet-authored pages. Match the legacy
             // SR picker's guard; retain absIndex gaps for proximity weighting.
             const content = TEACHING_CONTENT[p.book] && TEACHING_CONTENT[p.book][p.unit] && TEACHING_CONTENT[p.book][p.unit][p.page];
@@ -2170,6 +2171,9 @@
         }
         return shuffleArray(picked).map(e => e.item);
     }
-    window.NonSpellingContent = { catalog, normalize, buildPool, select, typedKey };
+    function selectPage(book, unit, page, count = 5) {
+        return shuffleArray(buildPool(book, unit, page, { pageOnly: true }).entries.slice()).slice(0, count).map(e => e.item);
+    }
+    window.NonSpellingContent = { catalog, normalize, buildPool, select, selectPage, typedKey };
     normalize();
 })();

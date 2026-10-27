@@ -153,6 +153,30 @@ Progress-bar labels (`STUDY_ROUND_LABELS`, ~1266) are `A:'Listen', C:'Scramble',
 
 ## Lifecycle
 
+### Preview notes and page-scoped Study (preview only, 2026-10-27)
+
+`PreviewNotes.onLogin()` opens the registered PU3 U9 p111 four-page reader for
+an unfinished student, whether assigned manually or reached through SR advance.
+The advance loop stops at an unfinished note before evaluating its cooldowns;
+fresh note placement is not overridden by a stale pending local advance.
+The Chinese `开始学习` action (no listening gate) calls
+`initStudyMode({previewNoteId:'pu3-u9-p111'})`: five uniformly shuffled distinct
+items from this page's original 14-word vocab array, plus five random distinct
+boards from `NonSpellingContent.selectPage`. `pageOnly` filters before pooling,
+so older-page due items cannot leak into this introductory session. All four
+types are eligible: 12 scrambles, page-local pair boards, the existing 8 M and
+14 F items. A random five-board draw need not contain every type.
+
+The standard A/C/D/E internals, mixed widgets, first-attempt SR tracking and
+acknowledged flush are reused. No content arrays, approved M/F wording or locked
+prefixes change. Only a fully finished five-word/five-board session carries
+`data.previewNote` on its **single ordinary `sessionType:'study'` event**, so SR
+and weekly targets count it normally and only once. Partial exits retain normal
+observed SR outcomes but do not complete the note. The main-menu `预习笔记`
+library reopens completed notes in listening-only review mode. A student-scoped
+local mirror covers pending offline delivery; the durable server map is returned
+with the normal login. See [data model](11-data-model.md).
+
 ```mermaid
 flowchart TD
     INIT[initStudyMode<br/>~29: SR-pick 5 words + 5 sentences] --> A["UI Round A — Listen & click<br/>startRoundA ~100"]

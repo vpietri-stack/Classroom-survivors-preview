@@ -103,6 +103,16 @@ These exist because their contracts were broken in production; treat failures as
 
 ## Out-of-chain test families (not in `npm test`)
 
+The registered-note integration is covered by `test_preview_notes_state.js`,
+`test_preview_notes_api.js` and `test_preview_notes_browser.js` in the root test
+chain. They pin exact existing p111 M1-M8/F1-F14 data, random page-only sampling,
+durable/archival/idempotent completion, actual save-handler etag retry and SR
+delta, automatic/manual placement, the iframe Chinese action, full regular
+Study progression through all four non-spelling types, ordinary target credit,
+partial exits, account isolation and review-library access. The browser harness
+uses a loopback static server and mocked network/handwriting-recognition outcomes;
+it never sends student data to live or preview APIs.
+
 - `test_interactive_notes_poc.js` and `test_interactive_notes_poc_browser.js`
   cover the listening-only PU3 U9 p111 original four-page note. They verify every
   hotspot and its word/sentence audio, all 31 MP3 decodes, natural audio playback,

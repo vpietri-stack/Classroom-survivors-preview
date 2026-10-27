@@ -26,7 +26,9 @@ function showStudyNotice(msg) {
 }
 
 // Entry point
-function initStudyMode() {
+function initStudyMode(options = {}) {
+    const notePlan = window.PreviewNotes && options.previewNoteId ? PreviewNotes.prepareStudy(options.previewNoteId) : null;
+    if (options.previewNoteId && !notePlan) return false;
     if (window.ClientDiagnostics) ClientDiagnostics.checkpoint('study-start', { mode: 'study', active: true, word: '', letter: '' });
     if (window.NonSpellingFlow) NonSpellingFlow.cleanupStudy();
     // Determine book/unit/page from current selection
@@ -38,8 +40,8 @@ function initStudyMode() {
     }
 
     // Get Spaced Repetition Content (SR-aware)
-    const SR_WORDS = getStudyContentSR(book, unit, page, 'vocab', 5);
-    const mixed = window.NonSpellingFlow ? NonSpellingFlow.prepareStudy(book, unit, page) : null;
+    const SR_WORDS = notePlan ? notePlan.words : getStudyContentSR(book, unit, page, 'vocab', 5);
+    const mixed = notePlan ? notePlan.exercises : window.NonSpellingFlow ? NonSpellingFlow.prepareStudy(book, unit, page) : null;
     const SR_SENTENCES = mixed ? [] : getStudyContentSR(book, unit, page, 'sentences', 5);
     const sentenceCount = mixed ? mixed.length : SR_SENTENCES.length;
 
@@ -66,6 +68,7 @@ function initStudyMode() {
     STUDY_STATE.words = SR_WORDS.slice(0, 5);
     STUDY_STATE.sentences = SR_SENTENCES.slice(0, 5);
     STUDY_STATE.nonSpellingExercises = mixed;
+    STUDY_STATE.previewNote = notePlan ? notePlan.context : null;
     STUDY_STATE._mixedActive = false;
 
     // Hide Start Screen
@@ -101,6 +104,7 @@ function initStudyMode() {
     overlay.classList.remove('hidden');
 
     startRoundA();
+    return true;
 }
 
 // --- ROUND A: Word Recognition ---
@@ -1299,6 +1303,7 @@ function resetRoundF() {
 
 
 async function finishStudySession() {
+    if (STUDY_STATE.previewNote && STUDY_STATE.srFinalized) return;
     if (window.NonSpellingFlow) NonSpellingFlow.cleanupStudy();
     const durationMs = Date.now() - STUDY_STATE.startTime;
     const durationSec = Math.floor(durationMs / 1000);
@@ -1310,13 +1315,18 @@ async function finishStudySession() {
 
     // Track session completion
     // Finalize SR state for this session before flushing
+    const previewNote = window.PreviewNotes ? PreviewNotes.completeStudy() : null;
+    const previewOwner = previewNote && STUDY_STATE.previewNote.owner;
+    const completedStudyStart = STUDY_STATE.startTime;
     STUDY_STATE.srFinalized = true;
     finalizeSession(srStudyResults);
 
     queueSessionEvent('study', {
         durationMs: durationMs,
-        durationFormatted: timeStr
+        durationFormatted: timeStr,
+        ...(previewNote ? { previewNote } : {})
     });
+    if (previewNote && window.PreviewNotes) PreviewNotes.markComplete(previewNote);
     // FIX (2026-08-25, "Doris refresh"): AWAIT the delivery of the session
     // record + SR state BEFORE showing the completion screen. On iPad/iOS the
     // page process can restart within ~1s of completion (WeChat/Safari WebKit
@@ -1326,6 +1336,7 @@ async function finishStudySession() {
     // persisted queue for the next-login drain).
     if (typeof flushAnalyticsWithDeadline === 'function') await flushAnalyticsWithDeadline(4000);
     else flushAnalyticsOnGameOver(); // Reliable flush with retry on session end
+    if (previewNote && (!STUDY_STATE.active || STUDY_STATE.startTime !== completedStudyStart || !authActiveUser || authActiveUser.id !== previewOwner)) return;
 
     const targetText = typeof getActiveTargetText === 'function' ? getActiveTargetText() : null;
     const messageHtml = targetText 
@@ -1359,6 +1370,7 @@ function exitStudyMode() {
         srStudyResults = [];
     }
     STUDY_STATE.active = false; // so the game-mode keydown listener resumes
+    STUDY_STATE.previewNote = null;
     clearTimeout(roundDTimer);
     // A word abandoned halfway is still worth keeping: the letters a child gave
     // up on are the ones the recognition needs to learn from.

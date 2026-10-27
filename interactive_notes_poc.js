@@ -99,6 +99,26 @@
     });
     viewport.append(paper); article.append(label, viewport); $('pages').append(article);
   });
+  const embedded = new URLSearchParams(location.search);
+  if (embedded.get('embed') === '1' && parent !== window) {
+    const request = embedded.get('request');
+    document.querySelector('.toolbar-title a').removeAttribute('href');
+    const action = document.createElement('div'); action.className = 'reader-study-action';
+    const button = document.createElement('button'); button.type = 'button';
+    const review = embedded.get('mode') === 'review';
+    button.id = 'reader-study-start'; button.textContent = review ? '返回主界面' : '开始学习';
+    button.onclick = () => {
+      stop();
+      if (!review) { button.disabled = true; button.textContent = '正在开始学习…'; }
+      parent.postMessage({ action: review ? 'close-note' : 'start-note-study', request }, location.origin);
+    };
+    action.append(button); $('pages').after(action);
+    window.addEventListener('message', event => {
+      if (event.source === parent && event.origin === location.origin && event.data?.request === request && event.data.action === 'note-study-error') {
+        button.disabled = false; button.textContent = '开始学习';
+      }
+    });
+  }
   $('showAreas').addEventListener('change', () => document.body.classList.toggle('show-areas', $('showAreas').checked));
   $('zoom').addEventListener('change', () => document.documentElement.style.setProperty('--zoom', $('zoom').value));
   $('speed').addEventListener('change', () => { if (audio) audio.playbackRate = Number($('speed').value); });

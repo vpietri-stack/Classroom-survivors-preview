@@ -2,6 +2,7 @@ const { app } = require('@azure/functions');
 const { validateApiKey } = require('./shared/validateApiKey');
 const { getContainer } = require('./shared/db');
 const auth = require('./shared/auth');
+const previewNotes = require('./shared/previewNotesCore');
 
 const ARCHIVE_TRIGGER_COUNT = 700;
 const RETENTION_DAYS_MS = 90 * 24 * 60 * 60 * 1000; // 90 days
@@ -354,6 +355,7 @@ app.http('saveAnalytics', {
                 // already persisted — exactly the merge semantics we need.
                 if (geoEvents.length) applyGeoSamples(user, geoEvents); // v2 consensus (idempotent on retry)
                 ({ addedCount: added, addedEventIds, duplicateEventIds } = applyEventsWithAck(user.analytics, cleanEvents));
+                previewNotes.apply(user, cleanEvents);
                 // SR newer-wins (2026-09-10, Doris stuck-flag fix): each client
                 // SR update carries a monotonic srSeq. Stale replays (lost
                 // response retried, beacon+fetch duplicates) must not re-apply

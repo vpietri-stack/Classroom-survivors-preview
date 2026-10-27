@@ -1380,7 +1380,8 @@ async function loginWithProfile(user, clickedBtn) {
                 targets: data.targets || [],
                 analytics: data.analytics || [],
                 teacher: data.teacher || null,
-                vsPromoSeen: !!data.vsPromoSeen
+                vsPromoSeen: !!data.vsPromoSeen,
+                previewNotes: data.previewNotes || {}
             };
             
             // Update the local cache with the fresh data
@@ -1562,7 +1563,8 @@ async function handleLoginSubmit() {
             targets: data.targets || [],
             analytics: data.analytics || [],
             teacher: data.teacher || null,
-            vsPromoSeen: !!data.vsPromoSeen
+            vsPromoSeen: !!data.vsPromoSeen,
+            previewNotes: data.previewNotes || {}
         };
         
         window.authLoading = false;
@@ -1789,7 +1791,8 @@ function finishLogin() {
             // Priority: Directly use content assigned from DB
             // STICKY ADVANCE first (2026-09-08): a previously-decided advance
             // is applied, not re-litigated — then the normal check runs.
-            if (typeof reapplyPendingPageAdvance === 'function') reapplyPendingPageAdvance();
+            if (!(window.PreviewNotes && PreviewNotes.blocksAdvance(authActiveUser, authActiveUser))
+                && typeof reapplyPendingPageAdvance === 'function') reapplyPendingPageAdvance();
             checkAndAdvancePageIfAllOnCooldown();
             loadContent();
         } else if (authActiveUser.classTime) {
@@ -1820,6 +1823,7 @@ function finishLogin() {
     } else {
         targetBanner.classList.add('hidden');
     }
+    if (window.PreviewNotes) PreviewNotes.onLogin();
 }
 
 /**
@@ -1863,6 +1867,7 @@ function resolveContentFromClassTime(classTime, studentName) {
 }
 
 function goBackToProfiles() {
+    if (window.PreviewNotes) PreviewNotes.close();
     // Hide start screen and go back to profile selection
     document.getElementById('startScreen').classList.add('hidden');
     document.getElementById('step-greeting').classList.add('hidden');
@@ -2023,6 +2028,7 @@ function checkAndAdvancePageIfAllOnCooldown() {
     const currentSession = getCurrentSession();
 
     while (true) {
+        if (window.PreviewNotes && PreviewNotes.blocksAdvance(authActiveUser, { book, unit, page })) break;
         const sortedPages = getSortedPagesForBook(book);
         const activePageIndex = sortedPages.findIndex(
             p => p.book === book && p.unit === unit && p.page === page
