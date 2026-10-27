@@ -75,12 +75,13 @@ a 15-second fetch timeout, then plays an audio/mpeg Blob URL. Successful Blob
 URLs are reused in memory (at most the 31 clips) and revoked on page exit.
 This adds no external TTS, microphone access or persistent practice state.
 
-No app entry, existing Study round, curriculum availability, student record,
-SR, reward, dashboard or deploy-version stamp is changed. The POC is available
-through its standalone preview URL. Later integration can add a per-lesson
-Notes entry that opens a page manifest of this same shape. Further lessons
-need images, word/sentence clips and aligned hotspot rectangles; speech scoring
-is not required for this pattern.
+The standalone reader remains listening-only and independent of account APIs. In
+the preview app, PreviewNotes now opens this reader in an iframe on assignment
+to PU3 U9 p111. Its final Chinese button launches normal Study rounds with five
+random original page vocabulary items and five random existing page boards from
+all four non-spelling types. Study completion uses ordinary SR, logging and
+weekly credit; completed notes reopen through 预习笔记 without a required session.
+See the Study, auth, data-model and telemetry wiki pages for the integration.
 
 ## Verification
 

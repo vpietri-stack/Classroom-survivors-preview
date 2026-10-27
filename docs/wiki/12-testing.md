@@ -103,7 +103,7 @@ These exist because their contracts were broken in production; treat failures as
 - `test_speech_hygiene.js` (2026-09-04) pins that `Recorder.stop()` closes its `AudioContext` and releases references — each sentence gate builds a fresh Recorder, and leaked contexts hit iPadOS Safari's hard limit, killing the WebContent process ~5 min into a session (the "forced refresh" that looked like a network bug). Also pins `csPageHeartbeat` merging `sp*` speech breadcrumbs and carrying them through the restart diagnostic.
 - **Three-way vocab filename contract** (added 2026-09-25a, in `test_asset_manifest.js`): the vocab-image naming rule exists as three *independent copies* that never call each other — `slice_vocab_sheet.js` `fileFor()` (the generator, which decides what is on disk), `asset_cache.js` `vocabImagePath()` (the prefetcher), and `game.js` `showVocabImage()` (the display). The block extracts all three expressions, evaluates them over every vocab string in the content packs, and fails if any disagrees with the generator. It exists because 2026-09-16a patched only the display copy and silently broke two images that worked.
 
-## Out-of-chain test families (not in `npm test`)
+## Preview-note integration tests
 
 The registered-note integration is covered by `test_preview_notes_state.js`,
 `test_preview_notes_api.js` and `test_preview_notes_browser.js` in the root test
@@ -114,6 +114,8 @@ Study progression through all four non-spelling types, ordinary target credit,
 partial exits, account isolation and review-library access. The browser harness
 uses a loopback static server and mocked network/handwriting-recognition outcomes;
 it never sends student data to live or preview APIs.
+
+## Out-of-chain test families (not in `npm test`)
 
 - `test_interactive_notes_poc.js` and `test_interactive_notes_poc_browser.js`
   cover the listening-only PU3 U9 p111 original four-page note. They verify every

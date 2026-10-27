@@ -410,3 +410,7 @@ Preview release 2026-10-23d adds approved PU1 Unit 7 28 M/36 F boards and locked
 ## Cancellation target correction (2026-10-27a)
 
 New class cancellations add 10 sessions as well as seven days to the existing group target. Existing cancellation receipts remain unchanged. Publish independently on current preview/production histories, retaining their curriculum, routes and data; deploy the existing PR #1 API before promoting production. Synchronize the stamp trio and dashboard auth/calendar/core cache busters. Verify the served rule and cancellation retry behaviour without altering real student attendance.
+
+## Preview notes release 2026-10-27b
+
+Publish the page-triggered PU3 U9 p111 listening reader and page-scoped Study flow to preview/main only. Update the existing origin/admin-dashboard-update PR environment for durable completion, retaining its existing Students-admin-dashboard-preview container and configuration. Never merge/close PR #1 or push origin/main for this preview. The synchronized stamps and changed reader/Study/curriculum cache busters advance together. Verify Pages assets and the isolated API deployment before reporting readiness.

@@ -291,3 +291,7 @@ Any agent that changes code covered by this page must update this page in the sa
 ## Remote incident diagnostics (2026-10-23)
 
 The optional account-enabled remote recorder attaches after student login, stops on profile change, and observes API result timings plus progress acknowledgements. It does not change auth or progress queue semantics. See [Telemetry](14-telemetry.md).
+
+## Preview-note login gate (27 October 2026)
+
+The preview-only PreviewNotes module receives the server previewNotes map at login. Before applying pending local page advancement and at each automatic SR step, an unfinished registered note blocks advancement. After placement/content loads, finishLogin opens its four-page reader. Completion requires its following regular Study session; an interrupted session opens the reader again at next login. Completion is per student and can also be restored on a fresh device from the server.

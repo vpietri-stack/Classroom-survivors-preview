@@ -185,3 +185,7 @@ curriculum location, stable ID/key, target sentences/answers and submitted respo
 in itemDetails. First-check SR outcomes use namespaced keys in the existing
 sentences bucket, so extractSRDelta and the existing server merge work unchanged.
 Matching remains one presentation board with three independently queued pairs.
+
+## Preview-note Study metadata
+
+A completed page-scoped Study session adds data.previewNote (catalog id, location, version, wordCount and exerciseCount) to the existing session/study event. Exercise events and SR use their normal paths; the same single Study session counts toward the weekly target. Reader taps and repeat visits emit no practice credit. The backend retains a bounded completion map independently of archived analytics.

@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-27a",
+  "version": "2026-10-27b",
   "deployedAt": "2026-10-27",
-  "notes": "Cancelled classes add 10 sessions and seven days; preserve preview curriculum, runtime and isolated data."
+  "notes": "Preview notes automatically open at PU3 U9 p111 and launch a regular page-scoped Study session; preserve isolated preview data."
 }
