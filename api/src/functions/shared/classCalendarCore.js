@@ -107,7 +107,11 @@
         const sameGroup = t => targetBelongsTo(student, t, key);
         const previous = previousTarget(targets.filter(sameGroup), event);
         if (status === 'cancelled') {
-            if (previous) { previous.groupKey = key; previous.endTime = addDays(previous.endTime, 7); }
+            if (previous) {
+                previous.groupKey = key;
+                previous.endTime = addDays(previous.endTime, 7);
+                previous.targetSessions = Number(previous.targetSessions) + 10;
+            }
             return targets;
         }
         if (!nextClass || +new Date(nextClass.startTime) <= +new Date(event.endTime)) throw new Error('Schedule a following class before recording attendance.');

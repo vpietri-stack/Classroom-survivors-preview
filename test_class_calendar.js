@@ -85,7 +85,19 @@ async function coreAndServiceTests() {
     assert.equal(core.updateTargets({targets:[]},event,'attended',rescheduled,[])[0].endTime,rescheduled.startTime);
     const cancelled = core.updateTargets({targets:[oldTarget()]},event,'cancelled',null,[]);
     assert.equal(cancelled[0].endTime,at('25'));
-    assert.equal(cancelled[0].targetSessions,10);
+    assert.equal(cancelled[0].targetSessions,20);
+    const fridayKey=core.groupKey('Teacher A','Fri 16:30');
+    const octoberTarget={id:'october',groupKey:fridayKey,startTime:core.iso('2026-10-23T18:00'),endTime:core.iso('2026-10-30T16:30'),targetSessions:10,manualOffset:2};
+    const octoberCancellation={id:'class_'+'f'.repeat(32),teacher:'Teacher A',classTime:'Fri 16:30',groupKey:fridayKey,startTime:core.iso('2026-10-30T16:30'),endTime:core.iso('2026-10-30T18:00')};
+    const extendedOctober=core.updateTargets({targets:[octoberTarget]},octoberCancellation,'cancelled',null,[])[0];
+    assert.equal(extendedOctober.startTime,octoberTarget.startTime);
+    assert.equal(extendedOctober.endTime,core.iso('2026-11-06T16:30'));
+    assert.equal(extendedOctober.targetSessions,20);
+    assert.equal(extendedOctober.manualOffset,2);
+    const extendedAgain=core.updateTargets({targets:[extendedOctober]},{...octoberCancellation,startTime:core.iso('2026-11-06T16:30')},'cancelled',null,[])[0];
+    assert.equal(extendedAgain.targetSessions,30);
+    assert.equal(extendedAgain.endTime,core.iso('2026-11-13T16:30'));
+    assert.deepEqual(core.updateTargets({targets:[]},octoberCancellation,'cancelled',null,[]),[]);
     const stats = core.attendanceStats({attendance:[{status:'attended',startTime:at('18')},{status:'missed',startTime:at('25')},{status:'cancelled',startTime:at('20')}]},'2026-10-12','2026-10-31');
     assert.equal(stats.rate,50); assert.equal(stats.recorded,2);
     assert.equal(core.attendanceStats({attendance:stats.records},'2026-10-18','2026-10-18').rate,100);
@@ -125,6 +137,7 @@ async function coreAndServiceTests() {
         await assert.rejects(service.saveEvent(store,{eventId:first.id,startTime:at('20'),endTime:at('20','18:00')}),/cannot be edited/);
         const cancel1 = await service.recordBatch(store,{action:'cancel',eventId:second.id},'admin'); assert(cancel1.success);
         const before = copy(store.docs.get('a').targets);
+        assert.equal(before[0].targetSessions,30);
         const cancel2 = await service.recordBatch(store,{action:'cancel',eventId:second.id},'admin'); assert(cancel2.success);
         assert.deepEqual(store.docs.get('a').targets,before);
         assert.equal(store.docs.get(second.id).status,'cancelled');
@@ -212,9 +225,11 @@ async function multipleGroupTests() {
         const cancelSat=events.find(e=>e.startTime===at('24','14:50'));
         assert((await service.recordBatch(store,{action:'cancel',eventId:cancelSat.id},'admin')).success);
         assert.equal(store.docs.get('selena').targets[0].endTime,at('31','14:50'));
+        assert.equal(store.docs.get('selena').targets[0].targetSessions,30);
         assert.deepEqual(store.docs.get('selena').targets.filter(t=>core.targetGroupKey(current,t)===sundayKey),sunTargets);
         await service.recordBatch(store,{action:'cancel',eventId:cancelSat.id},'admin');
         assert.equal(store.docs.get('selena').targets[0].endTime,at('31','14:50'));
+        assert.equal(store.docs.get('selena').targets[0].targetSessions,30);
         const stats=core.attendanceStats(store.docs.get('selena'),'2026-10-12','2026-10-31');
         assert.equal(stats.recorded,2);assert.equal(stats.rate,50);
 
@@ -222,7 +237,7 @@ async function multipleGroupTests() {
         const assign=httpHandler('setTargets.js',store);
         const result=await assign({json:async()=>({studentIds:['selena'],target:{startTime:at('11','18:00'),endTime:at('25'),targetSessions:30,groupKey:sundayKey}})},{error:()=>{}});
         assert(result.jsonBody.results[0].success);
-        assert.equal(store.docs.get('selena').targets.find(t=>t.id==='sat').targetSessions,20);
+        assert.equal(store.docs.get('selena').targets.find(t=>t.id==='sat').targetSessions,30);
         const wrong=await assign({json:async()=>({studentIds:['selena'],target:{startTime:at('11','18:00'),endTime:at('25'),targetSessions:10,groupKey:core.groupKey('outsider','Sun 16:30')}})},{error:()=>{}});
         assert(!wrong.jsonBody.results[0].success);
 

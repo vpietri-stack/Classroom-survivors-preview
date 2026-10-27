@@ -193,7 +193,7 @@ function openCalendarEdit(id) {
     ['calendarEditStart','calendarEditEnd','calendarSaveBtn'].forEach(id => { document.getElementById(id).disabled = locked; });
     document.getElementById('calendarCancelBtn').disabled = locked && event.status !== 'cancelled';
     document.getElementById('calendarCancelBtn').textContent = event.status === 'cancelled' ? 'Retry unfinished target extensions' : 'Cancel class · extend targets';
-    document.getElementById('calendarEditInfo').textContent = locked ? 'This class is locked because attendance or cancellation has started.' : 'Rescheduling changes this class only. Cancelling extends each student’s existing target period by seven days, keeping the session goal unchanged.';
+    document.getElementById('calendarEditInfo').textContent = locked ? 'This class is locked because attendance or cancellation has started.' : 'Rescheduling changes this class only. Cancelling adds 10 sessions to each student’s existing target and extends its period by seven days.';
     document.getElementById('calendarEditMessage').textContent = '';
     document.getElementById('calendarEditModal').classList.remove('hidden');
 }

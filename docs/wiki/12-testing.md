@@ -1,5 +1,7 @@
 # Testing
 
+Cancellation regression coverage in `test_class_calendar.js` verifies +10 sessions and seven days, the 23 October–6 November example, consecutive cancellations, preserved start/manual offset, no invented target when none exists, separate group targets and idempotent cancellation retries.
+
 23 October handwriting checks pin initial/direct-call guide gating, exclusion
 of taps, automatic guides after two meaningful failures with no guide button,
 per-letter reset, retained ink and the existing reveal/skip paths. The failure

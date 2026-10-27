@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-23j",
-  "deployedAt": "2026-10-23",
-  "notes": "Preview verification: temporary remote incident recorder and teacher diagnostics; preserve preview handwriting, curriculum, API routing and data."
+  "version": "2026-10-27a",
+  "deployedAt": "2026-10-27",
+  "notes": "Cancelled classes add 10 sessions and seven days; preserve preview curriculum, runtime and isolated data."
 }
