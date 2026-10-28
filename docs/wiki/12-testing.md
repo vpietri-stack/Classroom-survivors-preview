@@ -1,5 +1,8 @@
 # Testing
 
+Single-word lab regressions additionally cover export during a stalled optional model, preserved audio and teacher labels, skip/cancel with partial results, fallback asset routes, resumed chunks and checksum rejection.
+
+
 `test_speech_word_poc.js` verifies the standalone experiment: same clip across variants/models, recorder-equivalent trim, no automatic Moonshine use, distinct transcript/hint feedback, target invalidation, neutral errors, teacher labels and paired exports, cancellation, mobile fit, no external writes, and SHA-256 verification of pinned Moonshine assets. Native smoke testing separately exercises the actual Whisper and Moonshine workers with synthetic speech; this establishes integration, not child-reading accuracy.
 
 

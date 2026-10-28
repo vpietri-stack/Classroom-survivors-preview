@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-28f",
+  "version": "2026-10-28g",
   "deployedAt": "2026-10-28",
-  "notes": "Preview-only single-word speech lab: compare same audio with Whisper preparations and optional Moonshine, local-only recording/results. Preserve notes two-word speech restriction."
+  "notes": "Preview speech lab: export completed results while Moonshine loads; preserve partial results on cancel/skip; resumable verified model downloads with fallback routes."
 }

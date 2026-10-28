@@ -1,5 +1,8 @@
 # Deployment & Release Discipline
 
+Preview-only 2026-10-28g adds the resumable public model loader and refreshes the lab bootstrap/worker URLs. Synchronize version/auth/index/dashboard-auth; leave production and model weights unchanged. Verify partial export and skipped Moonshine on the hosted page.
+
+
 Single-word POC 2026-10-28f is preview-only and has no app/menu integration. Ship the new page/helpers/workers and pinned public Moonshine assets; leave notes, curriculum, API and shared speech engine unchanged. Update synchronized version/auth/index/dashboard-auth stamps. The existing runtime and Whisper cache keys are reused; Moonshine downloads only when selected. Preserve notes single-word listening-only behaviour.
 
 
