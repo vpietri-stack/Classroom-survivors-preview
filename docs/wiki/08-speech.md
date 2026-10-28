@@ -1,6 +1,6 @@
 # Speech Recognition & Pronunciation Scoring
 
-## Optional practice preview — 2026-10-28a
+## Optional practice preview — 2026-10-28b
 
 `SPEECH_PRACTICE_ENABLED` enables the new shared sentence practice controls on
 the preview path and localhost/file only. Production retains its existing gate.
@@ -12,9 +12,25 @@ or Continue without waiting for three failures. Continue is available while a
 recording is being checked. There is no learner-facing percentage, error chime
 for a transcript mismatch, word grading or pronunciation score. An optional
 disclosure shows what the recogniser may have heard. Recognised attempts use
-the same first-try matching threshold on every retry. Recognition still runs
-freely with unchanged Whisper tiny.en; expected text is compared afterwards.
-Target-conditioned acoustic assessment is not included in this release.
+the same first-try matching threshold on every retry. Whisper still transcribes
+freely; the target is never supplied as an ASR generation prompt. The preview
+also checks target-token evidence in the audio against the same hypotheses on
+silence. `speech_target.js` uses that evidence and independently recognised
+words to supply positive-only word hints. Green means heard by the software;
+all other words stay neutral. It is encouragement, not word-error grading.
+The teacher explicitly prefers accepting some imperfect words to rejecting
+acceptable child readings. The previous strict automatic-grading quality bar
+is not claimed to have been met or used to justify a pronunciation percentage.
+
+`speech_target_data.json` contains aggregate calibration parameters and a public
+curriculum-only CMU dictionary subset; its licence is retained alongside it.
+No student rows, identifiers, recordings or reference labels are published.
+All existing model/runtime files, cache keys and stable library URLs are reused.
+One silence encoder result is retained only when its input features are exactly
+equal; other tensors are released. Decoder steps yield to browser tasks so
+Continue can interrupt. A current native WASM step must finish before cleanup.
+Only one transcription/target check runs at a time. If the small hint assets
+are unavailable, free recognition and optional progression still work.
 
 Record controls suppress duplicate pending permission requests, bound permission
 waiting to 15 seconds and assessment waiting to 30 seconds, and dispose when
@@ -37,7 +53,9 @@ and current model without login, uploads or progress saving. It is preview-only.
 `test_speech_practice.js` covers both real Study/game callers, progression,
 uncertainty, late results, permission/timeout/disposal, account switching and
 production gating. `test_speech_engine_cancel.js` exercises cancellation and
-model reuse with actual Whisper/WASM and synthetic audio. Physical-phone
+model reuse and target checking with actual Whisper/WASM and synthetic audio.
+`test_speech_target.js` checks causal target tokens, silence, public data shape,
+positive-only output and silence-encoder reuse. Physical-phone
 performance remains a separate check.
 
 > **Last verified:** 2026-10-05 · **Part of:** [Classroom-survivors Repo Wiki](README.md)

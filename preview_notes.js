@@ -68,7 +68,7 @@
     function onLogin() {
         close(); const student = user(), button = document.getElementById('preview-notes-button');
         const active = enabled() && isStudent(student) && !(typeof isTestMode !== 'undefined' && isTestMode);
-        if (button) button.classList.toggle('hidden', !active);
+        if (button) button.classList.toggle('hidden', !active || Object.keys(progress(student)).length === 0);
         if (!active) return;
         student.previewNotes = progress(student);
         const note = core.atPage(student);
@@ -95,6 +95,8 @@
         const student = user(); if (!student || !marker) return;
         const event = { type: 'session', sessionType: 'study', timestamp: new Date().toISOString(), data: { previewNote: marker } };
         student.previewNotes = core.merge(progress(student), core.fromEvents([event]));
+        const button = document.getElementById('preview-notes-button');
+        if (button) button.classList.remove('hidden');
         try { localStorage.setItem(key(student), JSON.stringify(student.previewNotes)); } catch (_) {}
         if (typeof saveActiveUserToCache === 'function') saveActiveUserToCache();
         if (typeof checkAndAdvancePageIfAllOnCooldown === 'function') checkAndAdvancePageIfAllOnCooldown();

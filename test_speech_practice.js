@@ -26,7 +26,9 @@ async function main() {
         window.lastSignal = opts.signal;
         if (kind === 'deferred') return new Promise(resolve => { window.finishAsr = resolve; });
         if (kind === 'error') return Promise.reject(new Error('technical details should stay hidden'));
-        return Promise.resolve({ text: kind === 'junk' ? '[Music]' : 'A real reading.' });
+        return Promise.resolve({ text: kind === 'junk' ? '[Music]' : 'A real reading.', targetWords: kind === 'hints' ? [
+          { text: 'This', heardClear: true }, { text: 'is', heardClear: true }, { text: 'a', heardClear: true }, { text: 'short', heardClear: false }, { text: 'pen', heardClear: false }
+        ] : undefined, targetStatus: kind === 'hints' ? 'checked' : undefined });
       } };
     });
     await page.addScriptTag({ path: path.join(__dirname, 'speech_ui.js') });
@@ -49,6 +51,10 @@ async function main() {
     assert.equal(await page.evaluate(() => finished.length), 1); assert.equal(await page.evaluate(() => finished[0].completion), 'practised');
     assert.equal(await page.evaluate(() => 'pass' in finished[0] || 'score' in finished[0]), false); checks++;
     assert.equal(await page.evaluate(() => events.filter(e => e.type === 'speech_practice').length), 1); checks++;
+    await record('hints'); assert.equal(await page.locator('.speech-target-word.heard').count(), 3);
+    assert.equal(await page.locator('.speech-target-word:not(.heard)').count(), 2);
+    assert(!/wrong|错误|%|不太一样/.test(await page.locator('.heard-feedback').innerText()));
+    assert.equal(await page.locator('.speech-practice-continue').isEnabled(), true); checks++;
     for (const kind of ['quiet', 'short', 'junk', 'error']) {
       await record(kind); assert.equal(await page.locator('.speech-practice-continue').isVisible(), true);
       assert(!/technical details|%/.test(await page.locator('.heard-feedback').innerText()));

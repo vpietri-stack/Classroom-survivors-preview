@@ -1,6 +1,6 @@
 # Telemetry & Data Delivery
 
-Optional speech practice (2026-10-28a preview) adds one `speech_practice` exercise
+Optional speech practice (2026-10-28b preview) adds one `speech_practice` exercise
 event when Continue is chosen. `completion` is `practised` or `unassessed`, with
 recording/assessed-attempt counts and a nullable `matchedTarget` diagnostic. It
 contains no pronunciation score or earned success. Existing speech diagnostics
@@ -9,6 +9,10 @@ carry `flow: optional_practice_v1`; their scorer rung stays `attempt: 1` while
 results emit no assessment or completion. The normal bounded analytics queue,
 ownership, acknowledgements and batching apply; no new endpoint, container or
 throughput is provisioned. Labels/filters are in the teacher dashboard.
+
+The target-aware preview uses `assessment: target_aware_hints`, a count of
+positively heard words, and target-check status/time diagnostics on attempts.
+It does not emit a separate event per word or upload raw audio through analytics.
 
 Handwriting preview (2026-10-22): `handwritingAssisted` identifies a word completed
 after a hint, outline or reveal; `handwriting` remains independent completion.

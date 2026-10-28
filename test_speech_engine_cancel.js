@@ -6,7 +6,7 @@ const fs = require('fs'), path = require('path'), http = require('http'), assert
   const server = http.createServer((req, res) => {
     const route = decodeURIComponent(req.url.split('?')[0]);
     if (route === '/') { res.setHeader('Content-Type', 'text/html'); return res.end('<script src="speech_engine.js"></script>'); }
-    if (!/^\/(?:speech_engine\.js|lib\/(?:transformers\.min\.js|wasm\/ort-wasm-simd-threaded\.jsep\.(?:wasm|mjs))|models\/whisper-tiny\.en\/(?:[a-z_]+\.json|merges\.txt|onnx\/(?:encoder_model|decoder_model_merged)_quantized\.onnx))$/.test(route)) { res.writeHead(404); return res.end(); }
+    if (!/^\/(?:speech_engine\.js|speech_target\.js|speech_target_data\.json|lib\/(?:transformers\.min\.js|wasm\/ort-wasm-simd-threaded\.jsep\.(?:wasm|mjs))|models\/whisper-tiny\.en\/(?:[a-z_]+\.json|merges\.txt|onnx\/(?:encoder_model|decoder_model_merged)_quantized\.onnx))$/.test(route)) { res.writeHead(404); return res.end(); }
     const file = path.join(__dirname, route); if (!fs.existsSync(file)) { res.writeHead(404); return res.end(); }
     res.setHeader('Content-Type', route.endsWith('.wasm') ? 'application/wasm' : /\.m?js$/.test(route) ? 'text/javascript' : 'application/octet-stream');
     fs.createReadStream(file).pipe(res);
@@ -32,11 +32,22 @@ const fs = require('fs'), path = require('path'), http = require('http'), assert
       const cancelled = await first, elapsedMs = performance.now() - start;
       const readyAfterCancel = LocalEngine.isLoaded() && !LocalEngine.isBusy();
       const next = await LocalEngine.transcribe(tone);
-      return { cancelled, second, elapsedMs, readyAfterCancel, nextText: typeof next.text, busyAtEnd: LocalEngine.isBusy() };
+      const target = 'This is a short pen.', firstHints = await LocalEngine.transcribe(tone, { target }), repeatedHints = await LocalEngine.transcribe(tone, { target });
+      const targetAbort = new AbortController(); window.__speechLog = function (message) { if (message.startsWith('Checking audio')) setTimeout(() => targetAbort.abort(), 30); };
+      const targetCancelled = await LocalEngine.transcribe(tone, { target, signal: targetAbort.signal }).then(() => 'unexpected result', e => e.name);
+      window.__speechLog = null;
+      const afterTargetCancel = await LocalEngine.transcribe(tone, { target });
+      return { cancelled, second, elapsedMs, readyAfterCancel, nextText: typeof next.text, busyAtEnd: LocalEngine.isBusy(),
+        targetStatus: firstHints.targetStatus, words: firstHints.targetWords, repeatedWords: repeatedHints.targetWords,
+        targetCancelled, afterTargetCancel: afterTargetCancel.targetStatus, targetMs: [firstHints.targetCheckMs, repeatedHints.targetCheckMs] };
     });
     assert.equal(result.cancelled, 'AbortError'); checks++; assert.equal(result.second, 'SPEECH_BUSY'); checks++;
     assert(result.readyAfterCancel && result.elapsedMs < 15000); checks++;
     assert.equal(result.nextText, 'string'); assert.equal(result.busyAtEnd, false); assert.equal(weights, 2); checks++;
+    assert.equal(result.targetStatus, 'checked'); assert.equal(result.words.length, 5); assert(result.words.every(w => typeof w.heardClear === 'boolean')); checks++;
+    assert.deepEqual(result.words, result.repeatedWords); assert.equal(result.afterTargetCancel, 'checked'); checks++;
+    assert.equal(result.targetCancelled, 'AbortError'); assert.equal(weights, 2); checks++;
     console.log(checks + ' real Whisper cancellation checks passed; cancellation ' + Math.round(result.elapsedMs) + ' ms; weights downloaded once');
+    console.log('Target-aware added checking time on this desktop (cold/warm): ' + result.targetMs.join('/') + ' ms');
   } finally { if (browser) await browser.close(); await new Promise(resolve => server.close(resolve)); }
 })().catch(e => { console.error(e); process.exitCode = 1; });

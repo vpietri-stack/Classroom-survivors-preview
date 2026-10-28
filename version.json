@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-28a",
+  "version": "2026-10-28b",
   "deployedAt": "2026-10-28",
-  "notes": "Preview only: optional speech retries and Continue, gentler feedback without pronunciation percentages, and safe microphone/time-out recovery. Current speech model and earned sentence progress are preserved."
+  "notes": "Preview: encouraging target-aware word hints with the current speech model and optional retries/Continue. Preserve notes-library completion gating and isolated preview data."
 }

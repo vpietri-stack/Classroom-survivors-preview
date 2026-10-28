@@ -1,12 +1,12 @@
 # Study Mode (UI Rounds A–D + Match; internal functions A/C/D/E/F)
 
-The 2026-10-28a optional speech-practice preview uses the existing sentence
+The 2026-10-28b optional speech-practice preview uses the existing sentence
 gate call in `checkRoundE`. Learners can retry or continue after recording,
 including recognition/microphone problems, without a pronunciation percentage.
 The sentence-building SR result remains recorded before the speaking step;
 continuing does not award speech mastery or repeat the earned grammar result.
 Production keeps its current gate until explicitly promoted. See
-[Speech Recognition](08-speech.md#optional-practice-preview--2026-10-28a).
+[Speech Recognition](08-speech.md#optional-practice-preview--2026-10-28b).
 
 Temporary remote diagnostics: optional handwriting checkpoints and neural worker errors feed the account-enabled recorder. No ink or learner interactions are added. See [Telemetry](14-telemetry.md).
 
@@ -181,7 +181,9 @@ prefixes change. Only a fully finished five-word/five-board session carries
 `data.previewNote` on its **single ordinary `sessionType:'study'` event**, so SR
 and weekly targets count it normally and only once. Partial exits retain normal
 observed SR outcomes but do not complete the note. The main-menu `预习笔记`
-library reopens completed notes in listening-only review mode. A student-scoped
+button appears only after at least one preview Study session is completed,
+  including immediately after the first completion. The library reopens completed
+  notes in listening-only review mode. A student-scoped
 local mirror covers pending offline delivery; the durable server map is returned
 with the normal login. See [data model](11-data-model.md).
 

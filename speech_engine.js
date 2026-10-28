@@ -289,12 +289,39 @@
   let transcriber = null;     // cached pipeline
   let InterruptableStoppingCriteria = null;
   let transcriptionBusy = false;
+  let inferenceRuntime = null, targetCheckerLoading = null;
+  function targetChecker() {
+    if (!targetCheckerLoading) {
+      targetCheckerLoading = (async function () {
+        const controller = new AbortController(); let timer;
+        try {
+          const parts = await Promise.race([Promise.all([
+            import(new URL('speech_target.js?v=2026-10-28b', location.href).href),
+            fetch(new URL('speech_target_data.json?v=2026-10-28b', location.href).href, { signal: controller.signal }).then(function (response) { if (!response.ok) throw new Error('Target hints unavailable'); return response.json(); })
+          ]), new Promise(function (_, reject) { timer = setTimeout(function () { controller.abort(); reject(new Error('Target hints timed out')); }, 12000); })]);
+          return parts[0].createTargetChecker(transcriber, inferenceRuntime, parts[1]);
+        } finally { clearTimeout(timer); }
+      })().catch(function (error) { targetCheckerLoading = null; throw error; });
+    }
+    return targetCheckerLoading;
+  }
+  function waitForTarget(promise, signal) {
+    if (!signal) return promise;
+    return new Promise(function (resolve, reject) {
+      const abort = function () { signal.removeEventListener('abort', abort); const error = new Error('Target checking cancelled'); error.name = 'AbortError'; reject(error); };
+      if (signal.aborted) return abort(); signal.addEventListener('abort', abort, { once: true });
+      promise.then(function (value) { signal.removeEventListener('abort', abort); resolve(value); }, function (error) { signal.removeEventListener('abort', abort); reject(error); });
+    });
+  }
   let loading = null;          // in-flight promise
   let chosen = null;           // winning weight source {name, base} after probe
 
   // Reset all in-flight load state so SpeechStatus.retry() can start fresh
   // (re-probes mirrors, re-downloads). Called only on a manual retry.
   function resetLoad() {
+    if (transcriptionBusy) return false;
+    if (targetCheckerLoading) targetCheckerLoading.then(function (checker) { checker.dispose(); }, function () {});
+    targetCheckerLoading = null;
     transcriber = null;
     loading = null;
     chosen = null;
@@ -365,6 +392,7 @@
       }
 
       InterruptableStoppingCriteria = runtime.InterruptableStoppingCriteria || null;
+      inferenceRuntime = runtime;
       // Weights from the chosen (fast, CN-reachable) mirror; lib+wasm same-origin.
       // allowRemoteModels stays OFF so the blocked huggingface.co is NEVER contacted.
       env.allowLocalModels = true;
@@ -525,7 +553,7 @@
     // second decoder on the same pipeline or queue more recordings behind it.
     if (transcriptionBusy) { const e = new Error('Previous recording is still finishing'); e.code = 'SPEECH_BUSY'; throw e; }
     transcriptionBusy = true;
-    let stopper, interrupt, out, audio;
+    let stopper, interrupt, out, audio, targetAudio;
     try {
     if (!transcriber) await load();
     checkCancelled();
@@ -545,6 +573,7 @@
     }
     if (sampleRate !== TARGET_SR) audio = resample(audio, sampleRate, TARGET_SR);
     checkCancelled();
+    if (opts.target) targetAudio = audio;
 
     // --- Audio repeat hack for isolated words ---
     // Whisper tiny.en struggles on very short utterances (~0.3-0.6s single words)
@@ -587,10 +616,26 @@
     // times, treat it as noise / "try again" — never let it score.
     text = collapseRepetition(text);
 
+    let hints = null, targetCheckMs = 0;
+    if (opts.target) {
+      const checkingSince = performance.now();
+      try {
+        const checker = await waitForTarget(targetChecker(), signal); checkCancelled();
+        log('Checking audio against target words …');
+        hints = await checker.check(targetAudio, opts.target, text, signal); checkCancelled();
+      } catch (error) {
+        checkCancelled(); // Cancelled work must not return partial hints.
+        log('Target word hints unavailable; keep the transcription result');
+        hints = { status: 'unavailable', words: [] };
+      }
+      targetCheckMs = Math.round(performance.now() - checkingSince);
+    }
+
     log(`Transcribed in ${timeSec}s → "${text}"`);
     return {
       text,
-      timeSec: parseFloat(timeSec)
+      timeSec: parseFloat(timeSec),
+      ...(hints ? { targetWords: hints.words, targetStatus: hints.status, targetCheckMs: targetCheckMs } : {})
     };
     } finally {
       if (signal && interrupt) signal.removeEventListener('abort', interrupt);
@@ -599,6 +644,7 @@
         else if (out && out.logits && typeof out.logits.dispose === 'function') out.logits.dispose();
       } catch (_) { /* older runtime without dispose */ }
       audio = null;
+      targetAudio = null;
       transcriptionBusy = false;
     }
   }

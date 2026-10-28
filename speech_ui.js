@@ -26,6 +26,10 @@
 .speech-practice-instruction{font-size:14px;margin:8px 0 14px;line-height:1.6;}
 .speech-practice details{font-size:13px;margin-top:10px;overflow-wrap:anywhere;}
 .speech-practice summary{cursor:pointer;}
+.speech-target-words{display:flex;flex-wrap:wrap;justify-content:center;gap:7px;margin:12px 0;}
+.speech-target-word{display:inline-block;padding:7px 11px;border-radius:10px;background:rgba(100,116,139,.08);color:inherit;font-size:19px;}
+.speech-target-word.heard{background:#e1f3e3;color:#24663e;}
+.speech-target-note{font-size:12px;margin:6px 0;}
 /* Inline recording indicator (no overlay — sentence stays visible) */
 .rec-inline{display:none;flex-direction:column;align-items:center;gap:8px;margin-top:10px;}
 .rec-inline.show{display:flex;}
@@ -266,7 +270,7 @@
             return;
           }
           const t0 = Date.now();
-          return global.LocalEngine.transcribe(blob, { signal: assessment.signal }).then(function (r) {
+          return global.LocalEngine.transcribe(blob, { signal: assessment.signal, ...(opts.assessmentTarget ? { target: opts.assessmentTarget } : {}) }).then(function (r) {
             if (!current(ticket)) return;
             toIdle();
             spHeartbeat({ spLastMs: Date.now() - t0 }); // last transcribe duration
@@ -282,7 +286,8 @@
               // speech-sample research collection; ignored otherwise.
               blob: blob,
               ownerId: recordingOwnerId,
-              sampleRate: stats ? stats.sampleRate : null
+              sampleRate: stats ? stats.sampleRate : null,
+              targetWords: r.targetWords, targetStatus: r.targetStatus, targetCheckMs: r.targetCheckMs
             });
           });
         });
@@ -683,13 +688,14 @@
     opts = opts || {}; injectAssets();
     const target = opts.target || '', level = opts.level || 2, mode = opts.mode || 'study', book = opts.book || currentBook();
     const onDone = typeof opts.onDone === 'function' ? opts.onDone : function () {};
-    let done = false, disposed = false, recordings = 0, gradedTries = 0, errors = 0, outcome = 'not_recorded';
+    let done = false, disposed = false, recordings = 0, gradedTries = 0, errors = 0, outcome = 'not_recorded', hintedWords = 0;
     const wrap = document.createElement('div');
     wrap.className = 'speech-sentence-gate speech-practice mt-4 text-center';
     wrap.innerHTML = '<div class="text-lg mb-2">🎙️ 朗读练习：<b class="text-emerald-300" lang="en"></b></div>' +
       '<p class="speech-practice-instruction">点击录音，读完后点击停止。可以再练一次，也可以继续。</p>' +
       '<div class="speech-gate-btns flex items-center justify-center gap-3 flex-wrap"></div>' +
       '<div class="heard-feedback" role="status" aria-live="polite"></div>' +
+      '<div class="speech-target-words" hidden aria-label="听到的目标词"></div><p class="speech-target-note" hidden>绿色是这次听到的词；其他词不判对错。</p>' +
       '<details hidden><summary>查看识别到的内容</summary><p></p></details>';
     wrap.querySelector('b').textContent = target;
     const buttons = wrap.querySelector('.speech-gate-btns'), feedback = wrap.querySelector('.heard-feedback'), transcript = wrap.querySelector('details');
@@ -697,6 +703,13 @@
     cont.className = 'speech-practice-continue game-btn bg-emerald-600 hover:bg-emerald-500 text-lg px-8 py-4 rounded-2xl shadow-lg';
     cont.textContent = '继续 ▶'; cont.hidden = true;
     const alive = function () { return !done && !disposed && wrap.isConnected; };
+    function clearHints() { wrap.querySelector('.speech-target-words').hidden = true; wrap.querySelector('.speech-target-note').hidden = true; hintedWords = 0; }
+    function showHints(meta) {
+      clearHints(); if (!meta || !Array.isArray(meta.targetWords) || !meta.targetWords.length) return;
+      const list = wrap.querySelector('.speech-target-words'); list.replaceChildren();
+      for (const word of meta.targetWords.slice(0, 40)) { const chip = document.createElement('span'); chip.className = 'speech-target-word' + (word.heardClear ? ' heard' : ''); chip.textContent = word.text; list.appendChild(chip); if (word.heardClear) hintedWords++; }
+      list.hidden = false; wrap.querySelector('.speech-target-note').hidden = false;
+    }
     function offer(message) {
       if (!alive()) return;
       feedback.textContent = message; cont.hidden = false;
@@ -724,10 +737,11 @@
     }
     const recBtn = makeRecordButton({
       idleText: '🎙️ 开始朗读',
+      assessmentTarget: target,
       onStateChange: function (state) {
         if (!alive()) return;
         if (state === 'starting') { cont.hidden = false; feedback.textContent = '正在打开麦克风…'; }
-        if (state === 'recording') { cont.hidden = true; transcript.hidden = true; feedback.textContent = ''; }
+        if (state === 'recording') { cont.hidden = true; transcript.hidden = true; feedback.textContent = ''; clearHints(); }
         if (state === 'busy') { cont.hidden = false; outcome = 'unassessed'; feedback.textContent = '正在听你的录音…也可以直接继续。'; }
       },
       onRecorded: function () { if (alive()) recordings++; },
@@ -735,10 +749,12 @@
       onDispose: function () { disposed = true; if (!done) spHeartbeat({ spGate: 0, spRec: 0 }); },
       onResult: function (text, meta) {
         if (!alive()) return;
+        showHints(meta);
         if (isHallucination(text)) {
           outcome = 'unassessed'; transcript.hidden = true; capture(text, meta, null, 'hallucination');
           logSpeechEvent('gated', mode, { target: target, level: level, reason: 'hallucination', flow: 'optional_practice_v1', ua: UA }, recordings);
-          offer('这次没有听清楚。可以靠近麦克风再读一次，也可以继续。'); return;
+          if (hintedWords) { gradedTries++; outcome = 'target_heard'; }
+          offer(hintedWords ? '有些词已经听清了，谢谢你认真朗读！可以再练一次，也可以继续。' : '谢谢你练习！这次没有听清楚，可以再读一次，也可以继续。'); return;
         }
         gradedTries++;
         // Retrying never changes the match threshold. These are transcription
@@ -750,12 +766,13 @@
           accuracy: Math.round((result.accuracy || 0) * 1000) / 1000, phoneticRatio: Math.round((result.phoneticRatio || 0) * 1000) / 1000,
           edits: typeof result.edits === 'number' ? result.edits : null, attempt: 1, practiceAttempt: gradedTries,
           level: level, book: book, flow: 'optional_practice_v1', details: result.details || '',
-          audioMs: meta && meta.audioMs, transcribeMs: meta && meta.transcribeMs, blobBytes: meta && meta.blobBytes, ua: UA
+          audioMs: meta && meta.audioMs, transcribeMs: meta && meta.transcribeMs, blobBytes: meta && meta.blobBytes, ua: UA,
+          targetHintCount: hintedWords, targetStatus: meta && meta.targetStatus, targetCheckMs: meta && meta.targetCheckMs
         }, recordings);
         capture(text, meta, result, 'graded');
         transcript.querySelector('p').textContent = '我听到的可能是：“' + String(text || '').slice(0, 1000) + '”'; transcript.hidden = false;
-        offer(result.pass ? '✓ 这次听到了目标句子。还想练习，可以再读一次；也可以继续。' :
-          '这次识别的内容和句子不太一样。可以再读一次，也可以继续。');
+        offer(hintedWords ? '谢谢你认真朗读！这次已经听到了这些词。可以再练一次，也可以继续。' :
+          '谢谢你练习！想再练一次可以重新录音，也可以继续。');
       },
       onGated: function (reason, meta) {
         if (!alive()) return; outcome = 'unassessed'; transcript.hidden = true; capture('', meta, null, reason);
@@ -771,7 +788,7 @@
       const summary = { target: target, level: level, book: book, flow: 'optional_practice_v1', recordings: recordings,
         assessedAttempts: gradedTries, completion: gradedTries ? 'practised' : 'unassessed',
         matchedTarget: outcome === 'matched' ? true : outcome === 'different' ? false : null,
-        assessment: 'transcript_match_only', ua: UA };
+        assessment: 'target_aware_hints', targetHintCount: hintedWords, ua: UA };
       recBtn.disposeSpeech(); spHeartbeat({ spGate: 0, spRec: 0 });
       logSpeechEvent('practice', mode, summary, recordings || null); onDone(summary);
     };

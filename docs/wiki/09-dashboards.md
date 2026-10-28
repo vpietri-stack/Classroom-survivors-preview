@@ -8,6 +8,10 @@ recording-gate and error telemetry have explicit recognition/recording/technical
 labels and filters. A transcription match remains a diagnostic, not a teacher
 pronunciation grade.
 
+The `target_aware_hints` assessment adds only the number of positively heard
+words to the final summary. It remains **Not graded**; green hints are never
+written as pronunciation mastery or an SR success.
+
 The handwriting preview adds `handwritingAssisted`, displayed/filterable as
 **Handwriting (with help)** for words completed using a guide/reveal. Independent
 completion remains `handwriting`; skipped words are not completions.

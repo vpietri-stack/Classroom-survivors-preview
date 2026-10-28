@@ -330,7 +330,7 @@ function formatItemDetails(details) {
     if (!details) return '—';
     const parsed = parseExerciseDetails(details);
     if (parsed) {
-        if (parsed.flow === 'optional_practice_v1' && parsed.assessment === 'transcript_match_only') {
+        if (parsed.flow === 'optional_practice_v1' && ['transcript_match_only', 'target_aware_hints'].includes(parsed.assessment)) {
             return String(parsed.target || '') + '\n' +
                 (parsed.completion === 'practised' ? 'Practice recorded' : 'Continued without assessment') +
                 ' · ' + (Number(parsed.recordings) || 0) + ' recording(s) · No pronunciation grade';

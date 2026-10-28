@@ -36,6 +36,7 @@ async function fixture(page,id='notes-a',placement={book:'PU3',unit:'9',page:'11
   await fixture(page);
   await page.locator('#preview-notes-overlay iframe').waitFor();
   ok(true,'manual p111 assignment automatically opens notes after real finishLogin');
+  ok(await page.locator('#preview-notes-button').isHidden(),'library button stays hidden until a preview Study is completed');
   const reader=page.frameLocator('#preview-notes-overlay iframe');
   await reader.locator('.note-page').first().waitFor();
   ok(await reader.locator('.note-page').count()===4,'integrated reader includes all four original pages');
@@ -107,6 +108,7 @@ async function fixture(page,id='notes-a',placement={book:'PU3',unit:'9',page:'11
   }
   await page.waitForFunction(()=>document.getElementById('study-title').textContent==='Session Complete');
   ok(await page.evaluate(()=>!!authActiveUser.previewNotes['pu3-u9-p111']),'only completed follow-up Study unlocks permanent notes');
+  ok(await page.evaluate(()=>!document.getElementById('preview-notes-button').classList.contains('hidden')),'first completed preview Study immediately unlocks the library button for the main menu');
   ok(await page.evaluate(()=>authActiveUser.analytics.filter(e=>e.type==='session'&&e.sessionType==='study').length===1),'one regular completed study session recorded');
   ok(await page.evaluate(()=>countCompletedSessionsForTarget(authActiveUser,authActiveUser.targets[0].startTime,authActiveUser.targets[0].endTime)===1),'weekly target receives exactly one session credit');
   ok(await page.evaluate(()=>Object.keys(authActiveUser.srState.vocab).length===5&&Object.keys(authActiveUser.srState.sentences).some(k=>k.includes('non-spelling:find-fix:pu3:9:111:f14'))),'normal vocabulary and typed-exercise SR outcomes persisted');
@@ -124,6 +126,7 @@ async function fixture(page,id='notes-a',placement={book:'PU3',unit:'9',page:'11
   await fixture(page,'notes-server-only',{book:'PU3',unit:'9',page:'111'},notes);
   ok(await page.locator('#preview-notes-overlay').count()===0,'server completion works on a fresh account cache');
   await fixture(page,'notes-advance',{book:'PU3',unit:'9',page:'110'});
+  ok(await page.locator('#preview-notes-button').isHidden(),'students on other pages with no completed preview have no empty library button');
   await page.evaluate(()=>{
    PreviewNotes.close();
    const current=getCurrentSession();

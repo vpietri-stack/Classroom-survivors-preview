@@ -1,6 +1,6 @@
 # Deployment & Release Discipline
 
-## Optional speech practice preview — 2026-10-28a
+## Optional speech practice preview — 2026-10-28b
 
 Release only to the preview remote, preserving its API and existing features.
 The feature flag enables optional sentence-practice progression on preview/dev;
@@ -11,6 +11,13 @@ controls/model without recording uploads or progress writes. Keep speech model
 weights, model-cache namespace and runtime URLs unchanged; no new speech model
 is downloaded for this UI update. Production promotion remains a separate,
 explicitly authorised release after hosted preview review.
+
+The teacher-approved encouragement policy adds target-aware positive word hints
+using the same tiny.en model. Ship `speech_target.js`, `speech_target_data.json`
+and `speech_target_dictionary_LICENSE.txt` with the release. The hint data is a
+small, non-identifying aggregate/public dictionary asset, not another speech
+model. Preserve the notes-library completed-Study fix from preview 2026-10-28a
+and the preview API/data separation while integrating this release.
 
 ## Automatic guides preview (2026-10-23e)
 
@@ -426,3 +433,5 @@ New class cancellations add 10 sessions as well as seven days to the existing gr
 ## Preview notes release 2026-10-27b
 
 Publish the page-triggered PU3 U9 p111 listening reader and page-scoped Study flow to preview/main only. Update the existing origin/admin-dashboard-update PR environment for durable completion, retaining its existing Students-admin-dashboard-preview container and configuration. Never merge/close PR #1 or push origin/main for this preview. The synchronized stamps and changed reader/Study/curriculum cache busters advance together. Verify Pages assets and the isolated API deployment before reporting readiness.
+
+Preview-only 2026-10-28a hides the notes-library button until the student has a completed preview Study. Refresh the preview_notes script and synchronized version/auth/index/dashboard cache busters. No backend change is required.
