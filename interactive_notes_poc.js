@@ -20,8 +20,10 @@
   function play(id) {
     const clip = lesson.clips[id];
     if (!clip) return;
+    const targetChanged = current !== id;
+    window.dispatchEvent(new CustomEvent('notes-select', { detail: { id, text: clip.text } }));
     stop(); current = id; const token = generation;
-    $('nowPlaying').textContent = clip.text;
+    if (targetChanged) $('nowPlaying').textContent = clip.text;
     $('playerStatus').textContent = '正在播放 · ' + clip.translation;
     delete $('playerStatus').dataset.audioError;
     $('replay').disabled = false; $('stop').disabled = false;
@@ -126,5 +128,5 @@
   $('replay').addEventListener('click', () => { if (current) play(current); });
   document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); });
   window.addEventListener('pagehide', () => { stop(); audioCache.forEach(url => URL.revokeObjectURL(url)); audioCache.clear(); });
-  window.InteractiveNotesPOC = { snapshot: () => ({ pageCount: lesson.pages.length, currentClip: current, playing, mode: 'listening-only' }) };
+  window.InteractiveNotesPOC = { pause: stop, snapshot: () => ({ pageCount: lesson.pages.length, currentClip: current, playing, mode: 'listening-only' }) };
 })();

@@ -240,3 +240,5 @@ curriculum packs, and non_spelling_flow.js after game.js. The flow calls the
 legacy Study renderers at runtime after study_mode.js is loaded. Widget CSS is
 non_spelling_exercises.css. The standalone POC controller/chrome share the same
 curriculum/widget/styles, rather than duplicating exercise implementations.
+
+`notes_speech.js` is the preview-only optional microphone/recording controller for the illustrated notes bottom bar. It lazily reuses the shared targeted LocalEngine and Recorder, with explicit parent-close disposal.

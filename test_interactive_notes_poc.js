@@ -32,6 +32,6 @@ for (const pair of lesson.pairs) for (const item of [pair.left, pair.right]) {
 }
 const html = fs.readFileSync(path.join(__dirname, 'interactive_notes_poc.html'), 'utf8');
 const js = fs.readFileSync(path.join(__dirname, 'interactive_notes_poc.js'), 'utf8');
-ok(!/speech_engine|speech_scorer|speech_recorder|frontend_auth|interactive_notes_core|speech_sample/.test(html), 'no speech, microphone, account or collection scripts');
-ok(!/getUserMedia|LocalEngine|Recorder|localStorage|indexedDB|apiFetch/.test(js), 'listening-only controller has no capture, scoring, storage or API path');
+ok(!/speech_engine|speech_scorer|speech_recorder|frontend_auth|interactive_notes_core|speech_sample/.test(html), 'no eager speech engine, account or collection scripts');
+ok(!/getUserMedia|LocalEngine|Recorder|localStorage|indexedDB|apiFetch/.test(js), 'base listening controller delegates optional practice without capture, storage or API paths');
 console.log(checks + ' listening-note checks passed');

@@ -107,3 +107,22 @@ origin; no model/API/external calls or microphone requests are permitted.
 Rendered hotspot alignment is visually reviewed on all four pages.
 
 These POC suites remain outside the production root test chain.
+
+## Optional speech in notes (preview, 2026-10-28d)
+
+`notes_speech.js` adds a second row to the existing bottom player on preview and
+localhost only. Select any word or sentence, tap the microphone to record, and
+tap again to stop. The current LocalEngine target-aware checker receives the exact
+selected text and an abort signal; only `targetWords[].heardClear` words become
+green. Other words stay neutral. This is encouragement, not a pronunciation grade.
+Own-recording playback and retries are optional; original audio/speed/stop controls
+remain. The embedded reader shares its parent's model instance; standalone
+readers load the existing recorder and engine lazily on first microphone use.
+The iframe explicitly allows microphone access. Preparation/recording/checking
+have bounded waits. Target changes, stop, hide and exit cancel work and release
+microphone resources; recordings remain in memory and are revoked on replacement
+or exit. Nothing is uploaded or credited to SR/targets. Study completion is unchanged.
+`test_notes_speech_browser.js` mocks recognition outcomes to exercise the actual
+player controls, target identity, selective green feedback, retry, recording
+playback, cancellation/stale results, denied permission and 320px layout. The
+existing target-model and recorder suites cover their underlying implementation.

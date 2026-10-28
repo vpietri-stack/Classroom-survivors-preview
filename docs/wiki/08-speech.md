@@ -352,3 +352,22 @@ Any agent that changes code covered by this page must update this page in the sa
 ## Remote incident diagnostics (2026-10-23)
 
 When a remote incident trial is enabled for the active student, the existing __speechLog hook also feeds the bounded diagnostic recorder. No extra speech inference or audio capture is introduced. See [Telemetry](14-telemetry.md).
+
+## Optional speech in notes (preview, 2026-10-28d)
+
+`notes_speech.js` adds a second row to the existing bottom player on preview and
+localhost only. Select any word or sentence, tap the microphone to record, and
+tap again to stop. The current LocalEngine target-aware checker receives the exact
+selected text and an abort signal; only `targetWords[].heardClear` words become
+green. Other words stay neutral. This is encouragement, not a pronunciation grade.
+Own-recording playback and retries are optional; original audio/speed/stop controls
+remain. The embedded reader shares its parent's model instance; standalone
+readers load the existing recorder and engine lazily on first microphone use.
+The iframe explicitly allows microphone access. Preparation/recording/checking
+have bounded waits. Target changes, stop, hide and exit cancel work and release
+microphone resources; recordings remain in memory and are revoked on replacement
+or exit. Nothing is uploaded or credited to SR/targets. Study completion is unchanged.
+`test_notes_speech_browser.js` mocks recognition outcomes to exercise the actual
+player controls, target identity, selective green feedback, retry, recording
+playback, cancellation/stale results, denied permission and 320px layout. The
+existing target-model and recorder suites cover their underlying implementation.

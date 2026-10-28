@@ -482,3 +482,7 @@ PU1 Unit 5 adds the approved 28 M/36 F boards on existing pages 57 (5/6), 59 (8/
 PU1 Unit 6 adds the approved 32 M/46 F boards under existing pages 78 (28/40) and 81 (4/6). Transport, animals, there-is/are, suggestions and mixed review retain the approved prefixes and wording. M4/M6 use the teacher's revised travel/car/tree sentences; M11/M12 now practise negative and plural agreement without hints. M25/M26 and F25/F26 remain omitted without renumbering. M31-M34 practise there/their/they're together without initial hints; F41-F48 repair those forms. Legacy vocabulary, scrambles, pairs and earlier boards remain unchanged.
 
 PU1 Unit 7 adds 28 M/36 F boards on existing pages 83 (8/8), 84 (8/12), and 92 (12/16). The four teacher edits retain only b for basketball/baseball, merge M3 into music/piano/guitar, and merge M4 into TV/swim/swimming-pool context. M4's optional per-blank suffixes keep ming locked inside the final box. The keyboard excludes fixed endings; editable input stays separate, grading checks the full word, and CLEAR/backspace/retry preserve the ending. Other boards retain their existing behavior. Earlier vocabulary, scrambles, pairs and authored boards are unchanged.
+
+## Optional speech in notes (preview, 2026-10-28d)
+
+Optional microphone practice in the notes is preview-only and does not gate or credit Study. See [Speech](08-speech.md) for target-aware feedback and cleanup.

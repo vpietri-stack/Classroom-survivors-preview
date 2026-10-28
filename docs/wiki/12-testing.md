@@ -295,3 +295,7 @@ Remote diagnostics: test_client_diagnostics.js verifies strict token scoping, op
 Preview-note browser checks also verify that the library button stays hidden for
 students with no completed preview, appears immediately after first completion,
 and remains hidden when switching to a student on another page with no completion.
+
+## Optional speech in notes (preview, 2026-10-28d)
+
+`test_notes_speech_browser.js` covers the notes microphone toggle, exact target passed to the existing checker, selective green feedback, recording playback, retry, cancellation/stale results, permission denial, close disposal and 320px layout. Recognition is mocked in this UI suite; the existing target-model/recorder suites test their implementation. The regular notes integration suite also checks iframe microphone permission.

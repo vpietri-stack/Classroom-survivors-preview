@@ -36,6 +36,7 @@ async function fixture(page,id='notes-a',placement={book:'PU3',unit:'9',page:'11
   await fixture(page);
   await page.locator('#preview-notes-overlay iframe').waitFor();
   ok(true,'manual p111 assignment automatically opens notes after real finishLogin');
+  ok((await page.locator('#preview-notes-overlay iframe').getAttribute('allow')).includes('microphone'),'embedded notes allow explicit student microphone use');
   ok(await page.locator('#preview-notes-button').isHidden(),'library button stays hidden until a preview Study is completed');
   const reader=page.frameLocator('#preview-notes-overlay iframe');
   await reader.locator('.note-page').first().waitFor();
