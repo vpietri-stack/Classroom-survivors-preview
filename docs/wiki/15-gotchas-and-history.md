@@ -1,5 +1,9 @@
 # Gotchas & Project History
 
+## Adaptive speech research (2026-10-29)
+
+The bundled runtime filters generation kwargs through `forward_params`; merely supplying `encoder_outputs` did not reuse the encoder. Explicitly permit that key and instrument session runs before claiming shared-encoder timings. Shortening Whisper requires dynamic position slicing and removal of stale optional ONNX shape annotations; a one-second context caused repeated-word/EOS failures. Contexts/calibration were frozen before final evaluation. Windows Python reads must specify UTF-8: otherwise a `café` target became corrupted; assert each target word against its teacher reference before evaluation. A `voice: silence` field with a pending overall decision is not confirmed no-target ground truth. See [adaptive speech POC](../speech-adaptive-poc.md).
+
 > **Last verified:** 2026-09-27 · **Part of:** [Classroom-survivors Repo Wiki](README.md)
 
 **Purpose:** the "don't re-break this" page. Every entry here cost a real bug, a lost deploy, or lost student data. Subsystem-specific gotchas live on their pages ([Study Mode](05-study-mode.md), [Game Modes](06-game-modes.md), [Backend API](10-backend-api.md), [Telemetry](14-telemetry.md)); this page holds the cross-cutting rules, the deploy/process discipline, and the index of historical write-ups.

@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "id": "speech-encouragement-20261029-a",
+  "model": "Whisper tiny.en q8; unchanged numerical weights; dynamic position slice encoder patch",
+  "word": {
+    "contextMinimumSec": 12,
+    "phoneThreshold": 0.7,
+    "causalGainFullMeanMinimum": 0.5,
+    "causalFullMeanMinimum": -4,
+    "unknownWordCharThreshold": 0.65,
+    "unknownWordFullMeanMinimum": -4,
+    "normaliseSpokenNumbers": true
+  },
+  "sentence": {
+    "contextMinimumSec": 8,
+    "decision": "binary boosted tree clear-or-close acceptance",
+    "threshold": 0.4,
+    "features": 17,
+    "depth": 2,
+    "rounds": 60
+  },
+  "vad": {
+    "model": "Silero v5",
+    "thresholdMax": 0.15,
+    "frameSamples": 512,
+    "contextSamples": 64,
+    "tailFlushSamples": 4096
+  },
+  "audio": {
+    "rate": 16000,
+    "minimumSeconds": 0.12,
+    "maximumSeconds": 20,
+    "trimBeginning": false,
+    "artificialRepeat": false,
+    "cropFeatures": "Retain all audio plus >=250ms, round up to500ms, minimum8/12 seconds; never truncate within20-second input limit"
+  },
+  "generation": {
+    "maxWordTokens": 24,
+    "maxSentenceTokens": 96,
+    "do_sample": false,
+    "expectedTextUsedAsGenerationPrompt": false
+  },
+  "feedback": {
+    "positive": "green",
+    "uncertain": "purple",
+    "retryOptional": true,
+    "continueAlwaysAvailable": true,
+    "precisePronunciationGrade": false
+  },
+  "budget": {
+    "totalFirstDownloadMB": 150,
+    "warmSeconds": 5,
+    "sameSupportedDevicesAndBrowsers": true
+  },
+  "evaluation": "No threshold/model change after opening reserved results. Synthetic requested text is a proxy except eight human-reviewed source clips; two human-reviewed child word cuts remain development support, not proof about naturally isolated child speech."
+}

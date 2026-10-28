@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "id": "speech-encouragement-20261029-a",
+  "files": [
+    {
+      "name": "whisper/config.json",
+      "url": "models/whisper-tiny.en/config.json",
+      "bytes": 2344,
+      "sha256": "beade30b415e07b5954a58d6f1b16d055a5d4ca13903479f5841fe16ab8ba800",
+      "legacyName": "config.json"
+    },
+    {
+      "name": "whisper/preprocessor_config.json",
+      "url": "models/whisper-tiny.en/preprocessor_config.json",
+      "bytes": 353,
+      "sha256": "86c752c0f26ae2cc92699a1805eb66366b01c9260b7d31c7bd142d6b9e56017a",
+      "legacyName": "preprocessor_config.json"
+    },
+    {
+      "name": "whisper/tokenizer.json",
+      "url": "models/whisper-tiny.en/tokenizer.json",
+      "bytes": 2520530,
+      "sha256": "01faa5956a0a74c6da92784309f055268c6775d7d74014fd4b390a596032c5ec",
+      "legacyName": "tokenizer.json"
+    },
+    {
+      "name": "whisper/tokenizer_config.json",
+      "url": "models/whisper-tiny.en/tokenizer_config.json",
+      "bytes": 295650,
+      "sha256": "7fa104721c6787496798f7d6399450cbfdae2b7f8807ca85da6d1fb4f7c2bc58",
+      "legacyName": "tokenizer_config.json"
+    },
+    {
+      "name": "whisper/generation_config.json",
+      "url": "models/whisper-tiny.en/generation_config.json",
+      "bytes": 1796,
+      "sha256": "14912f6da0b42f3285d20003515b706c0dc44046a96fd01a0de33a151df8d80b",
+      "legacyName": "generation_config.json"
+    },
+    {
+      "name": "whisper/onnx/encoder_model_quantized.onnx",
+      "url": "models/whisper-tiny.en/onnx/encoder_model_quantized.onnx",
+      "bytes": 10124993,
+      "sha256": "e93ec822f16a8fd264e7de972ad17d615ea7334b75a52d54c50c2e18dd503a25",
+      "legacyName": "encoder_model_quantized.onnx"
+    },
+    {
+      "name": "whisper/onnx/decoder_model_merged_quantized.onnx",
+      "url": "models/whisper-tiny.en/onnx/decoder_model_merged_quantized.onnx",
+      "bytes": 30718858,
+      "sha256": "c0592d0749413c960569e1c7fb806b060d5d18f3ebad4a95cbf9a77dc6e9be52",
+      "legacyName": "decoder_model_merged_quantized.onnx"
+    },
+    {
+      "name": "encoder.patch.json",
+      "url": "speech_assets/adaptive-20261029a/encoder.patch.json",
+      "bytes": 3394,
+      "sha256": "edc754b78df2f621ad2d68c34cc2ae5e4e295a4c6e94f1564a7e69ae2c2e62d7"
+    },
+    {
+      "name": "phonetic-lexicon.json",
+      "url": "speech_assets/adaptive-20261029a/phonetic-lexicon.json",
+      "bytes": 2840141,
+      "sha256": "bc7dbdc11bd43a295dd7cdef1dedac8f795d546849f7a8baab1270d99cdd7b1f"
+    },
+    {
+      "name": "sentence-calibration.json",
+      "url": "speech_assets/adaptive-20261029a/sentence-calibration.json",
+      "bytes": 17531,
+      "sha256": "35651909d721ebf06566e09efe9d33d413369599cf2d4ba40bdcf43a986beb3e"
+    },
+    {
+      "name": "config.json",
+      "url": "speech_assets/adaptive-20261029a/config.json",
+      "bytes": 1802,
+      "sha256": "b437e8871783a1dd5b085a6dda91d4d7478894f49c1c7fc91f5412677cc1368c"
+    },
+    {
+      "name": "silero_vad_v5.onnx",
+      "url": "speech_assets/adaptive-20261029a/silero_vad_v5.onnx",
+      "bytes": 2327524,
+      "sha256": "2623a2953f6ff3d2c1e61740c6cdb7168133479b267dfef114a4a3cc5bdd788f"
+    }
+  ],
+  "licenses": {
+    "Whisper": "Existing OpenAI Whisper MIT model and app licenses",
+    "lexicon": "CMUdict, CMUDICT-LICENSE.txt",
+    "SileroVAD": "Silero VAD MIT, SILERO-LICENSE.txt; weights from @ricky0123/vad-web0.0.30"
+  }
+}

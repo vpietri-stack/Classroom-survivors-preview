@@ -1,5 +1,7 @@
 # Deployment & Release Discipline
 
+Adaptive speech preview 2026-10-29a publishes only `speech_adaptive_poc.html`, its `speech_adaptive_*` modules and versioned public helper assets/licenses. Retain the existing Tiny weights, legacy model cache, stable runtime URLs and app flow. Helpers have independent SHA-keyed resumable caches. Synchronize version/auth/index/dashboard-auth on preview only; no production push or learner-data upload. Verify hosted hashes, cached-model migration, actual inference, timeout/cancel, mobile layout and root tests. Final recordings must not become a tuning set. Details: [adaptive speech POC](../speech-adaptive-poc.md).
+
 Preview-only 2026-10-28h publishes the guided teacher collection page, public prompt plan and helper modules. No speech models, app flow, API, curriculum or production changes. Synchronize version/auth/index/dashboard-auth and use independent v=1 collection asset URLs. No teacher/student audio belongs in git; collected files and CLI development outputs stay local/private.
 
 

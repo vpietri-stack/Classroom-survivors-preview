@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-28h",
-  "deployedAt": "2026-10-28",
-  "notes": "Preview-only guided teacher word collection: 148 words, 333 prompts, locally saved reviewed audio, backup/restore and protected evaluation family splits."
+  "version": "2026-10-29a",
+  "deployedAt": "2026-10-29",
+  "notes": "Preview-only adaptive speech POC: unchanged Whisper Tiny weights, target-aware word/sentence encouragement, cache-preserving encoder patch and bounded local checks."
 }
