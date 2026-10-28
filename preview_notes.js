@@ -52,7 +52,7 @@
         opening = { id, review, owner: student.id, request, frame };
         const url = new URL(note.reader, location.href);
         url.searchParams.set('embed', '1'); url.searchParams.set('mode', review ? 'review' : 'intro'); url.searchParams.set('request', request);
-        url.searchParams.set('v', '2026-10-28d'); frame.src = url.href; overlay.append(frame);
+        url.searchParams.set('v', '2026-10-28e'); frame.src = url.href; overlay.append(frame);
     }
     function openLibrary() {
         const student = user();

@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-28d",
+  "version": "2026-10-28e",
   "deployedAt": "2026-10-28",
-  "notes": "Preview: optional targeted speech practice and own-recording playback in illustrated notes."
+  "notes": "Preview: notes recording requires at least two words; single words remain listening-only."
 }

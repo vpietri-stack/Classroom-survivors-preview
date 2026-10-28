@@ -356,7 +356,7 @@ When a remote incident trial is enabled for the active student, the existing __s
 ## Optional speech in notes (preview, 2026-10-28d)
 
 `notes_speech.js` adds a second row to the existing bottom player on preview and
-localhost only. Select any word or sentence, tap the microphone to record, and
+localhost only. Select a phrase or sentence of at least two words, tap the microphone to record, and
 tap again to stop. The current LocalEngine target-aware checker receives the exact
 selected text and an abort signal; only `targetWords[].heardClear` words become
 green. Other words stay neutral. This is encouragement, not a pronunciation grade.
@@ -371,3 +371,5 @@ or exit. Nothing is uploaded or credited to SR/targets. Study completion is unch
 player controls, target identity, selective green feedback, retry, recording
 playback, cancellation/stale results, denied permission and 320px layout. The
 existing target-model and recorder suites cover their underlying implementation.
+
+Notes recording now requires at least two lexical words (preview 2026-10-28e). Single-word selection cancels recording/checking, clears the previous recording, and disables both microphone and own-recording playback while preserving example listening. Punctuation and contractions do not create extra words. Browser coverage includes the exact two-word boundary and switching back to a multiword phrase.

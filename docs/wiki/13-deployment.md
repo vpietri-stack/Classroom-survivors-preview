@@ -439,3 +439,5 @@ Preview-only 2026-10-28a hides the notes-library button until the student has a 
 Preview-only 2026-10-28c moves speech hints onto completed Study/game sentence tiles. Synchronize version/auth/index and dashboard auth cache busters; refresh speech UI, game, Study and review-page scripts. Publish preview/main only, retaining current notes, curricula and isolated API/data. No model/runtime, backend or production deployment is needed.
 
 Preview-only 2026-10-28d adds optional targeted notes speech. Refresh reader JS/CSS, notes_speech and parent preview_notes (microphone iframe permission), and synchronize deployment stamps. Production and APIs are unchanged.
+
+Preview 2026-10-28e restricts optional notes recording to targets of two or more words. Refresh notes_speech and the embedded-reader query; synchronize the deployment stamps. Production and APIs remain unchanged.

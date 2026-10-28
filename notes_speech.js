@@ -8,12 +8,13 @@
   mic.setAttribute('aria-label', '开始录音'); mic.setAttribute('aria-pressed', 'false');
   replay.id = 'notes-recording'; replay.textContent = '▷ 听我的录音'; replay.disabled = true;
   status.id = 'notes-speech-status'; status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
-  status.textContent = '先点一个单词或句子，再点麦克风试读。';
+  status.textContent = '点读单词；选择两个词以上的短语或句子可以试读。';
   controls.append(mic, replay, status); player.append(controls);
   if (window.ResizeObserver) new ResizeObserver(() => document.documentElement.style.setProperty("--notes-player-height", player.offsetHeight + "px")).observe(player);
   let target = null, phase = 'idle', generation = 0, recorder = null, assessment = null, timer = null, recordingURL = null, ownAudio = null, runtime = null;
   const message = text => { status.textContent = text; };
-  function idle() { phase = 'idle'; mic.disabled = !target; mic.textContent = '🎤 试着读'; mic.setAttribute('aria-label', '开始录音'); mic.setAttribute('aria-pressed', 'false'); }
+  function canPractice() { return !!target && (target.text.match(/[\p{L}\p{N}]+(?:['’\-][\p{L}\p{N}]+)*/gu) || []).length >= 2; }
+  function idle() { phase = 'idle'; mic.disabled = !canPractice(); mic.textContent = '🎤 试着读'; mic.setAttribute('aria-label', '开始录音'); mic.setAttribute('aria-pressed', 'false'); }
   function cancel() {
     generation++; clearTimeout(timer); if (assessment) assessment.abort(); assessment = null;
     if (recorder) recorder.cancel(); recorder = null;
@@ -61,7 +62,7 @@
   }
   mic.addEventListener('click', async () => {
     if (phase === 'recording') { finish(generation, await engine()); return; }
-    if (!target || phase !== 'idle') return;
+    if (!canPractice() || phase !== 'idle') return;
     cancel(); const ticket = generation; discard(); render();
     window.InteractiveNotesPOC.pause();
     phase = 'preparing'; mic.disabled = true; message('正在准备语音，首次使用可能需要等一会儿…');
@@ -83,14 +84,14 @@
     }
   });
   replay.addEventListener('click', () => {
-    if (!recordingURL || phase !== 'idle') return;
+    if (!canPractice() || !recordingURL || phase !== 'idle') return;
     window.InteractiveNotesPOC.pause(); if (ownAudio) ownAudio.pause(); ownAudio = new Audio(recordingURL);
     ownAudio.play().catch(() => message('录音暂时没能播放，请再点一次。'));
   });
   window.addEventListener('notes-select', event => {
     const changed = !target || target.id !== event.detail.id;
-    cancel(); target = event.detail; mic.disabled = false;
-    if (changed) { discard(); message('点麦克风试读，读完再点一次停止。'); }
+    cancel(); target = event.detail; idle();
+    if (changed) { discard(); message(canPractice() ? '点麦克风试读，读完再点一次停止。' : '单词可以点读。选择两个词以上的短语或句子可以试读。'); }
   });
   document.getElementById('stop').addEventListener('click', () => { cancel(); message('已停止。可以继续点读或试读。'); });
   document.addEventListener('visibilitychange', () => { if (document.hidden) { cancel(); discard(); message('已停止录音。'); } });
