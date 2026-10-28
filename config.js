@@ -70,6 +70,14 @@ const THREE_TD_ENABLED = (function () {
     return path.indexOf('/classroom-survivors-preview') === 0;
 })();
 
+// Optional speech practice is reviewed on preview/local first. The production
+// speech gate stays unchanged until this feature is deliberately promoted.
+const SPEECH_PRACTICE_ENABLED = (function () {
+    const host = window.location.hostname;
+    return host === 'localhost' || host === '127.0.0.1' || window.location.protocol === 'file:' ||
+        /^\/Classroom-survivors-preview(?:\/|$)/i.test(window.location.pathname);
+})();
+
 // Pilot the mixed round on preview/dev; production stays on the current flow
 // until a deliberate release enables this feature there.
 const NON_SPELLING_ENABLED = (function () {

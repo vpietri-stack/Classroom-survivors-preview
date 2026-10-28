@@ -89,6 +89,24 @@ function makeRecorderSandbox() {
 
   // --- 2+3. sp* heartbeat merge + restart diagnostic passthrough ------------
   {
+    const { sandbox, stoppedTracks, fakeStream, closed } = makeRecorderSandbox();
+    let allow;
+    sandbox.navigator.mediaDevices.getUserMedia = () => new Promise(resolve => { allow = resolve; });
+    const rec = new sandbox.window.Recorder();
+    const pending = rec.start().catch(error => error.name);
+    rec.cancel(); allow(fakeStream);
+    ok('recorder: late permission after cancellation is rejected', await pending === 'AbortError');
+    ok('recorder: late permission stops its stream without opening a context', stoppedTracks.length === 1 && closed.length === 0 && rec.stream === null);
+  }
+  {
+    const { sandbox, stoppedTracks, closed } = makeRecorderSandbox();
+    const rec = new sandbox.window.Recorder(); await rec.start();
+    const proc = rec.processor; proc._emit(new Float32Array(4096).fill(.3));
+    rec.cancel(); rec.cancel(); proc._emit(new Float32Array(4096).fill(.3));
+    ok('recorder: discard closes the context and tracks exactly once', closed.length === 1 && stoppedTracks.length === 1);
+    ok('recorder: discard releases PCM and ignores late audio', rec._chunks.length === 0 && rec.audioCtx === null && !rec.recording);
+  }
+  {
     let store = {};
     const sandbox = {
       console,

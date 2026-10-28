@@ -1,5 +1,45 @@
 # Speech Recognition & Pronunciation Scoring
 
+## Optional practice preview — 2026-10-28a
+
+`SPEECH_PRACTICE_ENABLED` enables the new shared sentence practice controls on
+the preview path and localhost/file only. Production retains its existing gate.
+Both Study sentence building and the grammar game use `makeSentenceGate`, so
+they receive the preview flow without changing their earned grammar/SR result.
+
+After recording, recognition problems or a microphone error, learners can retry
+or Continue without waiting for three failures. Continue is available while a
+recording is being checked. There is no learner-facing percentage, error chime
+for a transcript mismatch, word grading or pronunciation score. An optional
+disclosure shows what the recogniser may have heard. Recognised attempts use
+the same first-try matching threshold on every retry. Recognition still runs
+freely with unchanged Whisper tiny.en; expected text is compared afterwards.
+Target-conditioned acoustic assessment is not included in this release.
+
+Record controls suppress duplicate pending permission requests, bound permission
+waiting to 15 seconds and assessment waiting to 30 seconds, and dispose when
+their DOM is removed. `Recorder.cancel()` discards PCM, closes its AudioContext,
+stops tracks, and rejects late permission grants without opening another graph.
+`LocalEngine.transcribe(input, {signal})` requests generation interruption using
+the existing runtime's stopping criterion, suppresses aborted output, and keeps
+one transcription active until the current WASM step finishes. A new recording
+is not queued behind that work. The model stays loaded for the next exercise.
+No new model, runtime, mirror or model-cache version is introduced.
+
+`speech_practice` records a single final practice/unassessed summary, never an
+earned success or pronunciation grade. Detaching a gate without continuing
+disposes resources without inventing completion. Late results and events from a
+previous account are ignored. The temporary capture module still owns all
+consent/quota/date checks; this release does not reopen collection.
+
+Teacher review: `speech_practice_preview.html` uses the actual shared controls
+and current model without login, uploads or progress saving. It is preview-only.
+`test_speech_practice.js` covers both real Study/game callers, progression,
+uncertainty, late results, permission/timeout/disposal, account switching and
+production gating. `test_speech_engine_cancel.js` exercises cancellation and
+model reuse with actual Whisper/WASM and synthetic audio. Physical-phone
+performance remains a separate check.
+
 > **Last verified:** 2026-10-05 · **Part of:** [Classroom-survivors Repo Wiki](README.md)
 
 **Owner files:** `speech_engine.js`, `speech_recorder.js`, `speech_scorer.js`, `speech_ui.js`, `speech_debug.js`, `speech_preload.js`, `sr_engine.js`, `test_sr_once_per_session.js`, `models/whisper-tiny.en/`, `api/tune_scorer.js`, `api/analyze_speech.js`, `gen_missing_audio.js`

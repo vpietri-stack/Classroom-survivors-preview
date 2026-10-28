@@ -1,5 +1,13 @@
 # Testing
 
+The required root suite also runs `test_speech_practice.js` (preview/production
+gating, real shared controls and Study/game progression, retry/Continue,
+permission/timeout/cancellation/late-result/account protections) and
+`test_speech_engine_cancel.js` (actual unchanged Whisper/WASM, synthetic audio,
+interruption, single-flight guard and reuse without model re-download).
+`test_speech_hygiene.js` additionally covers discarding audio and late microphone
+permission grants. These tests use no real student recordings or live accounts.
+
 Cancellation regression coverage in `test_class_calendar.js` verifies +10 sessions and seven days, the 23 October–6 November example, consecutive cancellations, preserved start/manual offset, no invented target when none exists, separate group targets and idempotent cancellation retries.
 
 23 October handwriting checks pin initial/direct-call guide gating, exclusion

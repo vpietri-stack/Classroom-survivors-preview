@@ -1,5 +1,13 @@
 # Teacher & Admin Dashboards
 
+The optional speech-practice preview adds `speech_practice`, labelled and
+filterable as **Speech practice (not graded)**. Its detail distinguishes
+recorded practice from continuing without an assessment, and its attempts cell
+says **Not graded**. It is not pronunciation mastery. Existing speech attempt,
+recording-gate and error telemetry have explicit recognition/recording/technical
+labels and filters. A transcription match remains a diagnostic, not a teacher
+pronunciation grade.
+
 The handwriting preview adds `handwritingAssisted`, displayed/filterable as
 **Handwriting (with help)** for words completed using a guide/reveal. Independent
 completion remains `handwriting`; skipped words are not completions.

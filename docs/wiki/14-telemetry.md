@@ -1,5 +1,15 @@
 # Telemetry & Data Delivery
 
+Optional speech practice (2026-10-28a preview) adds one `speech_practice` exercise
+event when Continue is chosen. `completion` is `practised` or `unassessed`, with
+recording/assessed-attempt counts and a nullable `matchedTarget` diagnostic. It
+contains no pronunciation score or earned success. Existing speech diagnostics
+carry `flow: optional_practice_v1`; their scorer rung stays `attempt: 1` while
+`practiceAttempt` records the actual retry number. Late/aborted/account-switched
+results emit no assessment or completion. The normal bounded analytics queue,
+ownership, acknowledgements and batching apply; no new endpoint, container or
+throughput is provisioned. Labels/filters are in the teacher dashboard.
+
 Handwriting preview (2026-10-22): `handwritingAssisted` identifies a word completed
 after a hint, outline or reveal; `handwriting` remains independent completion.
 Skips produce neither. Both use the existing queue and string word itemDetails;

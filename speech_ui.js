@@ -21,6 +21,11 @@
 .speech-rec-btn:active{transform:scale(.97);}
 .heard-feedback{font-size:15px;min-height:22px;margin-top:6px;}
 .heard-feedback.ok{color:#22c55e;} .heard-feedback.no{color:#ef4444;}
+.speech-practice [hidden]{display:none!important;}
+.speech-practice .heard-feedback{color:inherit;line-height:1.6;}
+.speech-practice-instruction{font-size:14px;margin:8px 0 14px;line-height:1.6;}
+.speech-practice details{font-size:13px;margin-top:10px;overflow-wrap:anywhere;}
+.speech-practice summary{cursor:pointer;}
 /* Inline recording indicator (no overlay — sentence stays visible) */
 .rec-inline{display:none;flex-direction:column;align-items:center;gap:8px;margin-top:10px;}
 .rec-inline.show{display:flex;}
@@ -44,6 +49,22 @@
   let _inlineEl = null; // the inline recording indicator element
   let _onInlineStop = null;
   let _onInlineCancel = null;
+  const _controls = new Set();
+  let _controlObserver = null;
+  function watchControl(btn, dispose) {
+    const entry = { btn: btn, seen: btn.isConnected, dispose: dispose };
+    _controls.add(entry);
+    if (!_controlObserver && typeof MutationObserver !== 'undefined') {
+      _controlObserver = new MutationObserver(function () {
+        _controls.forEach(function (item) {
+          if (item.btn.isConnected) item.seen = true;
+          else if (item.seen) item.dispose();
+        });
+      });
+      _controlObserver.observe(document.documentElement, { childList: true, subtree: true });
+    }
+    return function () { _controls.delete(entry); if (!_controls.size && _controlObserver) { _controlObserver.disconnect(); _controlObserver = null; } };
+  }
 
   // B1 CRASH BREADCRUMB (2026-09-04): module-level speech heartbeat. Merges
   // speech-pipeline state into the kill-surviving csPageHeartbeat breadcrumb
@@ -118,9 +139,10 @@
     btn.type = 'button';
     btn.className = 'speech-rec-btn game-btn text-xl px-8 py-4 rounded-2xl shadow-lg';
     const rec = new global.Recorder();
-    global._activeRecorder = rec; // so the overlay loop can read .level
-    let state = 'idle'; // 'idle' | 'recording' | 'busy'
+    let state = 'idle'; // 'idle' | 'starting' | 'recording' | 'busy'
     let safetyTimer = null;
+    let waitTimer = null;
+    let generation = 0, disposed = false, assessment = null;
     let recStartTs = 0; // for telemetry: how long the student actually spoke
     let recordingOwnerId = null;
 
@@ -130,8 +152,8 @@
         btn.classList.remove('bg-red-600', 'hover:bg-red-500');
         btn.classList.add('bg-rose-600', 'hover:bg-rose-500');
         btn.disabled = false;
-      } else if (state === 'busy') {
-        btn.innerText = '⏳ 识别中…';
+      } else if (state === 'busy' || state === 'starting') {
+        btn.innerText = state === 'starting' ? '🎙️ 正在打开麦克风…' : '⏳ 正在听…';
         btn.disabled = true;
       } else {
         btn.innerText = opts.idleText || '🎙️ 点击说话';
@@ -141,14 +163,38 @@
       }
     }
     function clearSafety() { if (safetyTimer) { clearTimeout(safetyTimer); safetyTimer = null; } }
-    function toIdle() { state = 'idle'; clearSafety(); hideInline(); updateUI(); spHeartbeat({ spRec: 0 }); }
+    function clearWait() { if (waitTimer) { clearTimeout(waitTimer); waitTimer = null; } }
+    function notify() { if (!disposed && opts.onStateChange) opts.onStateChange(state); }
+    function toIdle() { state = 'idle'; clearSafety(); clearWait(); if (global._activeRecorder === rec) { hideInline(); global._activeRecorder = null; } if (!disposed) { updateUI(); notify(); } spHeartbeat({ spRec: 0 }); }
+    function stopRecorder() { try { const p = typeof rec.cancel === 'function' ? rec.cancel() : rec.stop(); if (p && p.catch) p.catch(function () {}); } catch (_) {} }
+    function current(ticket) {
+      let owner = null; try { owner = typeof authActiveUser !== 'undefined' && authActiveUser ? authActiveUser.id : null; } catch (_) {}
+      if (!disposed && ticket === generation && (!btn.isConnected || owner !== recordingOwnerId)) btn.disposeSpeech();
+      return !disposed && ticket === generation && btn.isConnected && owner === recordingOwnerId;
+    }
+    function limitWait(ms, message) {
+      const ticket = generation;
+      clearWait(); waitTimer = setTimeout(function () {
+        if (!current(ticket)) return;
+        generation++; if (assessment) assessment.abort(); stopRecorder(); toIdle();
+        const error = new Error(message); error.code = 'SPEECH_TIMEOUT'; if (opts.onError) opts.onError(error);
+      }, ms);
+    }
+    const unwatch = watchControl(btn, function () { btn.disposeSpeech(); });
+    btn.disposeSpeech = function () {
+      if (disposed) return; disposed = true; generation++; clearWait(); clearSafety();
+      if (assessment) assessment.abort(); stopRecorder();
+      if (global._activeRecorder === rec) { hideInline(); global._activeRecorder = null; }
+      btn.disabled = true; unwatch(); if (opts.onDispose) opts.onDispose();
+    };
+    btn.setSpeechIdleText = function (text) { opts.idleText = text; if (!disposed && state === 'idle') updateUI(); };
 
     // Wire the inline indicator's Stop + Cancel (active while this button records).
     _onInlineStop = function () { if (state === 'recording') finishRecording(); };
     _onInlineCancel = function () { if (state === 'recording') cancelRecording(); };
 
     function startRecording() {
-      if (state !== 'idle') return;
+      if (disposed || state !== 'idle') return;
       try { recordingOwnerId = typeof authActiveUser !== 'undefined' && authActiveUser ? authActiveUser.id : null; }
       catch (_) { recordingOwnerId = null; }
       if (!global.Recorder.isSupported()) {
@@ -156,17 +202,29 @@
         else alert('Microphone unavailable. Allow mic access in your browser/WeChat settings.');
         return;
       }
+      if (global.LocalEngine && global.LocalEngine.isBusy && global.LocalEngine.isBusy()) {
+        const error = new Error('Previous recording is still finishing'); error.code = 'SPEECH_BUSY'; if (opts.onError) opts.onError(error); return;
+      }
+      const ticket = ++generation;
+      state = 'starting'; updateUI(); notify();
+      limitWait(15000, 'Microphone permission timed out');
       // The permission prompt may appear here; because this is a tap (not a hold),
       // there is no gesture to lose — we simply continue once permission resolves.
       rec.start().then(function () {
+        if (!current(ticket)) { stopRecorder(); return; }
+        clearWait(); global._activeRecorder = rec;
         state = 'recording';
         recStartTs = Date.now();
+        _onInlineStop = function () { if (state === 'recording') finishRecording(); };
+        _onInlineCancel = function () { if (state === 'recording') cancelRecording(); };
         showInline(btn);  // inline indicator, no overlay — sentence stays visible
         updateUI();
+        notify();
         clearSafety();
         safetyTimer = setTimeout(finishRecording, MAX_RECORD_MS);
         spHeartbeat({ spRec: 1 });
       }).catch(function (err) {
+        if (!current(ticket)) return;
         // Permission denied / mic error -> clean, retryable reset (no stuck state).
         toIdle();
         if (isPermissionError(err) && opts.onPermissionDenied) opts.onPermissionDenied(err);
@@ -176,21 +234,27 @@
     }
 
     function finishRecording() {
-      if (state !== 'recording') return;
+      if (disposed || state !== 'recording') return;
+      const ticket = ++generation;
+      assessment = new AbortController();
       state = 'busy';
       clearSafety();
       hideInline();
       updateUI();
+      notify(); limitWait(30000, 'Speech assessment timed out');
       const audioMs = recStartTs ? Date.now() - recStartTs : null;
       rec.stop().then(function (blob) {
+        if (!current(ticket)) return;
         if (!blob || !blob.size) {
           toIdle();
           if (opts.onGated) opts.onGated('empty', { audioMs: audioMs, durMs: 0, peak: 0 });
           return;
         }
+        if (opts.onRecorded) opts.onRecorded({ audioMs: audioMs });
         // Pre-transcription gate: junk audio gets instant coaching feedback
         // instead of a doomed transcription round-trip.
         return wavStats(blob).then(function (stats) {
+          if (!current(ticket)) return;
           if (stats && stats.durMs < MIN_SPEECH_MS) {
             toIdle();
             if (opts.onGated) opts.onGated('too_short', { audioMs: audioMs, durMs: Math.round(stats.durMs), peak: stats.peak, blob: blob, sampleRate: stats.sampleRate, ownerId: recordingOwnerId });
@@ -202,7 +266,8 @@
             return;
           }
           const t0 = Date.now();
-          return global.LocalEngine.transcribe(blob).then(function (r) {
+          return global.LocalEngine.transcribe(blob, { signal: assessment.signal }).then(function (r) {
+            if (!current(ticket)) return;
             toIdle();
             spHeartbeat({ spLastMs: Date.now() - t0 }); // last transcribe duration
             if (opts.onResult) opts.onResult(r.text || '', {
@@ -222,6 +287,7 @@
           });
         });
       }).catch(function (err) {
+        if (!current(ticket)) return;
         toIdle();
         if (opts.onError) opts.onError(err);
       });
@@ -229,10 +295,12 @@
 
     function cancelRecording() {
       if (state !== 'recording') return;
+      generation++;
       clearSafety();
       // Stop the mic but discard the audio (no transcription).
-      rec.stop().catch(function () {});
+      stopRecorder();
       toIdle();
+      if (opts.onCancel) opts.onCancel();
     }
 
     btn.addEventListener('click', function () {
@@ -370,6 +438,7 @@
   //   when omitted the gate reads authActiveUser.book itself via currentBook().
   //   onDone() is the single "advance" callback — fired on Continue (pass) OR Skip.
   function makeSentenceGate(opts) {
+    if (typeof SPEECH_PRACTICE_ENABLED !== 'undefined' && SPEECH_PRACTICE_ENABLED) return makePracticeGate(opts);
     opts = opts || {};
     injectAssets();
     const target = opts.target || '';
@@ -605,6 +674,109 @@
 
     btns.appendChild(recBtn);
     btns.appendChild(skip);
+    return wrap;
+  }
+
+  // Practice progression is independent of the recogniser's match decision.
+  // No learner-facing percentage, word grades, retry leniency or mastery claim.
+  function makePracticeGate(opts) {
+    opts = opts || {}; injectAssets();
+    const target = opts.target || '', level = opts.level || 2, mode = opts.mode || 'study', book = opts.book || currentBook();
+    const onDone = typeof opts.onDone === 'function' ? opts.onDone : function () {};
+    let done = false, disposed = false, recordings = 0, gradedTries = 0, errors = 0, outcome = 'not_recorded';
+    const wrap = document.createElement('div');
+    wrap.className = 'speech-sentence-gate speech-practice mt-4 text-center';
+    wrap.innerHTML = '<div class="text-lg mb-2">🎙️ 朗读练习：<b class="text-emerald-300" lang="en"></b></div>' +
+      '<p class="speech-practice-instruction">点击录音，读完后点击停止。可以再练一次，也可以继续。</p>' +
+      '<div class="speech-gate-btns flex items-center justify-center gap-3 flex-wrap"></div>' +
+      '<div class="heard-feedback" role="status" aria-live="polite"></div>' +
+      '<details hidden><summary>查看识别到的内容</summary><p></p></details>';
+    wrap.querySelector('b').textContent = target;
+    const buttons = wrap.querySelector('.speech-gate-btns'), feedback = wrap.querySelector('.heard-feedback'), transcript = wrap.querySelector('details');
+    const cont = document.createElement('button'); cont.type = 'button';
+    cont.className = 'speech-practice-continue game-btn bg-emerald-600 hover:bg-emerald-500 text-lg px-8 py-4 rounded-2xl shadow-lg';
+    cont.textContent = '继续 ▶'; cont.hidden = true;
+    const alive = function () { return !done && !disposed && wrap.isConnected; };
+    function offer(message) {
+      if (!alive()) return;
+      feedback.textContent = message; cont.hidden = false;
+      recBtn.setSpeechIdleText('🎙️ 再读一次');
+    }
+    function technicalError(err, permission) {
+      if (!alive()) return; outcome = 'unassessed'; transcript.hidden = true;
+      if (++errors <= 2) logSpeechEvent('error', mode, { target: target, level: level, flow: 'optional_practice_v1', message: String(err && err.message || err).slice(0, 200), ua: UA }, recordings || 1);
+      if (permission && !wrap.querySelector('.mic-help')) wrap.insertAdjacentHTML('beforeend', micHelpHTML());
+      offer(permission ? '麦克风还没有打开。可以按下方提示设置，也可以继续。' :
+        err && err.code === 'SPEECH_TIMEOUT' ? '这次等待有点久。可以继续，稍后再练。' :
+        err && err.code === 'SPEECH_BUSY' ? '上一段录音还在结束处理中。可以稍后再练，也可以继续。' :
+        '这次没能完成识别。可以再试一次，也可以继续。');
+    }
+    function capture(text, meta, result, name) {
+      if (!global.SpeechSampleCapture || typeof global.SpeechSampleCapture.maybeCapture !== 'function') return;
+      try { global.SpeechSampleCapture.maybeCapture({
+        blob: meta && meta.blob, ownerId: meta && meta.ownerId, target: target, transcript: text || '', outcome: name,
+        student: (function () { try { return authActiveUser && authActiveUser.name || ''; } catch (_) { return ''; } })(),
+        pass: result ? !!result.pass : null, accuracy: result ? result.accuracy : null, phoneticRatio: result ? result.phoneticRatio : null,
+        attempt: gradedTries || 1, level: level, book: book, mode: mode, audioMs: meta && meta.audioMs,
+        durMs: meta && meta.durMs, peak: meta && meta.peak, sampleRate: meta && meta.sampleRate,
+        transcribeMs: meta && meta.transcribeMs, details: result && result.details || '', ua: UA, capturedAt: Date.now()
+      }); } catch (_) { /* existing consent/quota/date policy owns research capture */ }
+    }
+    const recBtn = makeRecordButton({
+      idleText: '🎙️ 开始朗读',
+      onStateChange: function (state) {
+        if (!alive()) return;
+        if (state === 'starting') { cont.hidden = false; feedback.textContent = '正在打开麦克风…'; }
+        if (state === 'recording') { cont.hidden = true; transcript.hidden = true; feedback.textContent = ''; }
+        if (state === 'busy') { cont.hidden = false; outcome = 'unassessed'; feedback.textContent = '正在听你的录音…也可以直接继续。'; }
+      },
+      onRecorded: function () { if (alive()) recordings++; },
+      onCancel: function () { offer('录音已取消。可以重新录音，也可以继续。'); },
+      onDispose: function () { disposed = true; if (!done) spHeartbeat({ spGate: 0, spRec: 0 }); },
+      onResult: function (text, meta) {
+        if (!alive()) return;
+        if (isHallucination(text)) {
+          outcome = 'unassessed'; transcript.hidden = true; capture(text, meta, null, 'hallucination');
+          logSpeechEvent('gated', mode, { target: target, level: level, reason: 'hallucination', flow: 'optional_practice_v1', ua: UA }, recordings);
+          offer('这次没有听清楚。可以靠近麦克风再读一次，也可以继续。'); return;
+        }
+        gradedTries++;
+        // Retrying never changes the match threshold. These are transcription
+        // diagnostics, not a calibrated pronunciation score or earned mastery.
+        const result = global.Scorer.scoreForBook ? global.Scorer.scoreForBook(target, text, book, 1) : global.Scorer.score(target, text, level);
+        outcome = result.pass ? 'matched' : 'different';
+        logSpeechEvent('attempt', mode, {
+          target: target, transcript: String(text || '').slice(0, 1000), pass: !!result.pass,
+          accuracy: Math.round((result.accuracy || 0) * 1000) / 1000, phoneticRatio: Math.round((result.phoneticRatio || 0) * 1000) / 1000,
+          edits: typeof result.edits === 'number' ? result.edits : null, attempt: 1, practiceAttempt: gradedTries,
+          level: level, book: book, flow: 'optional_practice_v1', details: result.details || '',
+          audioMs: meta && meta.audioMs, transcribeMs: meta && meta.transcribeMs, blobBytes: meta && meta.blobBytes, ua: UA
+        }, recordings);
+        capture(text, meta, result, 'graded');
+        transcript.querySelector('p').textContent = '我听到的可能是：“' + String(text || '').slice(0, 1000) + '”'; transcript.hidden = false;
+        offer(result.pass ? '✓ 这次听到了目标句子。还想练习，可以再读一次；也可以继续。' :
+          '这次识别的内容和句子不太一样。可以再读一次，也可以继续。');
+      },
+      onGated: function (reason, meta) {
+        if (!alive()) return; outcome = 'unassessed'; transcript.hidden = true; capture('', meta, null, reason);
+        logSpeechEvent('gated', mode, { target: target, level: level, reason: reason, flow: 'optional_practice_v1', audioMs: meta && meta.audioMs, durMs: meta && meta.durMs, ua: UA }, recordings || 1);
+        offer(reason === 'too_short' ? '录音有点短。可以读完句子再点停止，也可以继续。' :
+          '没有听清声音。可以靠近麦克风再读一次，也可以继续。');
+      },
+      onError: function (err) { technicalError(err, isPermissionError(err)); },
+      onPermissionDenied: function (err) { technicalError(err || new Error('Permission denied'), true); }
+    });
+    cont.onclick = function () {
+      if (!alive()) return; done = true; cont.disabled = true;
+      const summary = { target: target, level: level, book: book, flow: 'optional_practice_v1', recordings: recordings,
+        assessedAttempts: gradedTries, completion: gradedTries ? 'practised' : 'unassessed',
+        matchedTarget: outcome === 'matched' ? true : outcome === 'different' ? false : null,
+        assessment: 'transcript_match_only', ua: UA };
+      recBtn.disposeSpeech(); spHeartbeat({ spGate: 0, spRec: 0 });
+      logSpeechEvent('practice', mode, summary, recordings || null); onDone(summary);
+    };
+    buttons.appendChild(recBtn); buttons.appendChild(cont); spHeartbeat({ spGate: 1, spFails: 0 });
+    queryMicPermission().then(function (state) { if (alive() && state === 'denied') technicalError(new Error('Permission denied'), true); });
     return wrap;
   }
 

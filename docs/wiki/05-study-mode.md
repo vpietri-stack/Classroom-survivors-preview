@@ -1,5 +1,13 @@
 # Study Mode (UI Rounds A–D + Match; internal functions A/C/D/E/F)
 
+The 2026-10-28a optional speech-practice preview uses the existing sentence
+gate call in `checkRoundE`. Learners can retry or continue after recording,
+including recognition/microphone problems, without a pronunciation percentage.
+The sentence-building SR result remains recorded before the speaking step;
+continuing does not award speech mastery or repeat the earned grammar result.
+Production keeps its current gate until explicitly promoted. See
+[Speech Recognition](08-speech.md#optional-practice-preview--2026-10-28a).
+
 Temporary remote diagnostics: optional handwriting checkpoints and neural worker errors feed the account-enabled recorder. No ink or learner interactions are added. See [Telemetry](14-telemetry.md).
 
 ## Handwriting neural/interaction preview (2026-10-22)

@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-27b",
-  "deployedAt": "2026-10-27",
-  "notes": "Preview notes automatically open at PU3 U9 p111 and launch a regular page-scoped Study session; preserve isolated preview data."
+  "version": "2026-10-28a",
+  "deployedAt": "2026-10-28",
+  "notes": "Preview only: optional speech retries and Continue, gentler feedback without pronunciation percentages, and safe microphone/time-out recovery. Current speech model and earned sentence progress are preserved."
 }

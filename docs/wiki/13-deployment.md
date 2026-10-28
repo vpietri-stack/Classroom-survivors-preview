@@ -1,5 +1,17 @@
 # Deployment & Release Discipline
 
+## Optional speech practice preview — 2026-10-28a
+
+Release only to the preview remote, preserving its API and existing features.
+The feature flag enables optional sentence-practice progression on preview/dev;
+production keeps its current gate. Version/auth/index stamps advance together,
+with config, speech engine/recorder/UI and teacher-dashboard cache busters.
+`speech_practice_preview.html` is a no-login review page using the same shared
+controls/model without recording uploads or progress writes. Keep speech model
+weights, model-cache namespace and runtime URLs unchanged; no new speech model
+is downloaded for this UI update. Production promotion remains a separate,
+explicitly authorised release after hosted preview review.
+
 ## Automatic guides preview (2026-10-23e)
 
 Build on current preview/main including PU1 Unit 7 (2026-10-23d). Remove the guide

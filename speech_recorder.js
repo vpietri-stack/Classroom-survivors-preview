@@ -18,6 +18,7 @@
       this._chunks = [];      // Float32Array chunks
       this._recorders = [];    // fallback MediaRecorder handles
       this.level = 0;          // live mic level 0..1 (RMS), for UI feedback
+      this._generation = 0;
     }
 
     static isSupported() {
@@ -27,9 +28,10 @@
 
     async start() {
       if (this.recording) return;
+      const generation = ++this._generation;
       this._chunks = [];
 
-      this.stream = await navigator.mediaDevices.getUserMedia({
+      const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           channelCount: 1,
           echoCancellation: true,
@@ -39,7 +41,15 @@
           // engine resamples to 16 kHz; the WAV header records the TRUE rate.
         }
       });
+      // Permission can resolve after the exercise has been left. Never open
+      // an AudioContext or leave a live microphone for that discarded request.
+      if (generation !== this._generation) {
+        stream.getTracks().forEach(t => t.stop());
+        const error = new Error('Recording cancelled'); error.name = 'AbortError'; throw error;
+      }
+      this.stream = stream;
 
+      try {
       // Prefer an explicit 16 kHz context (best for ASR); fall back to default.
       const Ctx = global.AudioContext || global.webkitAudioContext;
       try {
@@ -69,6 +79,19 @@
       this.processor = processor;
 
       this.recording = true;
+      } catch (error) { this.cancel(); throw error; }
+    }
+
+    cancel() {
+      this._generation++;
+      this.recording = false;
+      this.level = 0;
+      try { this.source.disconnect(); } catch (_) {}
+      try { this.processor.disconnect(); } catch (_) {}
+      if (this.stream) this.stream.getTracks().forEach(t => t.stop());
+      if (this.audioCtx) { try { const closing = this.audioCtx.close(); if (closing && closing.catch) closing.catch(function () {}); } catch (_) {} }
+      this.audioCtx = this.source = this.processor = this.stream = null;
+      this._chunks = [];
     }
 
     async stop() {

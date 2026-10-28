@@ -299,7 +299,11 @@ function exerciseTypeLabel(type) {
         'sentenceScramble': 'Sentence Scramble',
         'sentenceMatch': 'Sentence Match',
         'missingWord': 'Missing Words',
-        'findAndFix': 'Find and Fix'
+        'findAndFix': 'Find and Fix',
+        'speech_practice': 'Speech practice (not graded)',
+        'speech_attempt': 'Speech recognition check',
+        'speech_gated': 'Speech recording check',
+        'speech_error': 'Speech technical issue'
     };
     if (map[type]) return map[type];
     // Speech telemetry types: speech_attempt, speech_error, etc.
@@ -326,6 +330,11 @@ function formatItemDetails(details) {
     if (!details) return '—';
     const parsed = parseExerciseDetails(details);
     if (parsed) {
+        if (parsed.flow === 'optional_practice_v1' && parsed.assessment === 'transcript_match_only') {
+            return String(parsed.target || '') + '\n' +
+                (parsed.completion === 'practised' ? 'Practice recorded' : 'Continued without assessment') +
+                ' · ' + (Number(parsed.recordings) || 0) + ' recording(s) · No pronunciation grade';
+        }
         const sentences = parsed.sentences || (parsed.sentence ? [parsed.sentence] : []);
         const answers = parsed.answers || (parsed.answer ? [parsed.answer] : []);
         if (Array.isArray(sentences) && sentences.length && Array.isArray(answers) && answers.length) {
@@ -845,7 +854,7 @@ function openSessionDetail(sessionIdx) {
     }
 
     tbody.innerHTML = exercises.map(ex => {
-        const attBadge = ex.attempts > 1
+        const attBadge = ex.exerciseType === 'speech_practice' ? '<span class="badge">Not graded</span>' : ex.attempts > 1
             ? `<span class="badge badge-attempts-high">${ex.attempts}</span>`
             : `<span class="badge badge-attempts-1">${ex.attempts}</span>`;
 
@@ -936,7 +945,7 @@ function applyExerciseFilters() {
     noMsg.classList.add('hidden');
 
     tbody.innerHTML = exercises.map(ex => {
-        const attBadge = ex.attempts > 1
+        const attBadge = ex.exerciseType === 'speech_practice' ? '<span class="badge">Not graded</span>' : ex.attempts > 1
             ? `<span class="badge badge-attempts-high">${ex.attempts}</span>`
             : `<span class="badge badge-attempts-1">${ex.attempts}</span>`;
 

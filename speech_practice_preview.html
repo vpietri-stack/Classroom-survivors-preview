@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>朗读练习预览</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;background:#f7f5eb;color:#273f37;font:17px/1.65 system-ui,"Microsoft YaHei",sans-serif}main{max-width:760px;margin:40px auto;padding:0 20px}h1{line-height:1.25;font-size:30px}.intro{color:#53685f}section{padding:28px;border:1px solid #d7e0d3;border-radius:22px;background:white;margin-top:24px}.speech-gate-btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}button,select{font:inherit;padding:12px 18px;border-radius:12px;border:1px solid #a9bfb1;max-width:100%}button{cursor:pointer}button:disabled{opacity:.55;cursor:default}.speech-rec-btn{background:#b44d42;color:white}.speech-practice-continue,#prepare{background:#287553;color:white}.speech-sentence-gate{text-align:center}.speech-sentence-gate b{display:block;font-size:28px;line-height:1.4;color:#246c51;margin:15px 0}.heard-feedback{margin-top:18px}.rec-inline-label{color:#9c3029!important;background:#fff1e9!important}.rec-inline-cancel{color:#53685f!important}.mic-help{background:#fff4d9;padding:14px;border-radius:12px;color:#5f4c20}#status{min-height:28px}label{display:block;font-size:14px;margin-bottom:6px}.small{font-size:14px;color:#637369}button:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid #dcab46;outline-offset:3px}@media(max-width:480px){main{margin:24px auto;padding:0 14px}section{padding:20px 16px}.speech-gate-btns button{flex:1;min-width:130px}h1{font-size:26px}}
+  </style>
+</head>
+<body><main>
+  <p class="small">Classroom Survivors · 预览</p><h1>读一读，按自己的节奏练习</h1>
+  <p class="intro">读完一句，可以再读一次，也可以继续。不需要反复尝试才能过关。</p>
+  <p class="small">使用当前语音模型。首次使用约需下载 41 MB；已缓存时可重复使用。本页不会上传录音，也不会保存学习记录。</p>
+  <label for="sentence">试读句子</label>
+  <select id="sentence"><option>This is a short pen.</option><option>It's a soft bed.</option><option>I have a red bag.</option></select>
+  <p id="status" role="status" aria-live="polite">准备好后，点击下方按钮。</p>
+  <button id="prepare" type="button">准备朗读</button>
+  <section id="practice" hidden aria-label="朗读练习"></section>
+  <p class="small">这里没有发音评分，也没有自动给单词标对错。识别内容可能有误，不代表孩子读错了。</p>
+</main>
+<script src="config.js?v=2026-10-28a"></script>
+<script src="speech_scorer.js?v=4"></script>
+<script src="speech_recorder.js?v=2"></script>
+<script src="speech_engine.js?v=12"></script>
+<script src="speech_ui.js?v=16"></script>
+<script src="speech_practice_preview.js?v=2026-10-28a"></script>
+</body></html>
