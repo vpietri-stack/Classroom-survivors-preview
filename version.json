@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-28e",
+  "version": "2026-10-28f",
   "deployedAt": "2026-10-28",
-  "notes": "Preview: notes recording requires at least two words; single words remain listening-only."
+  "notes": "Preview-only single-word speech lab: compare same audio with Whisper preparations and optional Moonshine, local-only recording/results. Preserve notes two-word speech restriction."
 }

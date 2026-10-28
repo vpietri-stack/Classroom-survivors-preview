@@ -1,5 +1,8 @@
 # Testing
 
+`test_speech_word_poc.js` verifies the standalone experiment: same clip across variants/models, recorder-equivalent trim, no automatic Moonshine use, distinct transcript/hint feedback, target invalidation, neutral errors, teacher labels and paired exports, cancellation, mobile fit, no external writes, and SHA-256 verification of pinned Moonshine assets. Native smoke testing separately exercises the actual Whisper and Moonshine workers with synthetic speech; this establishes integration, not child-reading accuracy.
+
+
 `test_speech_practice.js` also covers existing Study/game tile feedback, prompt/row removal, immediate retry reset, ordered repeated words and contractions, and neutral fallback on mismatched checker output.
 
 

@@ -4,3 +4,7 @@
 # Shell scripts must keep LF: autocrlf checks them out with CRLF on Windows and
 # Git Bash then fails on every line ("$'\r': command not found").
 *.sh text eol=lf
+
+# Preserve the exact published bytes recorded in the optional model manifest.
+models/moonshine-tiny-poc/** -text whitespace=-blank-at-eol
+models/moonshine-tiny-poc/onnx/*.onnx binary

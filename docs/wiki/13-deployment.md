@@ -1,5 +1,8 @@
 # Deployment & Release Discipline
 
+Single-word POC 2026-10-28f is preview-only and has no app/menu integration. Ship the new page/helpers/workers and pinned public Moonshine assets; leave notes, curriculum, API and shared speech engine unchanged. Update synchronized version/auth/index/dashboard-auth stamps. The existing runtime and Whisper cache keys are reused; Moonshine downloads only when selected. Preserve notes single-word listening-only behaviour.
+
+
 ## Optional speech practice preview — 2026-10-28b
 
 Release only to the preview remote, preserving its API and existing features.

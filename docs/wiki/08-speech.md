@@ -1,5 +1,8 @@
 # Speech Recognition & Pronunciation Scoring
 
+Single-word experiment (preview 2026-10-28f): `speech_word_poc.html` records/imports one clip and compares the unchanged Whisper engine using app-style trim/repetition, trim without repetition, 250ms edge silence without repetition, and untrimmed audio. The same selected target is passed to the existing checker; thresholds are unchanged. The page separately reports free transcript matching, target status and positive/neutral hints. Optional Moonshine Tiny runs free transcription on the identical normally trimmed clip; it does not claim the same target-aware checker. Separate workers run sequentially and terminate for cancellation/timeouts/hidden pages and after completion. Raw capture is bounded to 20 seconds, pending mic permission to 15 seconds; local file import is limited to 10MB/20sec. No account, capture module or API calls; recordings/results remain in memory unless downloaded. Paired WAV/JSON exports use an anonymous clipId and a teacher label. The notes page retains its two-word restriction and production is unchanged.
+
+
 Preview 2026-10-28c: Study and grammar callers pass their completed sentence tiles to the optional practice gate. The repeated target prompt and separate word-feedback row are omitted. Each microphone attempt resets those tiles to purple immediately; target words heard clearly turn their existing tiles green, while uncertain words stay purple. Word mapping preserves sentence order, repeated words, contractions and punctuation; unexpected target output leaves tiles neutral. Standalone callers without tiles retain their target display. The no-login review page demonstrates the same tile feedback.
 
 
