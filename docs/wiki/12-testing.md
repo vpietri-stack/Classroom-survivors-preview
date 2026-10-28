@@ -1,5 +1,8 @@
 # Testing
 
+`test_speech_collection.js` covers the public prompt inventory, confusable family split isolation, mandatory human review, multiple retained takes, durable reload, full audio backup/restore, hash corruption and ID conflicts, imitation notes, quota failure without draft loss, late mic grants, 320px layout and no external/model calls. The inspection CLI is checked against a synthetic backup and excludes reserved prompts from development manifests.
+
+
 Single-word lab regressions additionally cover export during a stalled optional model, preserved audio and teacher labels, skip/cancel with partial results, fallback asset routes, resumed chunks and checksum rejection.
 
 

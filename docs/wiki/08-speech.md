@@ -1,5 +1,8 @@
 # Speech Recognition & Pronunciation Scoring
 
+Preview 2026-10-28h adds a guided adult word collection, independent of the lab and student workflow. Its 333 prompts cover 148 words, 10 conditions, near-word negatives, homophones and sentence controls. Each reviewed untrimmed take is saved atomically in its own IndexedDB store, with paired audio/label backups and restore validation. Imitated accents are explicitly adult stress data. Whole word families share a deterministic split; 63 prompts are reserved. The page runs no recognizer, changes no thresholds, and sends no audio or analytics. Keep student development evaluation separate; do not spend the 83 reserved child clips. Full protocol: `docs/speech-word-collection.md`.
+
+
 Preview 2026-10-28g fixes lab exports: every completed row is immediately downloadable while other models load. Cancel retains partial results and audio; Skip Moonshine records an explicit skipped result. Exports carry running/partial/cancelled/complete state and requestedModels. The optional model loader fetches pinned public assets in four parallel 256KB ranges, switches routes after bounded failures, verifies whole-file SHA-256, and caches completed chunks for resume. Routes include pinned raw GitHub, gh-proxy, HF mirror, Hugging Face and same-origin. Only public model GETs go to those hosts; audio never leaves the worker/device. Model/tokenizer bytes and recognition thresholds are unchanged.
 
 

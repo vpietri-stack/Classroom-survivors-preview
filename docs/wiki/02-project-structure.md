@@ -1,5 +1,8 @@
 # Project Structure & File Map
 
+`speech_word_collection.html` and `speech_collection_*` form a separate preview-only teacher recorder: 148 words / 333 prompts, IndexedDB audio, reviewed labels and whole-collection backup/restore. It loads no speech model or API. `speech_collection_inspect.cjs` validates private backups and prepares development-only inputs under `.hermes/word-collection/`. See `docs/speech-word-collection.md`.
+
+
 > **Last verified:** 2026-09-25 · **Part of:** [Classroom-survivors Repo Wiki](README.md)
 
 **Owner files:** `index.html`, `package.json`, `.github/workflows/azure-static-web-apps-brave-bush-0438ab000.yml`, `AGENTS.md`

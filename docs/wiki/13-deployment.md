@@ -1,5 +1,8 @@
 # Deployment & Release Discipline
 
+Preview-only 2026-10-28h publishes the guided teacher collection page, public prompt plan and helper modules. No speech models, app flow, API, curriculum or production changes. Synchronize version/auth/index/dashboard-auth and use independent v=1 collection asset URLs. No teacher/student audio belongs in git; collected files and CLI development outputs stay local/private.
+
+
 Preview-only 2026-10-28g adds the resumable public model loader and refreshes the lab bootstrap/worker URLs. Synchronize version/auth/index/dashboard-auth; leave production and model weights unchanged. Verify partial export and skipped Moonshine on the hosted page.
 
 
