@@ -173,7 +173,9 @@ prefixes change. Only a fully finished five-word/five-board session carries
 `data.previewNote` on its **single ordinary `sessionType:'study'` event**, so SR
 and weekly targets count it normally and only once. Partial exits retain normal
 observed SR outcomes but do not complete the note. The main-menu `预习笔记`
-library reopens completed notes in listening-only review mode. A student-scoped
+button appears only after at least one preview Study session is completed,
+  including immediately after the first completion. The library reopens completed
+  notes in listening-only review mode. A student-scoped
 local mirror covers pending offline delivery; the durable server map is returned
 with the normal login. See [data model](11-data-model.md).
 

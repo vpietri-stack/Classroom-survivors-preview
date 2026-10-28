@@ -276,3 +276,7 @@ PU1 Unit 7 checks enforce 28 M/36 F and per-page counts, complete IDs, exact tea
 ## Remote incident diagnostics (2026-10-23)
 
 Remote diagnostics: test_client_diagnostics.js verifies strict token scoping, opt-in/expiry, sanitizing, ack/dedup, concurrency and storage bounds. test_client_diagnostics_browser.js verifies console capture, recovery after reload/delayed return, network failures, account switching, disabled behaviour and the UTF-8 payload budget. Both run in npm test.
+
+Preview-note browser checks also verify that the library button stays hidden for
+students with no completed preview, appears immediately after first completion,
+and remains hidden when switching to a student on another page with no completion.
