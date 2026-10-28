@@ -4,7 +4,12 @@
   let ready = false;
   function showSentence() {
     if (!ready) return;
-    practice.replaceChildren(SpeechUI.makeSentenceGate({ target: sentence.value, book: 'PU2', mode: 'study', onDone: function () {
+    const tiles = document.createElement('div'); tiles.className = 'preview-sentence-tiles';
+    const wordTiles = sentence.value.split(/\s+/).map(word => {
+      const tile = document.createElement('span'); tile.className = 'preview-word-tile correct';
+      tile.dataset.word = tile.textContent = word; tiles.appendChild(tile); return tile;
+    });
+    practice.replaceChildren(tiles, SpeechUI.makeSentenceGate({ wordTiles: wordTiles, target: sentence.value, book: 'PU2', mode: 'study', onDone: function () {
       status.textContent = '已继续到下一句。本页没有记录分数或学习进度。';
       sentence.selectedIndex = (sentence.selectedIndex + 1) % sentence.options.length; showSentence();
     } }));

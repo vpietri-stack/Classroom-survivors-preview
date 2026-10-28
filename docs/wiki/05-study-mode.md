@@ -1,5 +1,8 @@
 # Study Mode (UI Rounds A–D + Match; internal functions A/C/D/E/F)
 
+Preview 2026-10-28c reuses the completed Round E tiles for speech hints: microphone attempts reset them to purple, then heard words become green. There is no repeated target prompt or second feedback sentence. Earned unscramble results and optional progression stay unchanged.
+
+
 The 2026-10-28b optional speech-practice preview uses the existing sentence
 gate call in `checkRoundE`. Learners can retry or continue after recording,
 including recognition/microphone problems, without a pronunciation percentage.

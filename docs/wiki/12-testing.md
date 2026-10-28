@@ -1,5 +1,8 @@
 # Testing
 
+`test_speech_practice.js` also covers existing Study/game tile feedback, prompt/row removal, immediate retry reset, ordered repeated words and contractions, and neutral fallback on mismatched checker output.
+
+
 The required root suite also runs `test_speech_practice.js` (preview/production
 gating, real shared controls and Study/game progression, retry/Continue,
 permission/timeout/cancellation/late-result/account protections) and

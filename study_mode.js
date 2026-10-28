@@ -1006,6 +1006,7 @@ function checkRoundE() {
             }
             const gate = window.SpeechUI.makeSentenceGate({
                 target: sentenceText,
+                wordTiles: slots.map(slot => slot.firstElementChild),
                 level: 2,
                 onDone: advance
             });

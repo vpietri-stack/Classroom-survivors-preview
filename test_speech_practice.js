@@ -23,7 +23,7 @@ async function main() {
         stop() { const n = kind === 'short' ? 4000 : 20000, b = new ArrayBuffer(44 + n * 2), v = new DataView(b); v.setUint32(24, 16000, true); if (kind !== 'quiet') for (let i = 0; i < n; i++) v.setInt16(44 + i * 2, 10000, true); return Promise.resolve(new Blob([b], { type: 'audio/wav' })); }
       };
       window.LocalEngine = { isBusy: () => kind === 'busy', transcribe: (audio, opts) => {
-        window.lastSignal = opts.signal;
+        window.lastSignal = opts.signal; window.lastTarget = opts.target;
         if (kind === 'deferred') return new Promise(resolve => { window.finishAsr = resolve; });
         if (kind === 'error') return Promise.reject(new Error('technical details should stay hidden'));
         return Promise.resolve({ text: kind === 'junk' ? '[Music]' : 'A real reading.', targetWords: kind === 'hints' ? [
@@ -31,6 +31,7 @@ async function main() {
         ] : undefined, targetStatus: kind === 'hints' ? 'checked' : undefined });
       } };
     });
+    await page.addStyleTag({ path: path.join(__dirname, 'style.css') });
     await page.addScriptTag({ path: path.join(__dirname, 'speech_ui.js') });
     async function open(kind) { await page.evaluate(kind => { window.kind = kind; document.getElementById('gate').replaceChildren(SpeechUI.makeSentenceGate({ target: 'This is a short pen.', mode: 'study', onDone: s => finished.push(s) })); }, kind); }
     async function record(kind, fresh = true) {
@@ -111,17 +112,56 @@ async function main() {
       checkRoundE();
     });
     assert.equal(await page.evaluate(() => srStudyResults.length), 1); checks++;
-    await record('different', false); await page.locator('.speech-practice-continue').click();
+    assert.equal(await page.locator('.speech-practice b, .speech-practice .speech-target-words').count(), 0); checks++;
+    await page.locator('.speech-rec-btn').click();
+    await page.waitForFunction(() => document.querySelector('.rec-inline.show'));
+    assert.equal(await page.locator('#sentence-drop-zone .speech-reading-neutral').count(), 5); checks++;
+    await page.evaluate(() => { kind = 'hints'; });
+    await page.locator('#recInlineStop').click();
+    await page.waitForFunction(() => !document.querySelector('.speech-rec-btn').disabled);
+    assert.equal(await page.locator('#sentence-drop-zone .correct').count(), 3);
+    assert.equal(await page.locator('#sentence-drop-zone .speech-reading-neutral').count(), 2); checks++;
+    // A fresh attempt clears earlier greens immediately, even before permission resolves.
+    await page.evaluate(() => { kind = 'pending'; }); await page.locator('.speech-rec-btn').click();
+    assert.equal(await page.locator('#sentence-drop-zone .speech-reading-neutral').count(), 5); checks++;
+    await page.locator('.speech-practice-continue').click();
     assert.equal(await page.evaluate(() => studyAdvances), 1); assert.equal(await page.evaluate(() => srStudyResults.length), 1); checks++;
     await page.addScriptTag({ content: caller('game.js', 'checkGrammar') });
     await page.evaluate(() => {
       document.body.innerHTML = '<div id="grammarGame"><div id="word-dock"></div><div id="grammar-actions"></div></div>';
-      const game = document.getElementById('grammarGame'); game.dataset.targetSentence = 'This is a short pen.'; game.dataset.validOptions = JSON.stringify(['This is a short pen.']);
-      for (const word of ['This', 'is', 'a', 'short', 'pen.']) { const slot = document.createElement('div'), tile = document.createElement('div'); slot.className = 'drop-zone'; slot.dataset.expected = word; tile.innerText = word; slot.append(tile); game.append(slot); }
+      const game = document.getElementById('grammarGame'); game.dataset.targetSentence = 'This pen is short.'; game.dataset.validOptions = JSON.stringify(['This is a short pen.']);
+      for (const word of ['This', 'is', 'a', 'short', 'pen.']) { const slot = document.createElement('div'), tile = document.createElement('div'); slot.className = 'drop-zone'; slot.dataset.expected = word; tile.className = 'draggable placed'; tile.innerText = word; slot.append(tile); game.append(slot); }
       window.grammarGameEl = () => document.getElementById('grammarGame'); window.srGameResults = []; window.srInSessionFailures = new Set(); window.srInSessionSuccesses = new Set();
       window.rewards = 0; window.handleMinigameSuccess = () => rewards++; checkGrammar();
     });
     assert.equal(await page.evaluate(() => srGameResults.length), 1); checks++;
+    await record('hints', false);
+    assert.equal(await page.evaluate(() => lastTarget), 'This is a short pen.'); checks++;
+    assert.equal(await page.locator('#grammarGame .drop-zone .correct').count(), 3);
+    assert.equal(await page.locator('#grammarGame .drop-zone .speech-reading-neutral').count(), 2);
+    assert.equal(await page.locator('.speech-practice b, .speech-practice .speech-target-words').count(), 0); checks++;
+    const tilePaint = await page.locator('.drop-zone > div').evaluateAll(tiles => tiles.map(t => getComputedStyle(t).backgroundImage));
+    assert(tilePaint[0].includes('74, 222, 128')); assert(tilePaint[3].includes('129, 140, 248')); checks++;
+    // Preserve the two differently judged occurrences of a repeated word.
+    await page.evaluate(() => {
+      const tiles = Array.from(document.querySelectorAll('.drop-zone > div'));
+      ['I', 'said', 'I', "didn't", 'go.'].forEach((w,i) => { tiles[i].textContent = w; });
+      document.getElementById('word-dock').replaceChildren(SpeechUI.makeSentenceGate({
+        target: "I said I didn't go.", wordTiles: tiles, onDone: () => {} }));
+      LocalEngine.transcribe = async () => ({ text: "I said I didn't go", targetWords: [
+        {text:'I',heardClear:true},{text:'said',heardClear:true},{text:'I',heardClear:false},
+        {text:"didn't",heardClear:true},{text:'go',heardClear:false}] });
+    });
+    await record('hints', false);
+    assert.deepEqual(await page.locator('.drop-zone > div').evaluateAll(tiles => tiles.map(t => t.classList.contains('correct'))), [true,true,false,true,false]); checks++;
+    // No shifted green tiles if the checker returns an unexpected word sequence.
+    await page.evaluate(() => { LocalEngine.transcribe = async () => ({ text:'mismatch', targetWords:[{text:'go',heardClear:true}] }); });
+    await record('hints', false);
+    assert.equal(await page.locator('.drop-zone .correct').count(), 0); checks++;
+    // Return to the original caller gate to check its reward exactly once.
+    await page.evaluate(() => { document.getElementById('word-dock').replaceChildren(); window.exerciseAttempts = 1; window.kind = 'different';
+      document.querySelectorAll('.drop-zone > div').forEach((t,i) => { t.textContent = ['This','is','a','short','pen.'][i]; });
+      srGameResults.length = 0; checkGrammar(); });
     await record('different', false); await page.locator('.speech-practice-continue').click();
     assert.equal(await page.evaluate(() => rewards), 1); assert.equal(await page.evaluate(() => srGameResults.length), 1); checks++;
     const config = fs.readFileSync(path.join(__dirname, 'config.js'), 'utf8');

@@ -29,6 +29,7 @@
 .speech-target-words{display:flex;flex-wrap:wrap;justify-content:center;gap:7px;margin:12px 0;}
 .speech-target-word{display:inline-block;padding:7px 11px;border-radius:10px;background:rgba(100,116,139,.08);color:inherit;font-size:19px;}
 .speech-target-word.heard{background:#e1f3e3;color:#24663e;}
+.speech-reading-tile.speech-reading-neutral{background:linear-gradient(180deg,#818cf8,#6366f1)!important;color:white!important;border-color:#4338ca!important;box-shadow:0 3px 0 #4338ca!important;animation:none!important;}
 .speech-target-note{font-size:12px;margin:6px 0;}
 /* Inline recording indicator (no overlay — sentence stays visible) */
 .rec-inline{display:none;flex-direction:column;align-items:center;gap:8px;margin-top:10px;}
@@ -687,6 +688,7 @@
   function makePracticeGate(opts) {
     opts = opts || {}; injectAssets();
     const target = opts.target || '', level = opts.level || 2, mode = opts.mode || 'study', book = opts.book || currentBook();
+    const wordTiles = Array.from(opts.wordTiles || []).filter(Boolean);
     const onDone = typeof opts.onDone === 'function' ? opts.onDone : function () {};
     let done = false, disposed = false, recordings = 0, gradedTries = 0, errors = 0, outcome = 'not_recorded', hintedWords = 0;
     const wrap = document.createElement('div');
@@ -697,15 +699,52 @@
       '<div class="heard-feedback" role="status" aria-live="polite"></div>' +
       '<div class="speech-target-words" hidden aria-label="听到的目标词"></div><p class="speech-target-note" hidden>绿色是这次听到的词；其他词不判对错。</p>' +
       '<details hidden><summary>查看识别到的内容</summary><p></p></details>';
-    wrap.querySelector('b').textContent = target;
+    if (wordTiles.length) {
+      wrap.querySelector('b').parentElement.remove();
+      wrap.querySelector('.speech-target-words').remove();
+      wrap.querySelector('.speech-target-note').remove();
+    } else wrap.querySelector('b').textContent = target;
     const buttons = wrap.querySelector('.speech-gate-btns'), feedback = wrap.querySelector('.heard-feedback'), transcript = wrap.querySelector('details');
     const cont = document.createElement('button'); cont.type = 'button';
     cont.className = 'speech-practice-continue game-btn bg-emerald-600 hover:bg-emerald-500 text-lg px-8 py-4 rounded-2xl shadow-lg';
     cont.textContent = '继续 ▶'; cont.hidden = true;
     const alive = function () { return !done && !disposed && wrap.isConnected; };
-    function clearHints() { wrap.querySelector('.speech-target-words').hidden = true; wrap.querySelector('.speech-target-note').hidden = true; hintedWords = 0; }
+    function clearHints() {
+      hintedWords = 0;
+      if (wordTiles.length) {
+        wordTiles.forEach(tile => {
+          tile.classList.remove('!bg-green-500', '!bg-red-500', 'correct', 'wrong');
+          tile.classList.add('speech-reading-tile', 'speech-reading-neutral');
+          tile.setAttribute('aria-label', tile.textContent + '：未判断');
+        });
+      } else {
+        wrap.querySelector('.speech-target-words').hidden = true;
+        wrap.querySelector('.speech-target-note').hidden = true;
+      }
+    }
     function showHints(meta) {
       clearHints(); if (!meta || !Array.isArray(meta.targetWords) || !meta.targetWords.length) return;
+      if (wordTiles.length) {
+        // Match in sentence order, including repeated words and punctuation.
+        // A tile containing several words is green only if each word was heard.
+        const tokens = text => (String(text).match(/[\p{L}\p{N}]+(?:['’\-][\p{L}\p{N}]+)*/gu) || []).map(w => w.toLowerCase().replace(/’/g, "'"));
+        const expected = wordTiles.flatMap(tile => tokens(tile.dataset.word || tile.textContent));
+        const actual = meta.targetWords.flatMap(w => tokens(w.text));
+        if (expected.length !== actual.length || expected.some((w, i) => w !== actual[i])) return;
+        let offset = 0;
+        wordTiles.forEach(tile => {
+          const n = tokens(tile.dataset.word || tile.textContent).length;
+          const heard = n > 0 && meta.targetWords.slice(offset, offset + n).every(w => w.heardClear);
+          if (heard) {
+            tile.classList.remove('speech-reading-neutral');
+            tile.classList.add('!bg-green-500', 'correct');
+            tile.setAttribute('aria-label', tile.textContent + '：这次听清了');
+          }
+          hintedWords += meta.targetWords.slice(offset, offset + n).filter(w => w.heardClear).length;
+          offset += n;
+        });
+        return;
+      }
       const list = wrap.querySelector('.speech-target-words'); list.replaceChildren();
       for (const word of meta.targetWords.slice(0, 40)) { const chip = document.createElement('span'); chip.className = 'speech-target-word' + (word.heardClear ? ' heard' : ''); chip.textContent = word.text; list.appendChild(chip); if (word.heardClear) hintedWords++; }
       list.hidden = false; wrap.querySelector('.speech-target-note').hidden = false;
@@ -740,7 +779,7 @@
       assessmentTarget: target,
       onStateChange: function (state) {
         if (!alive()) return;
-        if (state === 'starting') { cont.hidden = false; feedback.textContent = '正在打开麦克风…'; }
+        if (state === 'starting') { clearHints(); transcript.hidden = true; cont.hidden = false; feedback.textContent = '正在打开麦克风…'; }
         if (state === 'recording') { cont.hidden = true; transcript.hidden = true; feedback.textContent = ''; clearHints(); }
         if (state === 'busy') { cont.hidden = false; outcome = 'unassessed'; feedback.textContent = '正在听你的录音…也可以直接继续。'; }
       },

@@ -1925,14 +1925,14 @@ function checkGrammar() {
         // Speech step: now that the sentence is built correctly, ask the student
         // to say it aloud (Whisper). Skipped silently if the model isn't ready
         // yet, so it never blocks the reward or shows a spinner.
-        const targetSentence = document.getElementById('grammarGame').dataset.targetSentence || '';
         if (window.SpeechStatus && window.SpeechStatus.isReady() && window.SpeechUI && window.SpeechUI.makeSentenceGate) {
             const actions = document.getElementById('grammar-actions');
             if (actions) actions.classList.add('hidden');
             // Place the speech gate INTO the now-empty word-dock so the user doesn't scroll.
             const dock = document.getElementById('word-dock');
             const gate = window.SpeechUI.makeSentenceGate({
-                target: targetSentence,
+                target: userWords.join(' '), // Assess the accepted sentence actually built.
+                wordTiles: Array.from(zones, zone => zone.firstElementChild),
                 level: 2,
                 mode: 'game', // tags speech telemetry events with the game context
                 onDone: function () {

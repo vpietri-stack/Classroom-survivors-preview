@@ -1,5 +1,8 @@
 # Game Modes & Minigames
 
+Preview 2026-10-28c grammar speech feedback colours the existing completed tiles: purple on microphone start, green for words heard, purple for uncertainty. It checks the accepted sentence actually built, including valid alternative orders, and omits the duplicated prompt and feedback sentence. Rewards remain tied to the unscramble.
+
+
 > **Last verified:** 2026-09-04 · **Part of:** [Classroom-survivors Repo Wiki](README.md)
 
 **Owner files:** `game.js` (2345 lines — menus, dispatch, the four DOM minigames, audio stack), `boot.js` (Phaser config, `registerScene`, `activeGameMode`, HiDPI enter/exit), `config.js` (`TD_ENABLED` / `THREE_TD_ENABLED` URL gates), `tower_defense.js` (1808), `gomoku.js` (781), `uno.js` (1821), `index.html` (`#gameSelectionOverlay` ~508, minigame overlays, TD HUD ~663+).

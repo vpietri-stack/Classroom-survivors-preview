@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-28b",
+  "version": "2026-10-28c",
   "deployedAt": "2026-10-28",
-  "notes": "Preview: encouraging target-aware word hints with the current speech model and optional retries/Continue. Preserve notes-library completion gating and isolated preview data."
+  "notes": "Preview: speech feedback reuses the completed sentence tiles, resetting to purple on each microphone attempt and turning heard words green. Preserve notes-library completion gating and isolated preview data."
 }

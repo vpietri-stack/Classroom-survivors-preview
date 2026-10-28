@@ -1,5 +1,8 @@
 # Speech Recognition & Pronunciation Scoring
 
+Preview 2026-10-28c: Study and grammar callers pass their completed sentence tiles to the optional practice gate. The repeated target prompt and separate word-feedback row are omitted. Each microphone attempt resets those tiles to purple immediately; target words heard clearly turn their existing tiles green, while uncertain words stay purple. Word mapping preserves sentence order, repeated words, contractions and punctuation; unexpected target output leaves tiles neutral. Standalone callers without tiles retain their target display. The no-login review page demonstrates the same tile feedback.
+
+
 ## Optional practice preview — 2026-10-28b
 
 `SPEECH_PRACTICE_ENABLED` enables the new shared sentence practice controls on
