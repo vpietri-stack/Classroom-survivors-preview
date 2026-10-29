@@ -1,5 +1,7 @@
 # Speech Recognition & Pronunciation Scoring
 
+Preview 2026-10-29f makes the existing browser WASM runtime resumable and SHA-verified too. Reuse verified HTTP-cache bytes when available; otherwise transfer its 5.49 MB compressed copy (23.01 MB raw fallback), persist it, and serve the exact bytes to the matching local library wrapper. Session creation must not make an uncontrolled full-WASM network request. No additional speech model or recognition change; manifest transportVersion3, bootstrapv6,workerv5,asset/manifestv5.
+
 Preview 2026-10-29e fixes ModelScope/Git package compatibility during preparation. Segment hashes reject wrong mirror/cache bytes before assembly; known ModelScope cache files are converted read-only into the exact frozen bytes with 316 KB of compressed updates. Immutable pinned ModelScope sources are separate from canonical Git routes, and existing legacy entries stay unchanged. Metadata can use compressed transport. Bootstrap/worker/manifest queries advance without changing model decisions. See [adaptive POC](../speech-adaptive-poc.md).
 
 Preview 2026-10-29d separates page visibility from cancellation in the adaptive POC. Hidden pages stop microphone permission/capture, while preparation/assessment survive with paused visible-time deadlines. Background preparation errors defer and automatically retry using saved assets on return; stale worker errors are ignored. Stop/real unload still cancel; BFCache preserves work. The bootstrap query advances to v4 with no model/worker/asset URL changes. Browser/OS suspension is still possible.

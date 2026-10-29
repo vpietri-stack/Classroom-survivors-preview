@@ -2,6 +2,8 @@
 
 ## Adaptive speech research (2026-10-29)
 
+Model-cache-only smokes also missed the runtime's separate one-shot download. A fresh field check passed the repaired model-file hashes but twice timed out fetching the 23 MB browser engine. Put runtime bytes through the verified resumable cache too, preserve its exact matching wrapper/ABI, and test with full-file runtime fetches deliberately unavailable. Do not diagnose all long preparation waits as model compilation.
+
 ModelScope serves a different Xenova package: encoder10,124,913bytes versus Git10,124,993; decoder30,727,382 versus30,718,858. The old loader trusted segment length when CORS hid Content-Range, could mix versions, and retried the same incompatible source after a whole-file failure around89%. Hash every segment including resumed cache data; separate immutable source variants from canonical routes. Known cached variants can be converted with bounded exact byte updates, preserving their legacy entries. Tests seeded only with canonical Git files miss the real upgrade path.
 
 A blanket `visibilitychange` cancellation made long model preparation fail immediately when the teacher switched tabs. Separate microphone capture from model preparation/assessment. Pause request deadline accounting while hidden, preserve pending load state, and automatically retry background failures from saved chunks on return. Ignore stale worker errors and do not arm duplicate timers on visibility/pageshow events. Actual unload and explicit Stop still release resources; OS background suspension remains outside page control.

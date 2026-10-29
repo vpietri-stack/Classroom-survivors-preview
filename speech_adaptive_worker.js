@@ -1,4 +1,4 @@
-import {prepareAdaptiveAssets} from './speech_adaptive_assets.js?v=4';
+import {prepareAdaptiveAssets} from './speech_adaptive_assets.js?v=5';
 import {compactLexicon,decide} from './speech_adaptive_core.js?v=1';
 import {words,disposeTensors,stats} from './speech_target.js?v=2026-10-28b';
 import {evidence,warmZeroContexts} from './speech_adaptive_evidence.js?v=1';
@@ -7,12 +7,11 @@ async function load(id){
  if(pipe&&vad)return;if(loading)return loading;
  loading=(async()=>{
   const preferLocal=new URL(location.href).searchParams.has('local');assets=await prepareAdaptiveAssets(p=>postMessage({id,...p}),{preferLocal});const originalFetch=self.fetch.bind(self);
-  self.fetch=(input,init)=>{const url=typeof input==='string'?input:input instanceof URL?input.href:input.url,path=url.split('?')[0];let key;if(path.startsWith(assets.whisperBase))key='whisper/'+path.slice(assets.whisperBase.length);else if(path===assets.vadBase+'config.json')return Promise.resolve(new Response('{"model_type":"silero_vad","architectures":["PreTrainedModel"]}',{headers:{'Content-Type':'application/json'}}));else if(path===assets.vadBase+'onnx/model.onnx')key='silero_vad_v5.onnx';if(key&&assets.buffers.has(key))return Promise.resolve(new Response(assets.buffers.get(key),{headers:{'Content-Type':path.endsWith('.json')?'application/json':'application/octet-stream'}}));return originalFetch(input,init);};
-  const stable='https://vpietri-stack.github.io/Classroom-survivors-lib/tjs-v3/';let base=new URL('./lib/',import.meta.url).href;
-  if(!preferLocal&&!['localhost','127.0.0.1'].includes(location.hostname)){const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),4000);try{const response=await originalFetch(stable+'wasm/ort-wasm-simd-threaded.jsep.mjs',{signal:controller.signal});if(response.ok)base=stable;await response.body?.cancel();}catch(_){}finally{clearTimeout(timer);}}
-  postMessage({id,log:'Preparing the speech engine…'});runtime=await import(base+'transformers.min.js'+(base===stable?'':'?v=4'));
+  self.fetch=(input,init)=>{const url=typeof input==='string'?input:input instanceof URL?input.href:input.url,path=url.split('?')[0];let key;if(path.startsWith(assets.whisperBase))key='whisper/'+path.slice(assets.whisperBase.length);else if(path.endsWith('/ort-wasm-simd-threaded.jsep.wasm'))key='runtime/ort-wasm-simd-threaded.jsep.wasm';else if(path===assets.vadBase+'config.json')return Promise.resolve(new Response('{"model_type":"silero_vad","architectures":["PreTrainedModel"]}',{headers:{'Content-Type':'application/json'}}));else if(path===assets.vadBase+'onnx/model.onnx')key='silero_vad_v5.onnx';if(key&&assets.buffers.has(key))return Promise.resolve(new Response(assets.buffers.get(key),{headers:{'Content-Type':path.endsWith('.wasm')?'application/wasm':path.endsWith('.json')?'application/json':'application/octet-stream'}}));return originalFetch(input,init);};
+  const base=new URL('./lib/',import.meta.url).href;
+  postMessage({id,log:'Speech files are ready. Starting the local speech engine…'});runtime=await import(base+'transformers.min.js?v=4');
   const {env}=runtime;env.allowLocalModels=true;env.allowRemoteModels=false;env.useBrowserCache=false;env.localModelPath=new URL('./models/',import.meta.url).href;env.backends.onnx.wasm.wasmPaths=base+'wasm/';env.backends.onnx.wasm.numThreads=1;env.backends.onnx.wasm.proxy=false;
-  pipe=await runtime.pipeline('automatic-speech-recognition','whisper-tiny.en',{device:'wasm',dtype:'q8'});
+  postMessage({id,log:'Preparing the local speech checks…'});pipe=await runtime.pipeline('automatic-speech-recognition','whisper-tiny.en',{device:'wasm',dtype:'q8'});
   const original=pipe.processor,wrapped=async(audio,...args)=>{const f=await original(audio,...args),x=f.input_features,n=x.dims[2],frames=Math.min(n,Math.max(contextSeconds*100,Math.ceil((audio.length/16000+.25)*2)*50));if(frames<n){const data=new Float32Array(x.dims[1]*frames);for(let j=0;j<x.dims[1];j++)data.set(x.data.subarray(j*n,j*n+frames),j*frames);f.input_features=new runtime.Tensor('float32',data,[1,x.dims[1],frames]);x.dispose();}return f;};Object.assign(wrapped,original);wrapped.feature_extractor=original.feature_extractor;pipe.processor=wrapped;
   vad=await runtime.AutoModel.from_pretrained('silero-vad-v5',{device:'wasm',dtype:'fp32'});lexicon=compactLexicon(assets.lexicon);
   if(assets.calibration.id!==assets.config.id)throw Error('Speech configuration mismatch');

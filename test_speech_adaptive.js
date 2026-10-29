@@ -10,7 +10,7 @@ const url=s=>'data:text/javascript;base64,'+Buffer.from(s).toString('base64');
  const original=fs.readFileSync('models/whisper-tiny.en/onnx/encoder_model_quantized.onnx'),before=await assets.sha256(original),updated=await assets.applyEncoderPatch(original,patch);assert.equal(await assets.sha256(updated),patch.resultSHA256);assert.equal(await assets.sha256(original),before,'Migration must preserve the current model cache');
  const damaged=Buffer.from(original);damaged[100]^=1;await assert.rejects(()=>assets.applyEncoderPatch(damaged,patch),/does not match/);
  await assert.rejects(()=>assets.applyEncoderPatch(original,{...patch,ops:[{copy:[original.length,10]}]}),/Invalid/);
- const total=manifest.files.reduce((s,f)=>s+f.bytes,0)+['lib/transformers.min.js','lib/wasm/ort-wasm-simd-threaded.jsep.mjs','lib/wasm/ort-wasm-simd-threaded.jsep.wasm'].reduce((s,f)=>s+fs.statSync(f).size,0);assert(total<150e6);assert(manifest.files.filter(f=>!f.legacyName).reduce((s,f)=>s+f.bytes,0)<5.3e6);
+ const total=manifest.files.reduce((s,f)=>s+f.bytes,0)+['lib/transformers.min.js','lib/wasm/ort-wasm-simd-threaded.jsep.mjs'].reduce((s,f)=>s+fs.statSync(f).size,0);assert(total<150e6);assert(manifest.files.filter(f=>!f.legacyName&&!f.name.startsWith('runtime/')).reduce((s,f)=>s+f.bytes,0)<5.3e6);
  const evidence=(text,transcript,mean=-8,gain=-1,seconds=.5)=>({transcript,words:[],audioStats:{seconds},hypothesisScores:[{text,gainFullMean:gain,actual:{fullMeanLogProb:mean}}]});
  const green=e=>core.decide(e,[.95],lex,model,config)[0].heardClear;
  assert(green(evidence('to','2')),'Numerical transcription must preserve the spoken homophone');

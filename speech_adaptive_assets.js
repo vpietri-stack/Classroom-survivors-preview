@@ -28,8 +28,8 @@ function sources(file,preferLocal=false){
 }
 export async function prepareAdaptiveAssets(progress=()=>{},options={}){
  const fetcher=options.fetch||globalThis.fetch.bind(globalThis),controller=new AbortController(),timer=setTimeout(()=>controller.abort(),15000);let manifest;
- try{const response=await fetcher(new URL('manifest.json?v=4',assetBase),{signal:controller.signal,cache:'no-cache'});if(!response.ok)throw Error('Speech asset list unavailable');manifest=await response.json();}finally{clearTimeout(timer);}
- if(manifest.schema!==1||manifest.id!==ASSET_ID||manifest.transportVersion!==2)throw Error('Speech file list is out of date. Reload this preview page.');
+ try{const response=await fetcher(new URL('manifest.json?v=5',assetBase),{signal:controller.signal,cache:'no-cache'});if(!response.ok)throw Error('Speech asset list unavailable');manifest=await response.json();}finally{clearTimeout(timer);}
+ if(manifest.schema!==1||manifest.id!==ASSET_ID||manifest.transportVersion!==3)throw Error('Speech file list is out of date. Reload this preview page.');
  let cache;try{cache=await caches.open('speech-adaptive-assets-v1');}catch(_){}
  const buffers=new Map(),total=manifest.files.reduce((sum,f)=>sum+f.bytes,0);let done=0,networkBytes=0,reusedBytes=0;
  const notify=stage=>progress({stage,downloaded:done,total,networkBytes,reusedBytes,progress:Math.round(done/total*100)});
@@ -59,6 +59,7 @@ export async function prepareAdaptiveAssets(progress=()=>{},options={}){
  for(const file of manifest.files){
   const key=new URL('__files__/'+file.sha256,assetBase).href;let data,legacy;
   try{const saved=await cache?.match(key);if(saved)data=await verifiedCachedAsset(await saved.arrayBuffer(),file);}catch(_){}
+  if(!data)for(const candidate of file.httpCacheURLs||[]){const url=new URL(candidate,appBase);if(url.origin!==appBase.origin)continue;const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),3000);try{const response=await fetcher(url,{cache:'only-if-cached',mode:'same-origin',signal:controller.signal});if(response.ok)data=await verifiedCachedAsset(await response.arrayBuffer(),file);else await response.body?.cancel();}catch(_){}finally{clearTimeout(timer);}if(data)break;}
   if(!data&&file.legacyName){legacy=await (options.legacyFile||legacyFile)(file.legacyName);data=await verifiedCachedAsset(legacy,file);}
   if(data){done+=file.bytes;reusedBytes+=file.bytes;notify('Reusing saved speech files');}
   else{

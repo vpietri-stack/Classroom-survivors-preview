@@ -1,5 +1,7 @@
 # Testing
 
+`test_speech_adaptive_runtime.js` covers verified HTTP-cache hits, compressed cold/resumed WASM transfer, old-browser raw fallback and persistent byte equality. Native checks should force a runtime HTTP-cache miss and reject unplanned full-WASM downloads during session creation, so seeding model caches cannot hide the runtime's real first-use path.
+
 `test_speech_adaptive_mirrors.js` covers the actual ModelScope package (reconstructed from exact reversible fixtures), read-only legacy migration, poisoned chunk repair, wrong same-length mirror data without exposed range headers, early route rejection, verified cache retention, pinned cold/resumed source conversion, compatibility-download failure and budget. Cold/legacy smoke checks must include the real field package, not only Git-canonical cache entries.
 
 `test_speech_adaptive_lifecycle.js` uses a controlled worker and browser clock to cover ten hidden minutes of preparation, completion while hidden, deferred background errors and automatic saved-file recovery, stale-worker events, prepare-from-import, visible-only assessment deadlines, duplicate visibility events, BFCache, explicit Stop/unload, actual fake-device microphone shutdown and late microphone grants. No accounts, real student recordings or external requests are used.
