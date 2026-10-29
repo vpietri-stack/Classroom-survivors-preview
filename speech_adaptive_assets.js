@@ -2,6 +2,14 @@
 export const ASSET_ID='speech-encouragement-20261029-a';
 const CHUNK=262144,assetBase=new URL('./speech_assets/adaptive-20261029a/',import.meta.url),appBase=new URL('./',import.meta.url);
 export async function sha256(buffer){return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',buffer)),n=>n.toString(16).padStart(2,'0')).join('');}
+export async function verifiedCachedAsset(buffer,file){
+ if(!buffer)return null;const bytes=buffer instanceof Uint8Array?buffer:new Uint8Array(buffer);
+ if(bytes.byteLength===file.bytes&&await sha256(bytes)===file.sha256)return bytes;
+ // Some Windows development caches contain CRLF JSON. Verify its canonical
+ // published bytes without mutating or replacing the original legacy entry.
+ if(file.name.endsWith('.json')){const canonical=new TextEncoder().encode(new TextDecoder().decode(bytes).replace(/\r\n/g,'\n'));if(canonical.byteLength===file.bytes&&await sha256(canonical)===file.sha256)return canonical;}
+ return null;
+}
 async function legacyFile(name){
  try{return await new Promise(resolve=>{const request=indexedDB.open('whisper-model-cache',1);request.onupgradeneeded=()=>{if(!request.result.objectStoreNames.contains('files'))request.result.createObjectStore('files',{keyPath:'name'});};request.onerror=()=>resolve(null);request.onsuccess=()=>{const db=request.result;if(!db.objectStoreNames.contains('files')){db.close();return resolve(null);}const tx=db.transaction('files','readonly'),get=tx.objectStore('files').get('whisper-tiny.en-model-v1/'+name);get.onsuccess=()=>resolve(get.result?.data||null);get.onerror=()=>resolve(null);tx.oncomplete=()=>db.close();tx.onabort=()=>{db.close();resolve(null);};};});}catch(_){return null;}
 }
@@ -19,15 +27,15 @@ function sources(file,preferLocal=false){
 }
 export async function prepareAdaptiveAssets(progress=()=>{},options={}){
  const fetcher=options.fetch||globalThis.fetch.bind(globalThis),controller=new AbortController(),timer=setTimeout(()=>controller.abort(),15000);let manifest;
- try{const response=await fetcher(new URL('manifest.json',assetBase),{signal:controller.signal});if(!response.ok)throw Error('Speech asset list unavailable');manifest=await response.json();}finally{clearTimeout(timer);}
+ try{const response=await fetcher(new URL('manifest.json?v=2',assetBase),{signal:controller.signal});if(!response.ok)throw Error('Speech asset list unavailable');manifest=await response.json();}finally{clearTimeout(timer);}
  if(manifest.schema!==1||manifest.id!==ASSET_ID)throw Error('Unexpected speech assets');
  let cache;try{cache=await caches.open('speech-adaptive-assets-v1');}catch(_){}
  const buffers=new Map(),total=manifest.files.reduce((sum,f)=>sum+f.bytes,0);let done=0,networkBytes=0,reusedBytes=0;
  const notify=stage=>progress({stage,downloaded:done,total,networkBytes,reusedBytes,progress:Math.round(done/total*100)});
  for(const file of manifest.files){
   const key=new URL('__files__/'+file.sha256,assetBase).href;let data;
-  try{const saved=await cache?.match(key);if(saved){const bytes=await saved.arrayBuffer();if(bytes.byteLength===file.bytes&&await sha256(bytes)===file.sha256)data=new Uint8Array(bytes);}}catch(_){}
-  if(!data&&file.legacyName){const old=await legacyFile(file.legacyName);if(old&&old.byteLength===file.bytes&&await sha256(old)===file.sha256)data=new Uint8Array(old);}
+  try{const saved=await cache?.match(key);if(saved)data=await verifiedCachedAsset(await saved.arrayBuffer(),file);}catch(_){}
+  if(!data&&file.legacyName)data=await verifiedCachedAsset(await legacyFile(file.legacyName),file);
   if(data){done+=file.bytes;reusedBytes+=file.bytes;notify('Reusing saved speech files');}
   else{
    const bytes=new Uint8Array(file.bytes),count=Math.ceil(file.bytes/CHUNK),routes=options.sources?.(file)||sources(file,options.preferLocal),unhealthy=new Set();let next=0;

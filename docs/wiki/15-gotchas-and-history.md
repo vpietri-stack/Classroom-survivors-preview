@@ -2,6 +2,10 @@
 
 ## Adaptive speech research (2026-10-29)
 
+Windows CRLF model/helper JSON was initially hashed from the working copy while Git published LF. Local cache-seeding tests masked this; real hosted preparation failed with range-size/hash mismatches. Declare exact LF attributes for manifest-covered JSON, generate hashes from those bytes, and verify hosted downloads. Legacy CRLF cache support must canonicalize into a fresh buffer and still match the published SHA; never overwrite the original cache entry. Recognition weights/settings are unchanged by this packaging repair.
+
+Imported audio also needs preparation parity: decoding a 16 kHz file at the device rate, then linearly resampling back, changed one short development example's decision. Request a 16 kHz import context with the existing default-rate fallback; guard the preserved waveform as well as worker decisions. This is not a threshold adjustment against final recordings.
+
 The bundled runtime filters generation kwargs through `forward_params`; merely supplying `encoder_outputs` did not reuse the encoder. Explicitly permit that key and instrument session runs before claiming shared-encoder timings. Shortening Whisper requires dynamic position slicing and removal of stale optional ONNX shape annotations; a one-second context caused repeated-word/EOS failures. Contexts/calibration were frozen before final evaluation. Windows Python reads must specify UTF-8: otherwise a `café` target became corrupted; assert each target word against its teacher reference before evaluation. A `voice: silence` field with a pending overall decision is not confirmed no-target ground truth. See [adaptive speech POC](../speech-adaptive-poc.md).
 
 > **Last verified:** 2026-09-27 · **Part of:** [Classroom-survivors Repo Wiki](README.md)

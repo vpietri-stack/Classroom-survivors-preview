@@ -5,36 +5,36 @@
     {
       "name": "whisper/config.json",
       "url": "models/whisper-tiny.en/config.json",
-      "bytes": 2344,
-      "sha256": "beade30b415e07b5954a58d6f1b16d055a5d4ca13903479f5841fe16ab8ba800",
+      "bytes": 2197,
+      "sha256": "251ea843b5901a99efa58c0b99b8052c6019aa3e7d2baf46693a1128ff606233",
       "legacyName": "config.json"
     },
     {
       "name": "whisper/preprocessor_config.json",
       "url": "models/whisper-tiny.en/preprocessor_config.json",
-      "bytes": 353,
-      "sha256": "86c752c0f26ae2cc92699a1805eb66366b01c9260b7d31c7bd142d6b9e56017a",
+      "bytes": 339,
+      "sha256": "a6a76d28c93edb273669eb9e0b0636a2bddbb1272c3261e47b7ca6dfdbac1b8d",
       "legacyName": "preprocessor_config.json"
     },
     {
       "name": "whisper/tokenizer.json",
       "url": "models/whisper-tiny.en/tokenizer.json",
-      "bytes": 2520530,
-      "sha256": "01faa5956a0a74c6da92784309f055268c6775d7d74014fd4b390a596032c5ec",
+      "bytes": 2405679,
+      "sha256": "5eb60cec1e77aeeb6869a2bb5a8e01a84c3fe5d072d75369343021fe6f5310d0",
       "legacyName": "tokenizer.json"
     },
     {
       "name": "whisper/tokenizer_config.json",
       "url": "models/whisper-tiny.en/tokenizer_config.json",
-      "bytes": 295650,
-      "sha256": "7fa104721c6787496798f7d6399450cbfdae2b7f8807ca85da6d1fb4f7c2bc58",
+      "bytes": 282662,
+      "sha256": "93879c3dccdd4b976f709acd85b44778873f30c275e67026f30ca1e4c975230c",
       "legacyName": "tokenizer_config.json"
     },
     {
       "name": "whisper/generation_config.json",
       "url": "models/whisper-tiny.en/generation_config.json",
-      "bytes": 1796,
-      "sha256": "14912f6da0b42f3285d20003515b706c0dc44046a96fd01a0de33a151df8d80b",
+      "bytes": 1646,
+      "sha256": "7b2e8451ed5f118e75fdd991409d72119d21d2fef1eba9723f68fb9c57fe5dc9",
       "legacyName": "generation_config.json"
     },
     {
@@ -72,8 +72,8 @@
     {
       "name": "config.json",
       "url": "speech_assets/adaptive-20261029a/config.json",
-      "bytes": 1802,
-      "sha256": "b437e8871783a1dd5b085a6dda91d4d7478894f49c1c7fc91f5412677cc1368c"
+      "bytes": 1747,
+      "sha256": "52e66a36c3f7206cc3beb172380427edeb9369df8d4fda823f3916915fbe117e"
     },
     {
       "name": "silero_vad_v5.onnx",

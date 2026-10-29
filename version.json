@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-29a",
+  "version": "2026-10-29b",
   "deployedAt": "2026-10-29",
   "notes": "Preview-only adaptive speech POC: unchanged Whisper Tiny weights, target-aware word/sentence encouragement, cache-preserving encoder patch and bounded local checks."
 }

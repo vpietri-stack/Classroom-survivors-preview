@@ -36,6 +36,10 @@ Cold speech assets plus the matched browser runtime total about **73 MB**, under
 
 New downloads use a separate content-hash cache, resumable 256 KB parts, four fetches at most, per-route deadlines and complete-file verification. Retry can prefer same-origin files after a failed mirror/runtime attempt. Shared runtime files are not modified. Evicted caches may require the full download.
 
+Release 2026-10-29b fixes a hosted-preparation failure found after local inference passed: Windows CRLF JSON sizes/hashes differed from Git's published LF bytes. Targeted `.gitattributes` rules retain LF for manifest-covered JSON, and the manifest now describes the actual published files. Legacy CRLF text entries can be read into a fresh canonical buffer only when its exact published SHA-256 verifies; the original entry stays unchanged. Module/manifest queries advance to v2. This changes packaging and cache compatibility, not recognition settings or model weights.
+
+Audio imports request a 16 kHz decoding context, falling back to the browser's default when unsupported. This avoids decoding an already-16-kHz recording at the hardware rate and then converting it back with linear interpolation. The unnecessary round trip changed a development word cut from recognised to uncertain; direct decoding restores its original voice/decision evidence. A synthetic high-frequency waveform import/export check guards signal preservation. Microphone capture, frozen thresholds and final evaluation settings are unchanged.
+
 Capture/import is capped at 20 seconds and 10 MB, permission at 15 seconds, preparation at five minutes, and warmed checking at five seconds. Cancel, hiding and leaving terminate pending work and microphone tracks. Timeout leaves neutral feedback and permits another attempt or moving on. No recording, account, progress or analytics request is sent. WAV/results exports occur only when requested. Distinguish desktop browser timings from actual student hardware.
 
 ## Files and validation
