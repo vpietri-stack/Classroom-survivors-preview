@@ -1,4 +1,4 @@
-import {prepareAdaptiveAssets} from './speech_adaptive_assets.js?v=2';
+import {prepareAdaptiveAssets} from './speech_adaptive_assets.js?v=3';
 import {compactLexicon,decide} from './speech_adaptive_core.js?v=1';
 import {words,disposeTensors,stats} from './speech_target.js?v=2026-10-28b';
 import {evidence,warmZeroContexts} from './speech_adaptive_evidence.js?v=1';

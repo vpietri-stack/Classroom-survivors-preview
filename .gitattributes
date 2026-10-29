@@ -12,3 +12,4 @@ models/moonshine-tiny-poc/onnx/*.onnx binary
 # Adaptive speech hashes must describe the same bytes on Windows and Pages.
 models/whisper-tiny.en/*.json text eol=lf
 speech_assets/adaptive-20261029a/*.json text eol=lf
+speech_assets/adaptive-20261029a/*.bin binary

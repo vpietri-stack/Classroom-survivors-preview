@@ -61,7 +61,14 @@
       "name": "phonetic-lexicon.json",
       "url": "speech_assets/adaptive-20261029a/phonetic-lexicon.json",
       "bytes": 2840141,
-      "sha256": "bc7dbdc11bd43a295dd7cdef1dedac8f795d546849f7a8baab1270d99cdd7b1f"
+      "sha256": "bc7dbdc11bd43a295dd7cdef1dedac8f795d546849f7a8baab1270d99cdd7b1f",
+      "packed": {
+        "name": "phonetic-lexicon.gzip.bin",
+        "url": "speech_assets/adaptive-20261029a/phonetic-lexicon.gzip.bin",
+        "bytes": 795657,
+        "sha256": "328b1c10e72d55e6ac7089cb220bbc10848ea243dcabf72ab1534096e7b2c658",
+        "format": "gzip"
+      }
     },
     {
       "name": "sentence-calibration.json",

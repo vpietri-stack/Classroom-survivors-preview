@@ -27,31 +27,35 @@ function sources(file,preferLocal=false){
 }
 export async function prepareAdaptiveAssets(progress=()=>{},options={}){
  const fetcher=options.fetch||globalThis.fetch.bind(globalThis),controller=new AbortController(),timer=setTimeout(()=>controller.abort(),15000);let manifest;
- try{const response=await fetcher(new URL('manifest.json?v=2',assetBase),{signal:controller.signal});if(!response.ok)throw Error('Speech asset list unavailable');manifest=await response.json();}finally{clearTimeout(timer);}
+ try{const response=await fetcher(new URL('manifest.json?v=3',assetBase),{signal:controller.signal});if(!response.ok)throw Error('Speech asset list unavailable');manifest=await response.json();}finally{clearTimeout(timer);}
  if(manifest.schema!==1||manifest.id!==ASSET_ID)throw Error('Unexpected speech assets');
  let cache;try{cache=await caches.open('speech-adaptive-assets-v1');}catch(_){}
  const buffers=new Map(),total=manifest.files.reduce((sum,f)=>sum+f.bytes,0);let done=0,networkBytes=0,reusedBytes=0;
  const notify=stage=>progress({stage,downloaded:done,total,networkBytes,reusedBytes,progress:Math.round(done/total*100)});
+ async function download(file,logicalBytes){
+   const bytes=new Uint8Array(file.bytes),count=Math.ceil(file.bytes/CHUNK),routes=options.sources?.(file)||sources(file,options.preferLocal),unhealthy=new Set();let next=0;
+   async function part(){while(next<count){const start=next++*CHUNK,end=Math.min(file.bytes,start+CHUNK)-1,length=end-start+1,chunkKey=new URL('__chunks__/'+file.sha256+'/'+start,assetBase).href;let chunk;
+    try{const saved=await cache?.match(chunkKey);if(saved){const b=await saved.arrayBuffer();if(b.byteLength===length){chunk=b;reusedBytes+=length;}}}catch(_){}
+    if(!chunk){let error;
+     const available=routes.filter(r=>!unhealthy.has(r));for(const url of available.length?available:routes){const ctrl=new AbortController(),clock=setTimeout(()=>ctrl.abort(),20000);
+      try{notify('Downloading '+file.name);const response=await fetcher(url+'?part='+start+'-'+end,{headers:{Range:`bytes=${start}-${end}`},signal:ctrl.signal});if(!response.ok||response.status!==206&&length!==file.bytes){await response.body?.cancel();throw Error('Download route cannot resume');}const range=response.headers.get('Content-Range');if(range&&range!==`bytes ${start}-${end}/${file.bytes}`)throw Error('Wrong download segment');const b=await response.arrayBuffer();if(b.byteLength!==length)throw Error('Incomplete download');chunk=b;networkBytes+=length;break;}catch(e){error=e;unhealthy.add(url);}finally{clearTimeout(clock);}
+     }
+     if(!chunk)throw Error('Speech download stopped. Saved parts will resume on Retry. '+String(error?.message||''));
+     try{await cache?.put(chunkKey,new Response(chunk.slice(0)));}catch(_){}
+    }
+    bytes.set(new Uint8Array(chunk),start);done+=length*logicalBytes/file.bytes;notify('Downloading '+file.name);
+   }}
+   const completed=await Promise.allSettled(Array.from({length:Math.min(4,count)},()=>part())),failed=completed.find(r=>r.status==='rejected');if(failed)throw failed.reason;
+   if(await sha256(bytes)!==file.sha256){try{for(const request of await cache?.keys()||[])if(request.url.includes(file.sha256))await cache.delete(request);}catch(_){}throw Error('Speech file did not verify. Retry will download a fresh copy.');}return bytes;
+ }
  for(const file of manifest.files){
   const key=new URL('__files__/'+file.sha256,assetBase).href;let data;
   try{const saved=await cache?.match(key);if(saved)data=await verifiedCachedAsset(await saved.arrayBuffer(),file);}catch(_){}
   if(!data&&file.legacyName)data=await verifiedCachedAsset(await legacyFile(file.legacyName),file);
   if(data){done+=file.bytes;reusedBytes+=file.bytes;notify('Reusing saved speech files');}
   else{
-   const bytes=new Uint8Array(file.bytes),count=Math.ceil(file.bytes/CHUNK),routes=options.sources?.(file)||sources(file,options.preferLocal),unhealthy=new Set();let next=0;
-   async function part(){while(next<count){const start=next++*CHUNK,end=Math.min(file.bytes,start+CHUNK)-1,length=end-start+1,chunkKey=new URL('__chunks__/'+file.sha256+'/'+start,assetBase).href;let chunk;
-    try{const saved=await cache?.match(chunkKey);if(saved){const b=await saved.arrayBuffer();if(b.byteLength===length){chunk=b;reusedBytes+=length;}}}catch(_){}
-    if(!chunk){let error;
-     for(const url of routes.filter(r=>!unhealthy.has(r))){const ctrl=new AbortController(),clock=setTimeout(()=>ctrl.abort(),20000);
-      try{notify('Downloading '+file.name);const response=await fetcher(url+'?part='+start+'-'+end,{headers:{Range:`bytes=${start}-${end}`},signal:ctrl.signal});if(!response.ok||response.status!==206&&length!==file.bytes){await response.body?.cancel();throw Error('Download route cannot resume');}const range=response.headers.get('Content-Range');if(range&&range!==`bytes ${start}-${end}/${file.bytes}`)throw Error('Wrong download segment');const b=await response.arrayBuffer();if(b.byteLength!==length)throw Error('Incomplete download');chunk=b;networkBytes+=length;break;}catch(e){error=e;unhealthy.add(url);}finally{clearTimeout(clock);}
-     }
-     if(!chunk)throw Error('Speech download stopped. Saved parts will resume on Retry. '+String(error?.message||''));
-     try{await cache?.put(chunkKey,new Response(chunk.slice(0)));}catch(_){}
-    }
-    bytes.set(new Uint8Array(chunk),start);done+=length;notify('Downloading '+file.name);
-   }}
-   await Promise.all(Array.from({length:Math.min(4,count)},()=>part()));
-   if(await sha256(bytes)!==file.sha256){try{for(const request of await cache?.keys()||[])if(request.url.includes(file.sha256))await cache.delete(request);}catch(_){}throw Error('Speech file did not verify. Retry will download a fresh copy.');}data=bytes;
+   if(file.packed&&typeof DecompressionStream==='function'){const previousDone=done;try{const compressed=await download(file.packed,file.bytes);data=new Uint8Array(await new Response(new Response(compressed).body.pipeThrough(new DecompressionStream('gzip'))).arrayBuffer());if(data.byteLength!==file.bytes||await sha256(data)!==file.sha256)throw Error('Unpacked speech file did not verify');}catch(_){done=previousDone;data=null;}}
+   if(!data)data=await download(file,file.bytes);
   }
   buffers.set(file.name,data);try{await cache?.put(key,new Response(data.slice(0)));}catch(_){}
  }
