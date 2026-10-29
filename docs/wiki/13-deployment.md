@@ -1,5 +1,7 @@
 # Deployment & Release Discipline
 
+Adaptive preview 2026-10-29d fixes tab-switch cancellation. Advance only the page bootstrap to v4 and synchronize preview stamps; preserve worker/runtime/asset/cache URLs so existing downloads remain reusable. Verify hidden preparation survives and resumes after background errors, deadlines exclude hidden time, and active microphone tracks still stop. No production release.
+
 Adaptive preview 2026-10-29c publishes the verified `phonetic-lexicon.gzip.bin` alongside its original JSON, advances adaptive module/manifest queries to v3 and synchronizes preview stamps. Verify both compressed/decoded hashes and fallback on unsupported browsers; raw model assets and frozen recognition settings remain unchanged. Cold network preparation and warmed assessment are separate checks.
 
 Adaptive speech preview 2026-10-29b fixes manifest/checkout byte parity. Model/helper JSON covered by SHA manifests needs explicit LF attributes; local inference with CRLF-only test fixtures can mask a production download failure. Compare manifest sizes/hashes with Git blobs and actual hosted bytes, then run the hosted preparation/import UI. Advance adaptive bootstrap/worker/asset/manifest queries to v2 and synchronize preview stamps only.

@@ -2,6 +2,8 @@
 
 ## Adaptive speech research (2026-10-29)
 
+A blanket `visibilitychange` cancellation made long model preparation fail immediately when the teacher switched tabs. Separate microphone capture from model preparation/assessment. Pause request deadline accounting while hidden, preserve pending load state, and automatically retry background failures from saved chunks on return. Ignore stale worker errors and do not arm duplicate timers on visibility/pageshow events. Actual unload and explicit Stop still release resources; OS background suspension remains outside page control.
+
 Range requests sacrifice the dictionary's automatic whole-response gzip compression. An explicit gzip binary allows resumable compressed chunks, reducing 2.84 MB to 0.80 MB. Verify both compressed and decoded bytes, feature-detect decompression and retain the original transfer for older browsers. Await all pending chunk requests before fallback so late completions cannot double-count progress. Download delays must not be reported as model assessment latency.
 
 Windows CRLF model/helper JSON was initially hashed from the working copy while Git published LF. Local cache-seeding tests masked this; real hosted preparation failed with range-size/hash mismatches. Declare exact LF attributes for manifest-covered JSON, generate hashes from those bytes, and verify hosted downloads. Legacy CRLF cache support must canonicalize into a fresh buffer and still match the published SHA; never overwrite the original cache entry. Recognition weights/settings are unchanged by this packaging repair.
