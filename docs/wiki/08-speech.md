@@ -1,5 +1,7 @@
 # Speech Recognition & Pronunciation Scoring
 
+Preview 2026-10-29e fixes ModelScope/Git package compatibility during preparation. Segment hashes reject wrong mirror/cache bytes before assembly; known ModelScope cache files are converted read-only into the exact frozen bytes with 316 KB of compressed updates. Immutable pinned ModelScope sources are separate from canonical Git routes, and existing legacy entries stay unchanged. Metadata can use compressed transport. Bootstrap/worker/manifest queries advance without changing model decisions. See [adaptive POC](../speech-adaptive-poc.md).
+
 Preview 2026-10-29d separates page visibility from cancellation in the adaptive POC. Hidden pages stop microphone permission/capture, while preparation/assessment survive with paused visible-time deadlines. Background preparation errors defer and automatically retry using saved assets on return; stale worker errors are ignored. Stop/real unload still cancel; BFCache preserves work. The bootstrap query advances to v4 with no model/worker/asset URL changes. Browser/OS suspension is still possible.
 
 Preview 2026-10-29c adds optional verified gzip dictionary transport (~3.1 MB new helpers when supported; ~5.2 MB fallback). Native decompression is feature-detected and the original transfer remains available; decoded bytes/settings are identical. `test_speech_adaptive_assets.js` covers compressed integrity, unsupported-browser and failed-route fallback. All chunk operations settle before fallback and exhausted routes can recover for later chunks.

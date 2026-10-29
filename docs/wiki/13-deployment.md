@@ -1,5 +1,7 @@
 # Deployment & Release Discipline
 
+Adaptive preview 2026-10-29e publishes a versioned transport manifest with segment hashes, pinned mirror variants and verified compatibility updates. Publish the update JSON/gzip files and compressed metadata together; verify Git/published bytes and actual ModelScope cache migration. Bootstrap v5, worker v4 and asset/manifest v4 are synchronized with preview stamps. Preserve the frozen model, legacy cache and production app. A mirror with the same model name is not automatically byte-compatible.
+
 Adaptive preview 2026-10-29d fixes tab-switch cancellation. Advance only the page bootstrap to v4 and synchronize preview stamps; preserve worker/runtime/asset/cache URLs so existing downloads remain reusable. Verify hidden preparation survives and resumes after background errors, deadlines exclude hidden time, and active microphone tracks still stop. No production release.
 
 Adaptive preview 2026-10-29c publishes the verified `phonetic-lexicon.gzip.bin` alongside its original JSON, advances adaptive module/manifest queries to v3 and synchronizes preview stamps. Verify both compressed/decoded hashes and fallback on unsupported browsers; raw model assets and frozen recognition settings remain unchanged. Cold network preparation and warmed assessment are separate checks.
