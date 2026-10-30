@@ -203,3 +203,22 @@ Matching remains one presentation board with three independently queued pairs.
 ## Preview-note Study metadata
 
 A completed page-scoped Study session adds data.previewNote (catalog id, location, version, wordCount and exerciseCount) to the existing session/study event. Exercise events and SR use their normal paths; the same single Study session counts toward the weekly target. Reader taps and repeat visits emit no practice credit. The backend retains a bounded completion map independently of archived analytics.
+
+
+## Permanent run lifecycle and seven-day verbose trials (2026-10-30)
+
+`practice_telemetry.js` records `type: practice` events with `phase` start, complete, interrupted or error and a stable `runId`. Study, UNO, Gomoku and Vampire Survivors start hooks allocate one ID per actual run; exercise and normal completed-session events carry `practiceRunId`. These lifecycle events are not session/target credit. Explicit menu exit, logout/account change and starting another run have explicit reasons. A same-tab return with an unfinished persisted run is an inferred interruption, never a confirmed crash. BFCache pagehide/pageshow does not end a live run. A new independent tab does not declare another tab dead. A hard process kill may leave only a start without a completion.
+
+The module uses deployment/account/tab-scoped `csPractice_` state and a sessionStorage tab key. Only small stage metadata is checkpointed, at most once per three seconds; start/end/error transitions persist immediately. Runtime/promise/graphics errors are redacted and limited to five per run. It rides the existing acknowledged analytics queue and archives; no new permanent endpoint or container is provisioned. No ink/audio/answers/form values are captured.
+
+Detailed diagnostics v2 uses immutable `client_diagnostics_chunk` documents in the existing container. IDs hash the browser ID and ordered event IDs, making identical retries point-read/ack only. Each <=24KB request contains <=40 events (the browser sends <=16KB/32). Earlier chunks are not rewritten or evicted by a 1,000-event daily tail cap. Existing `client_diagnostics_day` records remain readable. Teacher history pages twenty chunks at a time with a continuation cursor, plus legacy records on the initial page.
+
+A shared `_global/config` document with `scope: all_students` enables a bounded all-student trial. Individual enabled:false overrides it; global paused:true stops even individual captures. Only admin tokens can configure the global policy. Configuration is cached server-side for up to 30 seconds; client refreshes every five minutes and enforces hard expiry. A global expiry stops the school trial without disabling permanent lifecycle tracking.
+
+`client_diagnostics_usage` documents atomically reserve up to 600 upload batches per student per UTC day across browser profiles. They count reservations (including failed attempts), not necessarily successful stored batches. The client also stops detailed capture at 15,000 events per UTC day and emits a budget marker. Retries/backoff and bounded local queues remain; quota exhaustion or errors never block gameplay/progress saves. Daily budget is independent of the permanent lifecycle queue.
+
+Upload responses report measured successful-operation `readRU`, `writeRU` and server elapsed time. Heartbeats include cumulative per-boot uploads/failures/429 responses, sent bytes, queue drops, synchronous diagnostic storage-write count/time/max and sampled main-thread timer delay. These are partial diagnostic samples, not an invoice, a causal slowdown measurement or total native/WASM memory. Missing final uploads can omit the last samples.
+
+`api/client_diagnostics_ops.js --database <explicit-db> --action enable-all --days 7` starts the trial; `stop-all` pauses it; `status` reports policy, daily reservation volume and latest heartbeat measurements. Optional `--out` writes a private report. It touches only diagnostics, never Students/progress. Preview and production databases are always explicit and separate.
+
+The teacher Diagnostics tab labels/filters practice, error, speech and performance records and shows run lifecycle from loaded analytics. Normal session/exercise dashboards and target counters retain their type guards. Speech recorder checkpoints now distinguish microphone request, context creation, recording start/stop, close request, encoding and Continue.

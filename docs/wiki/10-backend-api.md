@@ -162,3 +162,8 @@ Multi-group support: `updateStudent` accepts validated `classGroups` (up to 20 `
 ## Preview-note completion
 
 saveAnalytics folds valid session/study data.previewNote markers into the bounded user.previewNotes map inside its existing etag retry/write. The regular event, acknowledgements, SR delta and session counter remain the same transaction. Login returns this map through publicUser. No new endpoint or second weekly-target credit is introduced.
+
+
+## Diagnostic trial controls (2026-10-30)
+
+clientDiagnostics retains signed self-upload and privileged history access. POST configureGlobal is admin-only; global paused:true stops all captures and per-account enabled:false opts out. Policies cache for up to 30 seconds. Small immutable chunks replace whole-day rewrites, with idempotent identical retries. Atomic quota reservations cap each account at 600 batches/UTC day. Responses distinguish budget exhaustion from Cosmos 429 and include measured operation RU. Teacher GET history pages twenty chunks using cursor, adding legacy daily records on the first page. Diagnostic failures never block normal progress saves.

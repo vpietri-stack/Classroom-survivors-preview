@@ -824,6 +824,7 @@
     });
     cont.onclick = function () {
       if (!alive()) return; done = true; cont.disabled = true;
+      if (global.ClientDiagnostics) global.ClientDiagnostics.record('speech', 'practice: continue-clicked');
       const summary = { target: target, level: level, book: book, flow: 'optional_practice_v1', recordings: recordings,
         assessedAttempts: gradedTries, completion: gradedTries ? 'practised' : 'unassessed',
         matchedTarget: outcome === 'matched' ? true : outcome === 'different' ? false : null,

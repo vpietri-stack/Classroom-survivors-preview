@@ -1745,6 +1745,7 @@ function completeUnoESLQuestion(success) {
 }
 
 function triggerUno() {
+    if (window.PracticeTelemetry) PracticeTelemetry.start('game', 'uno');
     activeGameMode = 'Uno';
     // Re-show the shared Phaser canvas: showGameSelection()/exitVampireSurvivors()
     // set display:none to hide it on the menu, and triggerUno never restored it,
@@ -1806,6 +1807,7 @@ function triggerUno() {
 }
 
 function exitUnoGame() {
+    if (window.PracticeTelemetry) PracticeTelemetry.interrupt('game_exit', false);
     console.log('[DEBUG] exitUnoGame called, game:', !!game, 'isActive:', (game && game.scene) ? game.scene.isActive('UnoScene') : false);
     unoGameActive = false;
     if (window.unoTimerInterval) clearInterval(window.unoTimerInterval);

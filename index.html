@@ -10,7 +10,7 @@
                 window.__csDiagEarly.push(String(e.message).slice(0, 300) + ' ' + String(e.filename || '').split('?')[0] + ':' + e.lineno);
         });
     </script>
-    <script async src="client_diagnostics.js?v=2026-10-23j"></script>
+    <script async src="client_diagnostics.js?v=2026-10-30a"></script>
     <!--
       Anti-cache hints. WeChat's iOS in-app WebView (WKWebView) aggressively
       caches index.html/JS and ignores the server's Cache-Control, which can
@@ -740,7 +740,8 @@
     <script src="translations.js?v=2026-10-17a"></script>
     <script src="config.js?v=2026-10-28b"></script>
     <script src="sr_engine.js?v=2026-10-17a"></script>
-    <script src="frontend_auth.js?v=2026-10-29f"></script>
+    <script src="practice_telemetry.js?v=2026-10-30a"></script>
+    <script src="frontend_auth.js?v=2026-10-30a"></script>
     <script src="teaching_content.js?v=2026-09-16a"></script>
     <script src="content_pu1.js?v=2026-10-17a"></script>
     <script src="content_pu2.js?v=2026-10-17a"></script>
@@ -757,15 +758,15 @@
     <script src="class_config.js?v=2026-10-28b"></script>
     <script src="boot.js?v=2026-07-25a"></script>
     <script src="bgm.js?v=2"></script>
-    <script src="vampire_survivors.js?v=2026-08-25a"></script>
-    <script src="gomoku.js?v=2026-08-25a"></script>
-    <script src="uno.js?v=2026-08-25a"></script>
+    <script src="vampire_survivors.js?v=2026-10-30a"></script>
+    <script src="gomoku.js?v=2026-10-30a"></script>
+    <script src="uno.js?v=2026-10-30a"></script>
 
     <!-- ===== Speech-recognition engine (self-contained, global: LocalEngine / Recorder / Scorer) ===== -->
     <script src="speech_scorer.js?v=4"></script>
-    <script src="speech_recorder.js?v=2"></script>
+    <script src="speech_recorder.js?v=2026-10-30a"></script>
     <script src="speech_engine.js?v=12"></script>
-    <script src="speech_ui.js?v=17"></script>
+    <script src="speech_ui.js?v=2026-10-30a"></script>
     <!-- TEMPORARY (research, 2026-10-11 → 2026-10-26): stores the WAV the
          recogniser received for CONSENTED students only, so candidate ASR
          models can be evaluated against real classroom voices. Inert unless the
@@ -917,7 +918,7 @@
          removal checklist in docs/wiki/05-study-mode.md). Inert unless the server
          enables it for this student. -->
     <script src="handwriting_sample_capture.js?v=2026-10-12a"></script>
-    <script src="study_mode.js?v=2026-10-28c"></script>
+    <script src="study_mode.js?v=2026-10-30a"></script>
     <script>
         // School Defense 3D (three.js POC) menu entry: revealed ONLY where
         // THREE_TD_ENABLED (config.js) is true — preview deploy, localhost,

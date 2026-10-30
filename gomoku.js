@@ -73,6 +73,7 @@ function showGomokuModeSelection() {
 }
 
 function triggerGomoku(mode = gomokuMode) {
+    if (window.PracticeTelemetry) PracticeTelemetry.start('game', 'gomoku');
     if (mode) gomokuMode = mode;
     activeGameMode = 'Gomoku';
     // Undo VS HiDPI if it was active (drops the HiDPI window-resize listener);
@@ -770,6 +771,7 @@ async function endGomokuGame(result) {
 }
 
 function exitGomokuGame() {
+    if (window.PracticeTelemetry) PracticeTelemetry.interrupt('game_exit', false);
     gomokuGameActive = false;
     clearInterval(window.gomokuTimerInterval);
     if (gomokuSpeedInterval) clearInterval(gomokuSpeedInterval);

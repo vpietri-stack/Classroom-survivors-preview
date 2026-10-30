@@ -13,7 +13,7 @@ const API_BASE = API_BASE_URL;
 // The version watchdog (startVersionWatchdog) compares this to the live
 // version.json; a mismatch means stale WeChat builds never self-heal or
 // permanently nag. See DEPLOY_VERSION_STAMP.md. Bump BOTH together.
-const APP_VERSION = '2026-10-29f';
+const APP_VERSION = '2026-10-30a';
 
 // --- SESSION TOKEN (c) design) ---
 // The server mints a signed token on login. We store it in localStorage
@@ -169,6 +169,20 @@ function incrementExerciseAttempts() {
     exerciseAttempts++;
 }
 
+function queuePracticeLifecycle(record) {
+    if (!authActiveUser || isTestMode || (authActiveUser.role && authActiveUser.role !== 'student')) return;
+    const event = { type: 'practice', ...record, timestamp: new Date().toISOString(),
+        eventId: 'pl_' + Date.now() + '_' + Math.random().toString(36).slice(2, 10),
+        ownerId: authActiveUser.id, ps: csPageSessionId, appVersion: APP_VERSION };
+    if (analyticsQueue.length >= 500) analyticsQueue.splice(0, analyticsQueue.length - 499);
+    analyticsQueue.push(event);
+    persistAnalyticsQueue();
+    if (!authActiveUser.analytics) authActiveUser.analytics = [];
+    authActiveUser.analytics.push(event);
+    scheduleAnalyticsFlush();
+    if (window.ClientDiagnostics) ClientDiagnostics.record('practice', record);
+}
+
 function queueExerciseEvent(exerciseType, mode, itemDetails = null, customAttempts = null) {
     if (!authActiveUser || isTestMode) return;  // Skip recording in test mode
     const durationMs = Date.now() - exerciseStartTime;
@@ -185,6 +199,7 @@ function queueExerciseEvent(exerciseType, mode, itemDetails = null, customAttemp
     const event = {
         type: 'exercise',
         exerciseType: exerciseType,
+        practiceRunId: window.PracticeTelemetry ? PracticeTelemetry.current() : null,
         mode: mode,
         attempts: customAttempts !== null ? customAttempts : exerciseAttempts,
         durationMs: durationMs,
@@ -221,6 +236,7 @@ function queueSessionEvent(sessionType, data) {
     const event = {
         type: 'session',
         sessionType: sessionType,
+        practiceRunId: window.PracticeTelemetry ? PracticeTelemetry.current(sessionType) : null,
         data: data,
         timestamp: new Date().toISOString(),
         // Stable id so the server can de-duplicate if this event is flushed
@@ -231,6 +247,7 @@ function queueSessionEvent(sessionType, data) {
     };
     analyticsQueue.push(event);
     persistAnalyticsQueue();
+    if (window.PracticeTelemetry) PracticeTelemetry.complete(sessionType);
     csPageHeartbeat({ sess: sessionType });
     if (authActiveUser) {
         if (!authActiveUser.analytics) authActiveUser.analytics = [];
@@ -416,6 +433,7 @@ function csNewPageSession() {
  * previous one, so callers only pass what they know.
  */
 function csPageHeartbeat(state) {
+    if (window.PracticeTelemetry) PracticeTelemetry.checkpoint(state);
     if (window.ClientDiagnostics) ClientDiagnostics.checkpoint('activity', state);
     try {
         if (!csPageSessionId) csNewPageSession();
@@ -1652,6 +1670,7 @@ async function selectAvatar(avatarEmoji) {
 }
 
 function saveUserToLocalAndStart(user) {
+    if (window.PracticeTelemetry && authActiveUser && authActiveUser.id !== user.id) PracticeTelemetry.detach('account_changed');
     // Cross-account reset (2026-09-16): in-memory session leftovers (SR
     // pending triple, queue, page-session breadcrumb) belong to the PREVIOUS
     // login. Clear them FIRST, then hydrate this account's persisted state.
@@ -1750,6 +1769,7 @@ function finishLogin() {
     // the previous one died. Runs BEFORE queueDeviceInfoEvent so the login
     // device event already carries this page-session id.
     csNewPageSession();
+    if (window.PracticeTelemetry && !isTestMode) PracticeTelemetry.attach(authActiveUser, queuePracticeLifecycle);
     // 2026-08-26b: stamp a compact device signature into the breadcrumb so a
     // restart diagnostic is self-describing across devices (Doris is now
     // testing iPhone vs iPad). Format: platform|tp<touchpoints>|wx/br —
@@ -1872,6 +1892,7 @@ function goBackToProfiles() {
     // Hide start screen and go back to profile selection
     document.getElementById('startScreen').classList.add('hidden');
     document.getElementById('step-greeting').classList.add('hidden');
+    if (window.PracticeTelemetry) PracticeTelemetry.detach('logout');
     if (window.ClientDiagnostics) ClientDiagnostics.stop(false);
     authActiveUser = null;
     setSessionToken(null); // (c) clear session token on logout

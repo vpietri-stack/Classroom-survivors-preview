@@ -2,15 +2,16 @@ const { chromium } = require('playwright-core');
 const http = require('http'), fs = require('fs'), assert = require('assert');
 const script = fs.readFileSync(__dirname + '/client_diagnostics.js', 'utf8');
 const token = id => 'x.' + Buffer.from(JSON.stringify({ sub: id })).toString('base64url') + '.x';
-let enabled = true, fail = false, ack = true, uploads = [], checks = 0;
+let enabled = true, fail = false, throttle = false, ack = true, uploads = [], checks = 0;
 function check(value, name) { assert.ok(value, name); checks++; console.log('PASS: ' + name); }
 const server = http.createServer((req, res) => {
     if (req.url.startsWith('/api/clientDiagnostics')) {
         if (req.method === 'GET') { res.setHeader('Content-Type', 'application/json'); res.end(JSON.stringify({ enabled, endsAt: new Date(Date.now() + 86400000).toISOString() })); return; }
         let raw = ''; req.on('data', c => raw += c); req.on('end', () => {
             if (fail) { res.writeHead(503); res.end('{}'); return; }
+            if (throttle) { throttle=false;res.writeHead(429,{'Content-Type':'application/json'});res.end(JSON.stringify({kind:'cosmos_throttle',retryAfterMs:100}));return; }
             const p = JSON.parse(raw); uploads.push(p); res.setHeader('Content-Type', 'application/json');
-            res.end(JSON.stringify({ enabled, ack: ack ? p.events.map(e => e.boot + ':' + e.seq) : [] }));
+            res.end(JSON.stringify({ enabled, ack: ack ? p.events.map(e => e.boot + ':' + e.seq) : [], metrics: {readRU:2,writeRU:7,serverMs:3} }));
         }); return;
     }
     if (req.url.startsWith('/client_diagnostics.js')) { res.setHeader('Content-Type', 'application/javascript'); res.end(script); return; }
@@ -80,6 +81,12 @@ const server = http.createServer((req, res) => {
         check(await page.evaluate(() => Object.keys(localStorage).filter(k => k.includes('queue_')).every(k => JSON.parse(localStorage.getItem(k)).events.length <= 200)), 'client queues remain bounded during event bursts');
         await page.evaluate(() => { for (let i = 0; i < 1000; i++) ClientDiagnostics.record('error', 'error-flood-probe', true); });
         check(await page.evaluate(() => Object.keys(localStorage).filter(k => k.includes('queue_')).every(k => JSON.parse(localStorage.getItem(k)).events.filter(e => e.detail === 'error-flood-probe').length <= 8)), 'an error flood cannot force unlimited synchronous log writes');
+        await page.evaluate(()=>ClientDiagnostics.flush());
+        throttle=true;await page.evaluate(()=>{ClientDiagnostics.record('activity','throttle probe');return ClientDiagnostics.flush();});
+        await page.waitForTimeout(15100);await page.evaluate(()=>ClientDiagnostics.flush());
+        const health=uploads.flatMap(p=>p.events).filter(e=>e.type==='heartbeat').map(e=>{try{return JSON.parse(e.detail).diagnostics;}catch(_){return null;}}).filter(Boolean);
+        check(health.some(m=>m.readRU>0&&m.writeRU>0&&m.storageWrites>0),'heartbeats upload measured RU and synchronous storage timing');
+        check(health.some(m=>m.http429>=1&&m.failures>=1),'throttling and failed uploads are measured without breaking exercises');
         console.log('Remote diagnostics browser: ' + checks + ' checks passed.');
     } finally { await browser.close(); await new Promise(r => server.close(r)); }
 })().catch(e => { console.error(e); server.close(); process.exitCode = 1; });

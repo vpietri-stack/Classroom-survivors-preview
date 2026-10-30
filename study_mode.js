@@ -54,6 +54,7 @@ function initStudyMode(options = {}) {
     }
 
     STUDY_STATE.active = true;
+    if (window.PracticeTelemetry) PracticeTelemetry.start('study', 'study');
     STUDY_STATE.startTime = Date.now();
     STUDY_STATE.round = 'A';
     STUDY_STATE.isTransitioning = false;
@@ -1362,6 +1363,7 @@ async function finishStudySession() {
 }
 
 function exitStudyMode() {
+    if (window.PracticeTelemetry) PracticeTelemetry.interrupt('study_exit', false);
     if (window.NonSpellingFlow) NonSpellingFlow.cleanupStudy();
     // Abandoning mid-session must not lose observed results (failures are
     // recorded at the first wrong check). Partial sessions don't advance the

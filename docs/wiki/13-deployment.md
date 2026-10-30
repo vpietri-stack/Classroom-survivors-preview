@@ -462,3 +462,8 @@ Preview-only 2026-10-28c moves speech hints onto completed Study/game sentence t
 Preview-only 2026-10-28d adds optional targeted notes speech. Refresh reader JS/CSS, notes_speech and parent preview_notes (microphone iframe permission), and synchronize deployment stamps. Production and APIs are unchanged.
 
 Preview 2026-10-28e restricts optional notes recording to targets of two or more words. Refresh notes_speech and the embedded-reader query; synchronize the deployment stamps. Production and APIs remain unchanged.
+
+
+## Authorized all-student diagnostic trial (2026-10-30)
+
+Publish only diagnostic/lifecycle changes on each environment's existing history, preserving independent curricula, speech experiments, API routes and databases. Validate the isolated preview API and Pages first, then production. Synchronize stamps and changed-script queries. After production host verification, node api/client_diagnostics_ops.js --database Val-EslApp --action enable-all --days 7 starts the approved seven-day window; status measures partial heartbeat RU/performance and reserved volume, stop-all pauses it. The trial expires automatically; low-volume lifecycle persists. This rollout does not provision throughput or alter learner progress.

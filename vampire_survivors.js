@@ -3837,6 +3837,7 @@ function startGameFromIntro() {
 }
 
 function triggerVampireSurvivors() {
+    if (window.PracticeTelemetry) PracticeTelemetry.start('game', 'vampireSurvivors');
     activeGameMode = 'VS';
     
     // Reset SR tracking for this game session
@@ -3983,6 +3984,7 @@ function showPowerUpSelection(context) {
 
 // --- VS EXIT & REPLAY FUNCTIONS ---
 function exitVampireSurvivors() {
+    if (window.PracticeTelemetry) PracticeTelemetry.interrupt('game_exit', false);
     // Stop the VS game and return to game selection
     if (minigameCountdownInterval) {
         clearInterval(minigameCountdownInterval);

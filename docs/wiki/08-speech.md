@@ -394,3 +394,8 @@ playback, cancellation/stale results, denied permission and 320px layout. The
 existing target-model and recorder suites cover their underlying implementation.
 
 Notes recording now requires at least two lexical words (preview 2026-10-28e). Single-word selection cancels recording/checking, clears the previous recording, and disables both microphone and own-recording playback while preserving example listening. Punctuation and contractions do not create extra words. Browser coverage includes the exact two-word boundary and switching back to a multiword phrase.
+
+
+## Diagnostic stage breadcrumbs (2026-10-30)
+
+The recorder observes microphone request, AudioContext creation, recording start/stop, close request and encoding; optional-practice Continue is also recorded during detailed capture. Permanent checkpoints retain only the latest audio stage. These hooks do not alter recognition/recording and collect no additional audio.

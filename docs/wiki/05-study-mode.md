@@ -486,3 +486,8 @@ PU1 Unit 7 adds 28 M/36 F boards on existing pages 83 (8/8), 84 (8/12), and 92 (
 ## Optional speech in notes (preview, 2026-10-28d)
 
 Optional microphone practice in the notes is preview-only and does not gate or credit Study. See [Speech](08-speech.md) for target-aware feedback and cleanup.
+
+
+## Permanent session lifecycle (2026-10-30)
+
+After content checks, a real Study start allocates a practice run ID. Exercises and the existing completed-study event link to it. Completion, menu exit, account change and same-tab unfinished-page recovery produce distinct lifecycle records; inferred recovery is only a clue. These records do not grant target/SR credit. Stage breadcrumbs contain no ink, audio or submitted answers.

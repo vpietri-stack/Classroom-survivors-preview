@@ -11,11 +11,19 @@
     var loadAt = performance.now(), configGeneration = 0;
     var burstStart = Date.now(), ordinaryCount = 0, errorCount = 0, suppressed = 0;
     var encoder = typeof TextEncoder !== 'undefined' ? new TextEncoder() : null;
+    var budgetUntil = 0, budgetDay = '', dailyEvents = 0, budgetSavedAt = 0;
+    var metrics = { uploads: 0, failures: 0, http429: 0, dailyBudgetStops: 0, readRU: 0, writeRU: 0,
+        uploadBytes: 0, storageWrites: 0, storageMs: 0, maxStorageMs: 0, maxLagMs: 0, queueDropped: 0 };
     function jsonBytes(value) { var json = JSON.stringify(value); return encoder ? encoder.encode(json).length : new Blob([json]).size; }
     function uid() { return Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 11); }
     function key(name) { return 'csDiag_' + scope + '_' + owner + '_' + name; }
     function read(k) { try { return localStorage.getItem(k); } catch (_) { return null; } }
-    function put(k, v) { try { localStorage.setItem(k, v); } catch (_) {} }
+    function put(k, v) {
+        var since = performance.now();
+        try { localStorage.setItem(k, v); } catch (_) {}
+        var ms = performance.now() - since; metrics.storageWrites++; metrics.storageMs += ms;
+        metrics.maxStorageMs = Math.max(metrics.maxStorageMs, ms);
+    }
     function remove(k) { try { localStorage.removeItem(k); } catch (_) {} }
     function live() { return enabled && config && Date.parse(config.endsAt) > Date.now(); }
     function redact(value, max) {
@@ -33,18 +41,27 @@
     function save() {
         clearTimeout(saveTimer); saveTimer = null;
         if (!owner || !tabId) return;
-        while (queue.length > 200 || (queue.length && JSON.stringify(queue).length > 60000)) queue.shift();
+        while (queue.length > 200 || (queue.length && JSON.stringify(queue).length > 60000)) { queue.shift(); metrics.queueDropped++; }
         put(key('queue_' + tabId), JSON.stringify({ owner: owner, endsAt: config && config.endsAt, events: queue }));
+        if (Date.now() - budgetSavedAt >= 10000 || dailyEvents >= 15000) {
+            put(key('budget'), JSON.stringify({ day: budgetDay, events: dailyEvents })); budgetSavedAt = Date.now();
+        }
     }
     function record(type, detail, urgent) {
         try {
             if (!live()) return;
+            var day = new Date().toISOString().slice(0, 10);
+            if (budgetDay !== day) { budgetDay = day; dailyEvents = 0; }
+            if (Date.now() < budgetUntil || dailyEvents >= 15000) return;
+            if (dailyEvents === 14999) { type = 'client_report'; detail = 'Daily diagnostic event budget reached; permanent session tracking continues.'; urgent = true; metrics.dailyBudgetStops++; }
             var now = Date.now(), critical = ['error', 'promise_error', 'console_error', 'resource_error', 'context_lost'].indexOf(type) >= 0;
             if (now - burstStart >= 10000) { burstStart = now; ordinaryCount = 0; errorCount = 0; }
             if (critical ? errorCount++ >= 8 : ordinaryCount++ >= 80) { suppressed++; return; }
+            dailyEvents++;
+            if (w.PracticeTelemetry) context.practiceRunId = w.PracticeTelemetry.current() || '';
             queue.push({ boot: boot, seq: ++seq, ts: new Date().toISOString(), elapsedMs: Math.round(performance.now() - loadAt),
                 type: type, context: Object.assign({}, context), detail: redact(typeof detail === 'string' ? detail : JSON.stringify(detail || {})) });
-            if (queue.length > 200) queue.shift();
+            if (queue.length > 200) { queue.shift(); metrics.queueDropped++; }
             if (urgent) save();
             else if (!saveTimer) saveTimer = setTimeout(save, 750);
         } catch (_) {} // diagnostics must never throw into the exercise
@@ -80,6 +97,9 @@
             if (w.HWRecognition && typeof w.HWRecognition.status === 'function') out.handwritingStatus = w.HWRecognition.status();
             if (performance.memory) out.heapMB = Math.round(performance.memory.usedJSHeapSize / 1048576);
         } catch (_) {}
+        metrics.maxLagMs = Math.max(metrics.maxLagMs, out.lagMs);
+        out.diagnostics = Object.assign({}, metrics);
+        ['storageMs', 'maxStorageMs', 'readRU', 'writeRU'].forEach(function (k) { out.diagnostics[k] = Math.round(out.diagnostics[k] * 100) / 100; });
         return out;
     }
     function heartbeat(end) {
@@ -105,12 +125,14 @@
             var r = await Promise.race([operation, new Promise(function (_, reject) {
                 timeout = setTimeout(function () { if (ctrl) ctrl.abort(); reject(new Error('diagnostic timeout')); }, 4000);
             })]);
-            if (!r.ok) throw new Error('diagnostic status ' + r.status);
-            return await r.json();
+            var result; try { result = await r.json(); } catch (_) { result = {}; }
+            if (result.metrics) { metrics.readRU += Number(result.metrics.readRU) || 0; metrics.writeRU += Number(result.metrics.writeRU) || 0; }
+            if (!r.ok) { var failure = new Error('diagnostic status ' + r.status); failure.status = r.status; failure.kind = result.kind; failure.retryAfterMs = result.retryAfterMs; throw failure; }
+            return result;
         } finally { clearTimeout(timeout); }
     }
     async function flush() {
-        if (!live() || busy || suspended || !queue.length || navigator.onLine === false || tokenOwner() !== owner) { scheduleUpload(); return; }
+        if (!live() || busy || suspended || Date.now() < budgetUntil || !queue.length || navigator.onLine === false || tokenOwner() !== owner) { scheduleUpload(); return; }
         busy = true;
         var generation = configGeneration;
         var batch = queue.slice(0, 32), payload = { browserId: browserId, device: device(), events: batch };
@@ -120,9 +142,14 @@
             if (generation !== configGeneration) return;
             if (result.enabled === false) { stop(true); return; }
             var ack = new Set(result.ack || []);
+            metrics.uploads++; metrics.uploadBytes += jsonBytes(payload);
             queue = queue.filter(function (e) { return !ack.has(e.boot + ':' + e.seq); });
             save(); delay = 30000;
-        } catch (_) { delay = Math.min(delay * 2, 300000); }
+        } catch (error) {
+            metrics.failures++; if (error.status === 429) metrics.http429++;
+            if (error.kind === 'daily_budget') { metrics.dailyBudgetStops++; budgetUntil = Date.now() + (Number(error.retryAfterMs) || 3600000); }
+            delay = Math.min(Math.max(delay * 2, Number(error.retryAfterMs) || 0), 300000);
+        }
         finally { busy = false; if (generation === configGeneration) scheduleUpload(queue.length && delay === 30000 ? 3000 : delay); }
     }
     function installConsole() {
@@ -148,6 +175,7 @@
         if (enabled) { config = cfg; put(key('config'), JSON.stringify(cfg)); return; }
         config = cfg; enabled = true; put(key('config'), JSON.stringify(cfg));
         browserId = read(key('browser')) || uid(); put(key('browser'), browserId);
+        try { var savedBudget = JSON.parse(read(key('budget')) || 'null'); if (savedBudget) { budgetDay = savedBudget.day; dailyEvents = savedBudget.events || 0; } } catch (_) {}
         try { tabId = sessionStorage.getItem(key('tab')) || uid(); sessionStorage.setItem(key('tab'), tabId); } catch (_) { tabId = uid(); }
         // Recover queues from the same owner/deployment, including tabs closed yesterday.
         var prefix = key('queue_'), keys = [];
@@ -201,6 +229,10 @@
         if (!user || !user.id || (user.role && user.role !== 'student')) { stop(false); return; }
         if (attached && owner === user.id) return;
         if (enabled) stop(false);
+        if (owner !== user.id) {
+            Object.keys(metrics).forEach(function (k) { metrics[k] = 0; });
+            budgetUntil = 0; budgetDay = ''; dailyEvents = 0; suppressed = 0;
+        }
         owner = user.id; version = v || ''; attached = true;
         var generation = ++configGeneration;
         try { var cached = JSON.parse(read(key('config')) || 'null'); if (cached && cached.enabled && Date.parse(cached.endsAt) > Date.now()) start(cached); } catch (_) {}

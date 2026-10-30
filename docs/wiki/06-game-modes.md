@@ -154,3 +154,8 @@ Namespaced SR keys fit the existing API without a backend schema change.
 The shared typed widget also supports locked first-letter prefixes in game challenges. Key banks use only remaining suffix letters, while full-word grading and the reward bridge remain unchanged. PU3 Unit 4 page 54 supplies 16 M/20 F boards.
 
 The shared typed widget renders apostrophe-led contraction answers beside their pronoun as one nonwrapping group in both Study and game shells. Compact ending boxes preserve phone spacing; full-word blanks and existing reward behavior are unchanged.
+
+
+## Permanent session lifecycle (2026-10-30)
+
+UNO, Gomoku and Vampire Survivors allocate a practice run ID on actual start and close it through their existing completed-session event or explicit exit. Replays create distinct runs. A stale completion cannot claim another game's run. Lifecycle records grant no extra session/SR credit; starts without ends are not confirmed crashes.

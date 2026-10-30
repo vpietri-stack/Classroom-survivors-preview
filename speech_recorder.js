@@ -7,6 +7,12 @@
   'use strict';
 
   const SAMPLE_RATE = 16000;
+  function trace(phase) {
+    try {
+      if (global.ClientDiagnostics) global.ClientDiagnostics.record('speech', 'audio: ' + phase);
+      if (global.PracticeTelemetry) global.PracticeTelemetry.checkpoint({ audioPhase: phase });
+    } catch (_) {}
+  }
 
   class Recorder {
     constructor() {
@@ -27,6 +33,7 @@
     }
 
     async start() {
+      trace('microphone-request');
       if (this.recording) return;
       const generation = ++this._generation;
       this._chunks = [];
@@ -57,6 +64,7 @@
       } catch (_) {
         this.audioCtx = new Ctx();
       }
+      trace('audio-context-created');
       this._actualRate = this.audioCtx.sampleRate;   // may be 44100/48000
 
       const src = this.audioCtx.createMediaStreamSource(this.stream);
@@ -79,6 +87,7 @@
       this.processor = processor;
 
       this.recording = true;
+      trace('recording-started');
       } catch (error) { this.cancel(); throw error; }
     }
 
@@ -96,6 +105,7 @@
 
     async stop() {
       if (!this.recording) return null;
+      trace('recording-stop');
       this.recording = false;
       this.level = 0;
 
@@ -116,6 +126,7 @@
         try { this.audioCtx.close(); } catch (_) {}
         this.audioCtx = null;
       }
+      trace('audio-context-close-requested');
       this.source = null;
       this.processor = null;
       this.stream = null;
@@ -128,6 +139,7 @@
       const trimmed = pcm.slice(start);
       const wav = encodeWav(trimmed, rate);
       this._chunks = []; // release raw PCM after the WAV is encoded
+      trace('recording-encoded');
       return wav;
     }
   }

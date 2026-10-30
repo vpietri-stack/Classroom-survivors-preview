@@ -316,3 +316,8 @@ and remains hidden when switching to a student on another page with no completio
 `test_notes_speech_browser.js` covers the notes microphone toggle, exact target passed to the existing checker, selective green feedback, recording playback, retry, cancellation/stale results, permission denial, close disposal and 320px layout. Recognition is mocked in this UI suite; the existing target-model/recorder suites test their implementation. The regular notes integration suite also checks iframe microphone permission.
 
 Notes recording now requires at least two lexical words (preview 2026-10-28e). Single-word selection cancels recording/checking, clears the previous recording, and disables both microphone and own-recording playback while preserving example listening. Punctuation and contractions do not create extra words. Browser coverage includes the exact two-word boundary and switching back to a multiword phrase.
+
+
+## All-student diagnostic rollout coverage (2026-10-30)
+
+test_practice_telemetry.js covers consecutive runs, completion dedup, mismatched game completion, explicit/inferred exits, BFCache, accounts/tabs, bounded redacted errors and storage failures. test_client_diagnostics_v2.js covers global admin control/expiry/opt-outs, immutable retries, quota vs throttling, history pagination and legacy reads. Browser diagnostics tests verify bounded nonblocking capture, measured RU/storage timing and failed/throttled uploads. Backend integration still requires the isolated local Functions host; never run auth fixture mutations against production.
