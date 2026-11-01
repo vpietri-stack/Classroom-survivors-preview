@@ -152,6 +152,7 @@
     let recordingOwnerId = null;
 
     function updateUI() {
+      btn.dataset.speechState = state;
       if (state === 'recording') {
         btn.innerText = '⏹ 停止录音';
         btn.classList.remove('bg-red-600', 'hover:bg-red-500');
@@ -834,6 +835,18 @@
     };
     buttons.appendChild(recBtn); buttons.appendChild(cont); spHeartbeat({ spGate: 1, spFails: 0 });
     queryMicPermission().then(function (state) { if (alive() && state === 'denied') technicalError(new Error('Permission denied'), true); });
+    wrap.studyResumeState = function () { return { recordings, gradedTries, errors, outcome, hintedWords,
+      recordingState:recBtn.dataset.speechState||'idle', message:feedback.textContent, transcript:transcript.querySelector('p').textContent,
+      transcriptHidden:transcript.hidden, transcriptOpen:transcript.open, continueHidden:cont.hidden,
+      tileClasses:wordTiles.map(tile=>tile.className), tileLabels:wordTiles.map(tile=>tile.getAttribute('aria-label')||'') }; };
+    if(opts.resumeState) {
+      const saved=opts.resumeState;recordings=saved.recordings||0;gradedTries=saved.gradedTries||0;errors=saved.errors||0;
+      outcome=saved.outcome||'not_recorded';hintedWords=saved.hintedWords||0;
+      transcript.querySelector('p').textContent=saved.transcript||'';transcript.hidden=!!saved.transcriptHidden;transcript.open=!!saved.transcriptOpen;
+      cont.hidden=!!saved.continueHidden;feedback.textContent=saved.message||'';
+      (saved.tileClasses||[]).forEach((cls,i)=>{if(wordTiles[i]){wordTiles[i].className=cls;if(saved.tileLabels&&saved.tileLabels[i])wordTiles[i].setAttribute('aria-label',saved.tileLabels[i]);}});
+      if(['starting','recording','busy'].includes(saved.recordingState)) { cont.hidden=false;feedback.textContent='录音已中断，可以重新录音，也可以继续。'; }
+    }
     return wrap;
   }
 

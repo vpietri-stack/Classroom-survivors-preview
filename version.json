@@ -1,5 +1,5 @@
 {
-  "version": "2026-11-01b",
+  "version": "2026-11-01c",
   "deployedAt": "2026-11-01",
-  "notes": "Permanent practice lifecycle plus bounded all-student diagnostic trial, immutable uploads and measured RU/performance."
+  "notes": "Preview only: resume interrupted Study with Chinese login prompt, local and cloud checkpoints."
 }

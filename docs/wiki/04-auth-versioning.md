@@ -295,3 +295,9 @@ The optional account-enabled remote recorder attaches after student login, stops
 ## Preview-note login gate (27 October 2026)
 
 The preview-only PreviewNotes module receives the server previewNotes map at login. Before applying pending local page advancement and at each automatic SR step, an unfinished registered note blocks advancement. After placement/content loads, finishLogin opens its four-page reader. Completion requires its following regular Study session; an interrupted session opens the reader again at next login. Completion is per student and can also be restored on a fresh device from the server.
+
+## Study continuation at login (preview, 2026-11-01)
+
+finishLogin delegates to StudyRecovery.onLogin before opening ordinary preview notes. An unfinished Study offers Chinese Yes/No; No leaves the main menu with 继续上次学习. Resume retains original content without modifying the current profile assignment. Login lookup is bounded to four seconds and local recovery remains available offline. Observers attach before lookup so fast practice starts are captured. Account/logout detaches listeners' active owner and cancels old runtime callbacks; local keys include deployment scope and student ID.
+
+Study completions carry stable eventId se_study_<runId> and data.studyRunId. Queue persistence precedes recovery cleanup; the normal saveAnalytics transaction records a completion receipt. Games do not clear Study recovery. SR remembers lastStudyRunId per key so explicit partial exit plus resumed completion cannot apply the same outcome twice.

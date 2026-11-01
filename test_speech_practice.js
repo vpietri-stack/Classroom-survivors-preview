@@ -101,7 +101,7 @@ async function main() {
       const source = fs.readFileSync(path.join(__dirname, file), 'utf8'), start = source.indexOf('function ' + name + '('), end = source.indexOf('\nfunction ', start + 1);
       return source.slice(start, end < 0 ? undefined : end);
     }
-    await page.addScriptTag({ content: caller('study_mode.js', 'checkRoundE') });
+    await page.addScriptTag({ content: fs.readFileSync(path.join(__dirname,'study_mode.js'),'utf8').split('const STUDY_STATE =')[0] + caller('study_mode.js', 'checkRoundE') });
     await page.evaluate(() => {
       SPEECH_PRACTICE_ENABLED = true; window.SpeechStatus = { isReady: () => true }; window.kind = 'different';
       document.body.innerHTML = '<div><div id="sentence-drop-zone"></div><div id="sentence-word-bank"></div><div>controls</div></div>';

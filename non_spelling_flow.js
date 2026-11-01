@@ -32,6 +32,7 @@
         if (!tracking.recorded) {
             results.push({ type: item.srType, key: item.key, firstAttempt: result.solved });
             tracking.recorded = true;
+            if (mode === 'study') STUDY_STATE._typedRecorded = true;
         }
         if (mode === 'game') {
             if (result.solved) {
@@ -48,24 +49,21 @@
             if (typeof playHappySound === 'function') playHappySound();
         } else if (typeof synthError === 'function') synthError();
     }
-    function nextStudy() {
+    function nextStudy(resuming, savedWidget) {
         NonSpellingWidget.destroy();
         if (!STUDY_STATE.active || !STUDY_STATE._mixedActive) return;
         const item = STUDY_STATE.nonSpellingExercises[STUDY_STATE.currentNonSpellingIndex];
         if (!item) { finishStudySession(); return; }
         STUDY_STATE.round = 'E';
         STUDY_STATE.isTransitioning = false;
-        startExerciseTracking();
+        if (!resuming) { startExerciseTracking(); STUDY_STATE._typedRecorded = false; }
         if (item.type === 'sentence-scramble') {
-            STUDY_STATE.sentences = [item.sentence];
-            STUDY_STATE.currentSentenceIndex = 0;
+            if (!resuming) { STUDY_STATE.sentences = [item.sentence]; STUDY_STATE.currentSentenceIndex = 0; }
             updateStudyUI('Round D: Sentence Scramble', '把单词排成正确的句子。');
             nextRoundESentence();
         } else if (item.type === 'sentence-match') {
             STUDY_STATE.round = 'F';
-            STUDY_STATE.sentencePairs = item.pairs;
-            STUDY_STATE.pairAttempts = item.pairs.map(() => 1);
-            STUDY_STATE.pairQueued = item.pairs.map(() => false);
+            if (!resuming) { STUDY_STATE.sentencePairs = item.pairs; STUDY_STATE.pairAttempts = item.pairs.map(() => 1); STUDY_STATE.pairQueued = item.pairs.map(() => false); }
             item.pairs.forEach(pair => srUsedPairKeys.add(itemKey(pair)));
             updateStudyUI('Round D: Sentence Match', '把对应的句子配起来。');
             renderRoundF();
@@ -74,9 +72,9 @@
             container.replaceChildren();
             updateStudyUI(item.type === 'missing-word' ? 'Round D: Missing Words' : 'Round D: Find and Fix',
                 item.type === 'missing-word' ? '点击空格，用字母补全单词。' : '找出用错的单词并改正。');
-            const tracking = { recorded: false };
+            const tracking = { recorded: !!STUDY_STATE._typedRecorded };
             NonSpellingWidget.mount(container, item, {
-                presentation: 'study', onCheck: result => recordTyped(item, 'study', result, tracking), onNext: advanceStudy
+                presentation: 'study', resumeState: resuming && savedWidget || null, onCheck: result => recordTyped(item, 'study', result, tracking), onNext: advanceStudy
             });
         }
     }
@@ -130,5 +128,5 @@
         document.getElementById('exercise-widget').prepend(instruction);
         return true;
     }
-    window.NonSpellingFlow = { enabled, prepareStudy, beginStudy, advanceStudy, cleanupStudy, startGame, cleanupGame };
+    window.NonSpellingFlow = { enabled, prepareStudy, beginStudy, advanceStudy, restoreStudy: saved => { STUDY_STATE._mixedActive=true; document.getElementById('studyModeOverlay').classList.add('nse-mixed'); nextStudy(true,saved); }, cleanupStudy, startGame, cleanupGame };
 })();

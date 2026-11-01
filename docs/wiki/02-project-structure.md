@@ -245,3 +245,7 @@ non_spelling_exercises.css. The standalone POC controller/chrome share the same
 curriculum/widget/styles, rather than duplicating exercise implementations.
 
 `notes_speech.js` is the preview-only optional microphone/recording controller for the illustrated notes bottom bar. It lazily reuses the shared targeted LocalEngine and Recorder, with explicit parent-close disposal.
+
+## Study recovery (preview, 2026-11-01)
+
+Study recovery is separate from diagnostic collection: study_recovery.js owns local/cloud saves, login choice and account isolation; study_runtime.js owns serializing and rebuilding the existing controls; study_recovery.css styles the Chinese prompt. The shared api/src/functions/shared/studyResumeCore.js validates the same bounded checkpoint in browser and API. studyResume.js exposes the signed checkpoint endpoint.

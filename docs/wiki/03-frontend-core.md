@@ -393,3 +393,7 @@ PU3 Unit 9 additions (preview 2026-10-14j) keep page 107 legacy content and page
 Preview registry correction (2026-10-14m): PU1 Unit 2 availability is [19,20,21,22,23,26], removing nonexistent pages 24/25. PU2 Unit 4 is [45,46,47,54], exposing the already-authored page 47. Corresponding class_config.js documentation and pack cache busters are updated; teaching arrays, translations and student assignments are unchanged.
 
 PU2 Unit 2 preview 2026-10-15b corrects the page 19 matching pair to Tuesday comes after / Monday. This changes only that legacy pair; vocabulary, scrambles and their translations remain unchanged. New typed boards live in the shared non-spelling catalog.
+
+## Study recovery state boundary (preview, 2026-11-01)
+
+StudyRuntime rebuilds controls using normal renderers, never stored HTML. Snapshots retain the chosen plan/order, partial inputs, locked feedback, attempts, remaining transition timer, SR outcomes, handwriting points and speech gate feedback. Handwriting exportRecovery/restoreTrace preserves functional raw normalized points separately from the consented research takeTrace. NonSpellingWidget.getState/options.resumeState and NonSpellingFlow.restoreStudy preserve typed boards without replaying checks. Tracked timers and a runtime epoch prevent abandoned callbacks from advancing a restored exercise.

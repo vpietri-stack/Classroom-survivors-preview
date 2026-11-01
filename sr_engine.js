@@ -572,7 +572,7 @@ function mergeSRDelta(stored, delta) {
  * Full per-session SR update (see docstring above updateSRStateForSession
  * in git history).
  */
-function updateSRStateForSession(srState, sessionResults, currentSession) {
+function updateSRStateForSession(srState, sessionResults, currentSession, studyRunId = null) {
     const newState = {
         vocab: Object.assign({}, (srState || {}).vocab || {}),
         sentences: Object.assign({}, (srState || {}).sentences || {}),
@@ -586,6 +586,9 @@ function updateSRStateForSession(srState, sessionResults, currentSession) {
             ? getVocabSRRecord(newState.vocab, key)
             : newState[type][key];
 
+        // A resumed Study keeps its first-check outcome, including an earlier partial exit.
+        if (studyRunId && existing && existing.lastStudyRunId === studyRunId) return;
+        const studyMarker = studyRunId || existing && existing.lastStudyRunId;
         if (firstAttempt) {
             const prevResult = existing && existing.lastResult;
             const prevInterval = existing && existing.interval || 0;
@@ -601,6 +604,7 @@ function updateSRStateForSession(srState, sessionResults, currentSession) {
                 newInterval = 2;
             }
             newState[type][key] = {
+                ...(studyMarker ? { lastStudyRunId: studyMarker } : {}),
                 interval: newInterval,
                 dueAfterSession: currentSession + newInterval,
                 lastSession: currentSession,
@@ -619,6 +623,7 @@ function updateSRStateForSession(srState, sessionResults, currentSession) {
             // which come back every 2 sessions to avoid burnout.
             const interval = lapses >= SR_LEECH_LAPSES ? 2 : 1;
             newState[type][key] = {
+                ...(studyMarker ? { lastStudyRunId: studyMarker } : {}),
                 interval: interval,
                 dueAfterSession: currentSession + interval,
                 lastSession: currentSession,

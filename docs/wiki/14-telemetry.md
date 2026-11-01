@@ -224,3 +224,7 @@ Upload responses report measured successful-operation `readRU`, `writeRU` and se
 The teacher Diagnostics tab labels/filters practice, error, speech and performance records and shows run lifecycle from loaded analytics. Normal session/exercise dashboards and target counters retain their type guards. Speech recorder checkpoints now distinguish microphone request, context creation, recording start/stop, close request, encoding and Continue.
 
 Lifecycle checkpoints are immutable event snapshots. Teacher outcomes give a recorded completion priority over a later inferred interruption from a surviving stale breadcrumb.
+
+## Recovery is functional persistence (preview, 2026-11-01)
+
+PracticeTelemetry.snapshot/resume preserve the original Study run across login without a second start or credited session. Resumption adds a phase=resume breadcrumb. Study recovery stores functional partial answers/ink independently from privacy-bounded diagnostics and independent of diagnostic expiry/opt-out. Existing exercise and completed-session records retain their normal queue/ack delivery; completed sessions use a stable original run identity. Diagnostic absence still does not prove a crash.

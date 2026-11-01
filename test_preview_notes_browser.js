@@ -31,7 +31,7 @@ async function fixture(page,id='notes-a',placement={book:'PU3',unit:'9',page:'11
   const context=await browser.newContext({viewport:{width:1102,height:900}}),page=await context.newPage(),errors=[];
   page.on('pageerror',e=>errors.push(e.message));
   await page.route('**/*',route=>{const u=route.request().url();return u.startsWith(base)&&!u.includes('/models/')&&!u.includes('/lib/wasm/')?route.continue():route.abort();});
-  await page.goto(base+'/index.html?testMode=true&studentBook=PU3&studentUnit=9&studentPage=111');
+  await page.goto(base+'/index.html?resume=0&testMode=true&studentBook=PU3&studentUnit=9&studentPage=111');
   await page.waitForFunction(()=>window.PreviewNotes&&window.NonSpellingFlow);
   await fixture(page);
   await page.locator('#preview-notes-overlay iframe').waitFor();

@@ -850,6 +850,21 @@ function hwCreateTraceBox(opts) {
                 size: HW_SIZE, pen: HW_PEN, tol: HW_TOL, engine: HW_ENGINE_VERSION
             };
         },
+        // Keep functional ink lossless. The research trace above intentionally compacts points.
+        exportRecovery: function () {
+            return { s: strokes.map(function (stroke) { return stroke.flatMap(function (p) { return [p.x,p.y]; }); }),
+                target: target, guided: guided, frozen: frozen, size: HW_SIZE, engine: HW_ENGINE_VERSION };
+        },
+        // Functional recovery uses the engine grid, not screen-size-dependent pixels.
+        restoreTrace: function (saved) {
+            if (!saved || !Array.isArray(saved.s)) return;
+            revision++; cancelPending(); drawing = null; fallbackPass = false;
+            target = saved.target; guided = !!saved.guided; frozen = !!saved.frozen;
+            strokes = saved.s.map(function (flat) {
+                var points = []; for (var i=0;i+1<flat.length;i+=2) points.push({x:flat[i],y:flat[i+1]}); return points;
+            });
+            redraw();
+        },
         clearInk: function () { revision++; fallbackPass = false; strokes = []; drawing = null; cancelPending(); redraw(); },
         undo: function () { if (frozen) return; revision++; fallbackPass = false; drawing = null; strokes.pop(); cancelPending(); redraw(); if (opts.onWriting) opts.onWriting(); if (gentle && strokes.length) { var token=revision; pendingReject=setTimeout(function(){pendingReject=null;evaluateGentle(token,true);},160); } },
         freeze: function () { revision++; frozen = true; cancelPending(); },

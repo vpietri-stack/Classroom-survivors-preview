@@ -467,3 +467,9 @@ Preview 2026-10-28e restricts optional notes recording to targets of two or more
 ## Authorized all-student diagnostic trial (2026-10-30)
 
 Publish only diagnostic/lifecycle changes on each environment's existing history, preserving independent curricula, speech experiments, API routes and data containers. Validate the isolated preview API and Pages first, then production. Synchronize stamps and changed-script queries. After production host verification, node api/client_diagnostics_ops.js --database Val-EslApp --action enable-all --days 7 starts the approved seven-day window; status measures partial heartbeat RU/performance and reserved volume, stop-all pauses it. The trial expires automatically; low-volume lifecycle persists. This rollout does not provision throughput or alter learner progress.
+
+## Study recovery preview boundary (2026-11-01)
+
+This rollout is preview-only. Frontend is based on preview/main and published only to the Classroom-survivors-preview repository. The API is deployed through existing draft PR #1/admin-dashboard-update to SWA environment 1; never merge that PR merely to update staging. Keep separate histories and all preview speech/curriculum work.
+
+Environment 1 uses Val-EslApp / Students-admin-dashboard-preview with STUDY_RESUME_ENABLED=true and COSMOS_STUDY_RESUME_CONTAINER=study_resume_preview. Local verification uses Val-EslApp-Test / Students / study_resume_test. Containers share database throughput, partition by /studentId and exclude checkpoint contents from indexes. Production has no recovery flag/container setting and frontend config never enables recovery on the production path. User review precedes any later production activation.

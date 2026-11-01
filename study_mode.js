@@ -1,3 +1,40 @@
+var studyPendingTimer = null;
+var studyRuntimeEpoch = 0;
+function studyCancelPending(action) {
+    if (action && STUDY_STATE._resumePending && STUDY_STATE._resumePending.action !== action) return;
+    clearTimeout(studyPendingTimer); studyPendingTimer = null; STUDY_STATE._resumePending = null;
+}
+function studyLater(action, callback, ms) {
+    studyCancelPending();
+    const epoch = studyRuntimeEpoch;
+    STUDY_STATE._resumePending = { action, dueAt: Date.now() + ms };
+    studyPendingTimer = setTimeout(() => {
+        if (epoch !== studyRuntimeEpoch) return;
+        studyPendingTimer = null; STUDY_STATE._resumePending = null;
+        callback();
+        if (window.StudyRecovery) StudyRecovery.capture();
+    }, ms);
+    if (window.StudyRecovery) StudyRecovery.capture();
+    return studyPendingTimer;
+}
+function advanceRoundESentence() {
+    if (!STUDY_STATE.active) return;
+    STUDY_STATE.currentSentenceIndex++;
+    startExerciseTracking(); STUDY_STATE.isTransitioning = false; STUDY_STATE._roundEFrozen = false;
+    nextRoundESentence();
+}
+function mountStudySpeechGate(saved) {
+    const drop = document.getElementById('sentence-drop-zone');
+    if (!drop || !window.SpeechUI) return;
+    const controls = drop.parentElement.lastElementChild;
+    if (controls) controls.style.display = 'none';
+    const bank = document.getElementById('sentence-word-bank');
+    bank.replaceChildren(); bank.classList.remove('bg-gray-700/50'); bank.classList.add('bg-transparent');
+    bank.appendChild(SpeechUI.makeSentenceGate({ target: Array.from(drop.children).map(s => s.dataset.expected).join(' '),
+        wordTiles: Array.from(drop.children).map(s => s.firstElementChild), level: 2,
+        resumeState: saved || null, onDone: advanceRoundESentence }));
+}
+
 
 const STUDY_STATE = {
     active: false,
@@ -53,9 +90,12 @@ function initStudyMode(options = {}) {
         showStudyNotice("Fewer than 5 words/sentences available — running a shorter session.");
     }
 
+    studyRuntimeEpoch++; studyCancelPending();
+    if (window.StudyRuntime) StudyRuntime.cancel();
     STUDY_STATE.active = true;
     if (window.PracticeTelemetry) PracticeTelemetry.start('study', 'study');
     STUDY_STATE.startTime = Date.now();
+    startExerciseTracking();
     STUDY_STATE.round = 'A';
     STUDY_STATE.isTransitioning = false;
     STUDY_STATE.srFinalized = false;
@@ -72,6 +112,13 @@ function initStudyMode(options = {}) {
     STUDY_STATE.previewNote = notePlan ? notePlan.context : null;
     STUDY_STATE._mixedActive = false;
 
+    showStudyModeScreen();
+    startRoundA();
+    if (window.StudyRecovery) StudyRecovery.begin();
+    return true;
+}
+
+function showStudyModeScreen() {
     // Hide Start Screen
     document.getElementById('startScreen').classList.add('hidden');
 
@@ -104,14 +151,12 @@ function initStudyMode(options = {}) {
     const overlay = document.getElementById('studyModeOverlay');
     overlay.classList.remove('hidden');
 
-    startRoundA();
-    return true;
 }
 
 // --- ROUND A: Word Recognition ---
-function startRoundA() {
+function startRoundA(resuming) {
     STUDY_STATE.round = 'A';
-    STUDY_STATE.remainingWordsRoundA = [...STUDY_STATE.words];
+    if (!resuming) STUDY_STATE.remainingWordsRoundA = [...STUDY_STATE.words];
 
     updateStudyUI("Round A: Word Recognition", "Listen and click the correct word.");
 
@@ -128,7 +173,7 @@ function startRoundA() {
     `;
 
     renderRoundAWords();
-    playRoundAPrompt();
+    if (!resuming) playRoundAPrompt();
 }
 
 function renderRoundAWords() {
@@ -180,7 +225,7 @@ function checkRoundA(word, btnElement) {
         // Remove from list
         STUDY_STATE.remainingWordsRoundA = STUDY_STATE.remainingWordsRoundA.filter(w => w !== word);
 
-        setTimeout(() => {
+        studyLater('recognition_next', () => {
             btnElement.remove();
             STUDY_STATE.isTransitioning = false;
             playRoundAPrompt();
@@ -403,7 +448,7 @@ function checkRoundC() {
         playHappySound();
         srStudyResults.push({ type: 'vocab', key: itemKey(targetWord), firstAttempt: exerciseAttempts === 1 });
         queueExerciseEvent('wordScramble', 'study', targetWord);
-        setTimeout(() => {
+        studyLater('scramble_next', () => {
             STUDY_STATE.currentWordIndex++;
             startExerciseTracking();
             STUDY_STATE.isTransitioning = false;
@@ -425,31 +470,11 @@ function checkRoundC() {
         srStudyResults.push({ type: 'vocab', key: itemKey(targetWord), firstAttempt: false });
     }
     incrementExerciseAttempts();
-    const slotsArr = Array.from(slots);
-    slotsArr.forEach(s => {
-        if (s._resetTimer) clearTimeout(s._resetTimer);
-        s._resetTimer = setTimeout(() => {
-            const bank = document.getElementById('scramble-bank');
-            for (let slot of slots) {
-                if (slot.dataset.fixed === "true") continue; // never move fixed chars (space / - / . ) into the bank
-                if (slot.innerText) {
-                    const char = slot.innerText;
-                    const btn = document.createElement('button');
-                    btn.className = "study-letter-btn";
-                    btn.innerText = char;
-                    btn.dataset.char = char;
-                    btn.onclick = () => addLetterToSlot(char, btn, targetWord);
-                    bank.appendChild(btn);
-                    slot.innerText = '';
-                }
-                resetSlotColors();
-            }
-            STUDY_STATE._roundCFrozen = false;
-        }, 5000);
-    });
+    studyLater('scramble_reset', clearRoundC, 5000);
 }
 
 function clearRoundC() {
+    studyCancelPending('scramble_reset');
     // Allow CLEAR during the wrong-answer reveal (so the player can skip the 5s
     // wait), but not during the 1s success transition to the next word.
     if (STUDY_STATE.isTransitioning) return;
@@ -499,10 +524,12 @@ function startRoundD() {
     startExerciseTracking();
     // Fredoka must be loaded before the first glyph mask is built, otherwise the
     // outline (and so the scoring target) would be a fallback font's shape.
-    hwEnsureFont().then(() => nextRoundDWord());
+    const fontEpoch=studyRuntimeEpoch;
+    hwEnsureFont().then(() => { if(fontEpoch===studyRuntimeEpoch&&STUDY_STATE.round==='D')nextRoundDWord(); });
 }
 
-function nextRoundDWord() {
+function nextRoundDWord(saved) {
+    if (saved) roundDSkipUnlocked = !!saved.skip;
     clearTimeout(roundDTimer);
     if (STUDY_STATE.currentWordIndex >= STUDY_STATE.words.length) {
         finishRoundD();
@@ -541,6 +568,12 @@ function nextRoundDWord() {
     // become gaps the student handwrites, and the rest are given as context —
     // so a 29-letter item costs the same as a 6-letter one.
     const punct = [' ', "'", "-", ".", "?", "!", ","];
+    if (saved) {
+        roundDWord = word; roundDSlots = saved.slots; roundDGapOrder = saved.gaps; roundDCursor = saved.cursor;
+        roundDAttempts = saved.attempts; roundDEffortAttempts = saved.effort; roundDGuided = saved.guided;
+        roundDHadHelp = saved.help; roundDSkipUnlocked = saved.skip;
+        hwCaptureBeginWord(word);
+    } else {
     roundDWord = word;
     diagHandwriting('handwriting-word-start', '');
     roundDSlots = word.split('').map(ch => punct.includes(ch)
@@ -551,17 +584,21 @@ function nextRoundDWord() {
     roundDCursor = 0;
     hwCaptureBeginWord(word);
 
+    }
     renderRoundDSlots();
 
     const mount = document.getElementById('handwriting-trace');
     if (roundDTrace) roundDTrace.destroy();
-    roundDHadHelp = false;
+    if (!saved) roundDHadHelp = false;
     roundDTrace = hwCreateTraceBox({ keepInkOnReject:true, onAccept:roundDAcceptLetter, onReject:roundDRejectLetter, onWriting:function () { roundDStatus('继续写；写好后抬手即可'); } });
     mount.appendChild(roundDTrace.el);
     roundDTrace.measure();
 
-    roundDShowTarget();
-    playTTS();
+    if (saved) {
+        roundDTrace.restoreTrace(saved.trace);
+        roundDTargetShownAt = Date.now() - (saved.targetElapsedMs || 0);
+        roundDStatus(saved.status || '继续完成这个字母');
+    } else { roundDShowTarget(); playTTS(); }
 }
 
 let roundDWord = '';
@@ -665,7 +702,7 @@ function roundDAcceptLetter(letter, scores) {
     roundDCursor++;
     synthGem();
     renderRoundDSlots();
-    roundDTimer = setTimeout(() => {
+    roundDTimer = studyLater('handwriting_letter', () => {
         if (STUDY_STATE.round === 'D') roundDShowTarget();
     }, 140);
 }
@@ -695,7 +732,7 @@ function roundDRejectLetter(letter, scores) {
         slot.given = true;
         roundDCursor++;
         renderRoundDSlots();
-        roundDTimer = setTimeout(() => {
+        roundDTimer = studyLater('handwriting_letter', () => {
             if (STUDY_STATE.round === 'D') roundDShowTarget();
         }, 400);
         return;
@@ -747,7 +784,7 @@ function advanceRoundDWord(delayMs) {
     clearTimeout(roundDTimer);
     const skip = document.getElementById('handwriting-skip');
     if (skip) skip.disabled = true;
-    roundDTimer = setTimeout(() => {
+    roundDTimer = studyLater('handwriting_word', () => {
         if (!STUDY_STATE.active || STUDY_STATE.round !== 'D') return;
         STUDY_STATE.currentWordIndex++;
         startExerciseTracking();
@@ -928,6 +965,7 @@ function deleteWordTile(item) {
 }
 
 function clearRoundE() {
+    studyCancelPending('sentence_reset');
     // Allow CLEAR during the wrong-answer reveal (skip the 5s wait). BLOCKED only
     // during the 1s success transition to the next sentence (handled by isTransitioning).
     if (STUDY_STATE.isTransitioning) return;
@@ -980,42 +1018,11 @@ function checkRoundE() {
         srStudyResults.push({ type: 'sentences', key: itemKey(STUDY_STATE.sentences[STUDY_STATE.currentSentenceIndex]), firstAttempt: exerciseAttempts === 1 });
         queueExerciseEvent('sentenceScramble', 'study', STUDY_STATE.sentences[STUDY_STATE.currentSentenceIndex]);
 
-        const mixedSession = STUDY_STATE._mixedActive ? STUDY_STATE.startTime : null;
-        const advance = () => {
-            if (mixedSession !== null && (!STUDY_STATE.active || STUDY_STATE.startTime !== mixedSession)) return;
-            STUDY_STATE.currentSentenceIndex++;
-            startExerciseTracking();
-            STUDY_STATE.isTransitioning = false;
-            STUDY_STATE._roundEFrozen = false;
-            nextRoundESentence();
-        };
-
         // Speech step: now that the sentence is built correctly, ask the student
         // to say it aloud (Whisper). Skipped silently if the model isn't ready
         // yet, so it never blocks progression or shows a spinner.
         if (window.SpeechStatus && window.SpeechStatus.isReady() && window.SpeechUI && window.SpeechUI.makeSentenceGate) {
-            const sentenceText = targetWords.join(' ');
-            // Hide the CHECK/CLEAR controls and the now-empty word bank;
-            // place the speech gate INTO the bank's space so the user doesn't scroll.
-            const controls = dropZone.parentElement.lastElementChild;
-            if (controls) controls.style.display = 'none';
-            const bank = document.getElementById('sentence-word-bank');
-            if (bank) {
-                bank.innerHTML = '';  // clear any residual tiles
-                bank.classList.remove('bg-gray-700/50');
-                bank.classList.add('bg-transparent');
-            }
-            const gate = window.SpeechUI.makeSentenceGate({
-                target: sentenceText,
-                wordTiles: slots.map(slot => slot.firstElementChild),
-                level: 2,
-                onDone: advance
-            });
-            if (bank) {
-                bank.appendChild(gate);
-            } else {
-                dropZone.parentElement.appendChild(gate);
-            }
+            mountStudySpeechGate();
         } else {
             // Log WHY the gate was skipped — without this the skip is invisible
             // in the field ("speech isn't being prompted") and undebuggable.
@@ -1027,7 +1034,7 @@ function checkRoundE() {
                     : !window.SpeechUI ? 'SpeechUI missing'
                     : 'makeSentenceGate missing'));
             }
-            setTimeout(advance, 1000);
+            studyLater('sentence_next', advanceRoundESentence, 1000);
         }
     } else {
         STUDY_STATE._roundEFrozen = true; // freeze during reveal (not a transition, so CLEAR still works)
@@ -1039,24 +1046,7 @@ function checkRoundE() {
         incrementExerciseAttempts();
         dropZone.classList.add('border-red-500');
         if (STUDY_STATE._roundEResetTimer) clearTimeout(STUDY_STATE._roundEResetTimer);
-        STUDY_STATE._roundEResetTimer = setTimeout(() => {
-            dropZone.classList.remove('border-red-500');
-            STUDY_STATE.isTransitioning = false;
-            STUDY_STATE._roundEFrozen = false;
-            // Return all placed tiles to the bank (it depletes on placement).
-            const bank = document.getElementById('sentence-word-bank');
-            Array.from(dropZone.children).forEach(slot => {
-                const p = slot.firstChild;
-                if (p) {
-                    const tile = document.createElement('button');
-                    tile.className = "study-word-tile";
-                    tile.innerText = p.dataset.word;
-                    tile.dataset.word = p.dataset.word;
-                    bank.appendChild(tile);
-                    p.remove();
-                }
-            });
-        }, 5000);
+        STUDY_STATE._roundEResetTimer = studyLater('sentence_reset', clearRoundE, 5000);
     }
 }
 
@@ -1227,8 +1217,8 @@ function checkRoundF() {
                     const itemDetails = `A: ${pairs[targetIndex].a} | B: ${pairs[targetIndex].b}`;
                     // SR: first attempt = pairAttempts still at 1
                     srStudyResults.push({ type: 'sentencePairs', key: itemKey(pairs[targetIndex]), firstAttempt: STUDY_STATE.pairAttempts[targetIndex] === 1 });
-                    queueExerciseEvent('sentenceMatch', 'study', itemDetails, STUDY_STATE.pairAttempts[targetIndex]);
                     STUDY_STATE.pairQueued[targetIndex] = true;
+                    queueExerciseEvent('sentenceMatch', 'study', itemDetails, STUDY_STATE.pairAttempts[targetIndex]);
                 }
             } else {
                 // Incorrect match
@@ -1256,7 +1246,7 @@ function checkRoundF() {
         STUDY_STATE.isTransitioning = true;
         playHappySound();
         // Note: The individual pairs were already queued during the check above.
-        setTimeout(() => {
+        studyLater('match_next', () => {
             if (mixedSession !== null && (!STUDY_STATE.active || STUDY_STATE.startTime !== mixedSession)) return;
             STUDY_STATE.isTransitioning = false;
             if (mixedSession !== null) NonSpellingFlow.advanceStudy();
@@ -1279,7 +1269,7 @@ function checkRoundF() {
         }
 
         // Reset after 2 seconds
-        setTimeout(() => {
+        studyLater('match_reset', () => {
             if (mixedSession !== null && (!STUDY_STATE.active || STUDY_STATE.startTime !== mixedSession)) return;
             resetRoundF();
             STUDY_STATE.isTransitioning = false;
@@ -1305,7 +1295,7 @@ function resetRoundF() {
 
 
 async function finishStudySession() {
-    if (STUDY_STATE.previewNote && STUDY_STATE.srFinalized) return;
+    if (STUDY_STATE.srFinalized) return;
     if (window.NonSpellingFlow) NonSpellingFlow.cleanupStudy();
     const durationMs = Date.now() - STUDY_STATE.startTime;
     const durationSec = Math.floor(durationMs / 1000);
@@ -1321,7 +1311,7 @@ async function finishStudySession() {
     const previewOwner = previewNote && STUDY_STATE.previewNote.owner;
     const completedStudyStart = STUDY_STATE.startTime;
     STUDY_STATE.srFinalized = true;
-    finalizeSession(srStudyResults);
+    finalizeSession(srStudyResults, true, window.StudyRecovery && StudyRecovery.runId());
 
     queueSessionEvent('study', {
         durationMs: durationMs,
@@ -1363,13 +1353,16 @@ async function finishStudySession() {
 }
 
 function exitStudyMode() {
+    if (window.StudyRecovery) StudyRecovery.pause();
+    studyRuntimeEpoch++; studyCancelPending();
+    if (window.StudyRuntime) StudyRuntime.cancel();
     if (window.PracticeTelemetry) PracticeTelemetry.interrupt('study_exit', false);
     if (window.NonSpellingFlow) NonSpellingFlow.cleanupStudy();
     // Abandoning mid-session must not lose observed results (failures are
     // recorded at the first wrong check). Partial sessions don't advance the
     // session counter; the completed case is handled by finishStudySession.
     if (STUDY_STATE.active && !STUDY_STATE.srFinalized && srStudyResults.length > 0) {
-        finalizeSession(srStudyResults, false);
+        finalizeSession(srStudyResults, false, window.StudyRecovery && StudyRecovery.runId());
         srStudyResults = [];
     }
     STUDY_STATE.active = false; // so the game-mode keydown listener resumes
@@ -1382,6 +1375,7 @@ function exitStudyMode() {
     // down here or they accumulate across study sessions.
     if (roundDTrace) { roundDTrace.destroy(); roundDTrace = null; }
     document.getElementById('studyModeOverlay').classList.add('hidden');
+    if (window.StudyRecovery) StudyRecovery.restoreMenuContent();
     goBackFromGameSelection(); // back to the main dashboard (also shows startScreen)
 }
 

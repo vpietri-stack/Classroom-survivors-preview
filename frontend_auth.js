@@ -13,7 +13,7 @@ const API_BASE = API_BASE_URL;
 // The version watchdog (startVersionWatchdog) compares this to the live
 // version.json; a mismatch means stale WeChat builds never self-heal or
 // permanently nag. See DEPLOY_VERSION_STAMP.md. Bump BOTH together.
-const APP_VERSION = '2026-11-01b';
+const APP_VERSION = '2026-11-01c';
 
 // --- SESSION TOKEN (c) design) ---
 // The server mints a signed token on login. We store it in localStorage
@@ -111,7 +111,7 @@ function markSRSessionAdvancedToday() {
  *
  * @param {Array} sessionResults  [{ type, key, firstAttempt }, ...]
  */
-function finalizeSession(sessionResults, shouldIncrementSession = true) {
+function finalizeSession(sessionResults, shouldIncrementSession = true, studyRunId = null) {
     if (!authActiveUser || isTestMode || !sessionResults || sessionResults.length === 0) return;
 
     const currentSession = getCurrentSession();
@@ -128,7 +128,7 @@ function finalizeSession(sessionResults, shouldIncrementSession = true) {
     const merged = Array.from(canonical.values());
     if (merged.length === 0) return;
 
-    const newSRState = updateSRStateForSession(currentSRState, merged, currentSession);
+    const newSRState = updateSRStateForSession(currentSRState, merged, currentSession, studyRunId);
 
     // Eagerly update in-memory user so the next session in the same page-load gets fresh data
     authActiveUser.srState = newSRState;
@@ -220,6 +220,7 @@ function queueExerciseEvent(exerciseType, mode, itemDetails = null, customAttemp
         event.itemDetails = itemDetails;
     }
     
+    if (window.StudyRecovery) StudyRecovery.decorate(event);
     analyticsQueue.push(event);
     persistAnalyticsQueue();
     csPageHeartbeat({ ex: exerciseType, mode: mode });
@@ -245,8 +246,10 @@ function queueSessionEvent(sessionType, data) {
         ownerId: authActiveUser.id, // cross-account guard (2026-09-16, see queueExerciseEvent)
         ps: csPageSessionId // restart telemetry page-session stamp
     };
+    if (window.StudyRecovery) StudyRecovery.decorate(event);
     analyticsQueue.push(event);
     persistAnalyticsQueue();
+    if (window.StudyRecovery) StudyRecovery.complete(event);
     if (window.PracticeTelemetry) PracticeTelemetry.complete(sessionType);
     csPageHeartbeat({ sess: sessionType });
     if (authActiveUser) {
@@ -1670,6 +1673,7 @@ async function selectAvatar(avatarEmoji) {
 }
 
 function saveUserToLocalAndStart(user) {
+    if (window.StudyRecovery && authActiveUser && authActiveUser.id !== user.id) StudyRecovery.detach();
     if (window.PracticeTelemetry && authActiveUser && authActiveUser.id !== user.id) PracticeTelemetry.detach('account_changed');
     // Cross-account reset (2026-09-16): in-memory session leftovers (SR
     // pending triple, queue, page-session breadcrumb) belong to the PREVIOUS
@@ -1844,7 +1848,8 @@ function finishLogin() {
     } else {
         targetBanner.classList.add('hidden');
     }
-    if (window.PreviewNotes) PreviewNotes.onLogin();
+    if (window.StudyRecovery) StudyRecovery.onLogin(() => { if (window.PreviewNotes) PreviewNotes.onLogin(); });
+    else if (window.PreviewNotes) PreviewNotes.onLogin();
 }
 
 /**
@@ -1888,6 +1893,7 @@ function resolveContentFromClassTime(classTime, studentName) {
 }
 
 function goBackToProfiles() {
+    if (window.StudyRecovery) StudyRecovery.detach();
     if (window.PreviewNotes) PreviewNotes.close();
     // Hide start screen and go back to profile selection
     document.getElementById('startScreen').classList.add('hidden');

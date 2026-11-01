@@ -87,3 +87,10 @@ const NON_SPELLING_ENABLED = (function () {
         || /^192\.168\./.test(host) || /^10\./.test(host) || /^172\.(1[6-9]|2\d|3[01])\./.test(host);
     return (preview || local) && new URLSearchParams(window.location.search).get('nonspelling') !== '0';
 })();
+
+// Study recovery is a preview-only review. Production cannot force it on by URL.
+const STUDY_RESUME_ENABLED = (() => {
+    const local = window.location.protocol === 'file:' || ['localhost','127.0.0.1'].includes(window.location.hostname);
+    return (local || /^\/Classroom-survivors-preview(?:\/|$)/i.test(window.location.pathname))
+        && new URLSearchParams(window.location.search).get('resume') !== '0';
+})();

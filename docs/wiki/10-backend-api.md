@@ -170,3 +170,9 @@ clientDiagnostics retains signed self-upload and privileged history access. POST
 
 
 Hosted preview isolation is configured through Azure environment 1: Val-EslApp/Students-admin-dashboard-preview for profiles and Val-EslApp/client_diagnostics_preview for traces. Production uses Val-EslApp/Students and Val-EslApp/client_diagnostics. Val-EslApp-Test is the separate local integration-test database. Preview container setup shares existing throughput and never provisions an extra offer.
+
+## studyResume (preview, 2026-11-01)
+
+GET/POST /api/studyResume requires a valid signed session even if legacy profile auth is optional. Students can read/write only their own checkpoint; privileged accounts may read a scoped student. POST supports begin, claim, checkpoint and complete. Atomic ETag writes plus baseVersion protect replacing/claiming; writerId and seq reject a stale page and acknowledge an identical retry without rewriting. Completed runs return 410; competing writers return 409. The route is included in CORS OPTIONS.
+
+Disabled unless STUDY_RESUME_ENABLED=true AND COSMOS_STUDY_RESUME_CONTAINER is explicitly configured. It uses COSMOS_DB_NAME and /studentId partitioning. A checkpoint is capped at 60,000 UTF-8 bytes with bounded traversal and rejects HTML/credential-like keys. Normal saveAnalytics records studyRecoveryCompletion in the same profile ETag transaction as an accepted completed Study event; GET suppresses stale checkpoints even if the client never sent complete. Re-delivery cannot award another completion. This feature does not alter exercise/session credit rules.

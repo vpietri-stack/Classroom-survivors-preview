@@ -399,3 +399,7 @@ Notes recording now requires at least two lexical words (preview 2026-10-28e). S
 ## Diagnostic stage breadcrumbs (2026-10-30)
 
 The recorder observes microphone request, AudioContext creation, recording start/stop, close request and encoding; optional-practice Continue is also recorded during detailed capture. Permanent checkpoints retain only the latest audio stage. These hooks do not alter recognition/recording and collect no additional audio.
+
+## Interrupted Study speech (preview, 2026-11-01)
+
+Speech sentence gates export/import studyResumeState: attempts, feedback, transcript and Continue state. An interrupted starting/recording/busy operation restores idle with 录音已中断，可以重新录音，也可以继续。 No microphone is opened automatically and no audio bytes enter Study checkpoints. Disposing a Study runtime cancels its recorder; continuing the restored gate does not queue its already-completed grammar exercise again.

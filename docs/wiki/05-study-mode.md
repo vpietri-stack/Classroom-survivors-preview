@@ -491,3 +491,9 @@ Optional microphone practice in the notes is preview-only and does not gate or c
 ## Permanent session lifecycle (2026-10-30)
 
 After content checks, a real Study start allocates a practice run ID. Exercises and the existing completed-study event link to it. Completion, menu exit, account change and same-tab unfinished-page recovery produce distinct lifecycle records; inferred recovery is only a clue. These records do not grant target/SR credit. Stage breadcrumbs contain no ink, audio or submitted answers.
+
+## Interrupted Study continuation (preview, 2026-11-01)
+
+A real Study begins a checkpoint immediately after content checks, including the first recognition target before any exercise completes. Local snapshots follow interactions, pointer-up, ink movement (80 ms throttle) and a visible five-second heartbeat. Remote writes coalesce around five seconds; position changes and explicit pause/completion flush sooner, and a bounded keepalive is attempted on hide/pagehide. Gameplay never awaits persistence. A hard process kill may run no final handler: restore the latest valid saved checkpoint rather than promise unsaved milliseconds.
+
+Next login asks 看起来你上次的学习还没有完成，要继续吗？ with 是，继续学习 and 否，返回主菜单. No retains the menu continuation; a newly completed Study clears it. Recognition, spelling, handwriting, sentence speech, matching and mixed missing-word/find-fix boards resume through their existing controllers with original timing/attempts/partial state. A suspended microphone is idle on restore and explicitly retryable; no audio recording is persisted or restarted. Existing completed exercises and SR outcomes retain stable identities. Only Study has recovery; games retain their existing lifecycle.

@@ -9,7 +9,7 @@
   const STUDY_ADVANCE_MS = 1200;
   const $ = id => document.getElementById(id);
   let session = [], cursor = 0, input = [], activeBox = 0, selectedWord = null, binnedWord = null;
-  let letters = [], verdict = null, locked = false, solved = false, resetTimer = null, drag = null;
+  let letters = [], verdict = null, locked = false, solved = false, resetTimer = null, drag = null, resetDue = 0;
 
   function shuffle(items) {
     const copy = [...items];
@@ -46,7 +46,8 @@
     label.textContent = text;
     $('feedback').appendChild(label);
   }
-  function cancelTimer() { clearTimeout(resetTimer); resetTimer = null; }
+  function cancelTimer() { clearTimeout(resetTimer); resetTimer = null; resetDue = 0; }
+  function later(fn,ms) { resetDue=Date.now()+ms; resetTimer=setTimeout(()=>{resetTimer=null;resetDue=0;fn();},ms); }
   function clearDrag() {
     if (drag && drag.ghost) drag.ghost.remove();
     drag = null;
@@ -350,7 +351,7 @@
       exercise.firstAttempt = exercise.attempts === 1;
       renderProgress();
       message(exercise.firstAttempt ? '答对了！' : '答对了！稍后再复习这题。', 'success');
-      if (exercise.presentation === 'study') resetTimer = setTimeout(next, STUDY_ADVANCE_MS);
+      if (exercise.presentation === 'study') later(next, STUDY_ADVANCE_MS);
       else requestAnimationFrame(() => {
         if (current() !== exercise || !solved || !isActive()) return;
         $('result-action').scrollIntoView({ block: 'nearest', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
@@ -362,7 +363,7 @@
         : !verdict.word ? '单词选错了，但新单词拼对了。'
         : '单词选对了，请改正红色字母。';
       message(text, 'error');
-      resetTimer = setTimeout(resetAnswer, REVEAL_MS);
+      later(resetAnswer, REVEAL_MS);
     }
   }
   function finishSession() {
@@ -413,7 +414,18 @@
   }
 
 
-  function getState() { return { cursor, input: [...input], activeBox, binnedWord, locked, solved }; }
+  function getState() { return { cursor, input: [...input], activeBox, selectedWord, binnedWord, locked, solved,
+    letters:letters.slice(), verdict:verdict&&{...verdict}, attempts:current()&&current().attempts,
+    firstAttempt:current()&&current().firstAttempt, remainingMs:resetDue?Math.max(0,resetDue-Date.now()):null,
+    message:$('feedback')&&$('feedback').textContent, messageKind:$('feedback')&&$('feedback').classList.contains('success')?'success':$('feedback')&&$('feedback').classList.contains('error')?'error':'' }; }
+  function restoreState(saved) {
+    if(!saved||!Array.isArray(saved.input))return;
+    cancelTimer();input=saved.input.slice();activeBox=saved.activeBox;selectedWord=saved.selectedWord;binnedWord=saved.binnedWord;
+    locked=!!saved.locked;solved=!!saved.solved;letters=saved.letters.slice();verdict=saved.verdict;
+    current().attempts=saved.attempts||0;current().firstAttempt=saved.firstAttempt;current().complete=solved;
+    render();message(saved.message||'',saved.messageKind||'');
+    if(locked)later(solved?next:resetAnswer,Math.max(0,Math.min(saved.remainingMs==null?100:saved.remainingMs,3000)));
+  }
   function isActive() {
     if (!widgetRoot || !widgetRoot.isConnected) return false;
     const overlay = widgetRoot.closest('.overlay');
@@ -446,6 +458,7 @@
     cursor = 0;
     bindWidget();
     startExercise();
+    if (options.resumeState) restoreState(options.resumeState);
   }
   function handleKeyboard(event) {
     if (!isActive()) return;

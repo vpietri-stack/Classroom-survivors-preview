@@ -64,7 +64,15 @@
         } catch (_) {}
     }
     function error(message) { if (!owner || errorCount++ >= 5) return; event('error', { message: clean(message) }); save(); }
-    w.PracticeTelemetry = { attach: attach, detach: detach, start: start, complete: complete,
+    function resume(saved) {
+        if (!owner || !emit || !saved || !saved.id) return;
+        if (run && run.id !== saved.id) interrupt('another_run_resumed', false);
+        run = { id:saved.id, boot:boot, mode:'study', game:'study', startedAt:saved.startedAt || new Date().toISOString(),
+            lastActivityAt:new Date().toISOString(), checkpoint:saved.checkpoint || {} };
+        errorCount = 0; event('resume'); save();
+    }
+    w.PracticeTelemetry = { attach: attach, detach: detach, start: start, complete: complete, resume: resume,
+        snapshot: function () { return run ? JSON.parse(JSON.stringify(run)) : null; },
         interrupt: interrupt, checkpoint: checkpoint, current: function (game) { return run && (!game || run.game === game) ? run.id : null; } };
     w.addEventListener('error', function (e) { if (e.target === w) error(e.message + '\n' + (e.error && e.error.stack || '')); }, true);
     w.addEventListener('unhandledrejection', function (e) { var r = e.reason; error(r && typeof r.message === 'string' ? r.message : typeof r === 'string' ? r : 'Unhandled promise rejection'); });
