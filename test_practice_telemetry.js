@@ -9,6 +9,7 @@ function load(local=storage(),session=storage()){
 const events=[],p=load();p.api.attach({id:'student_a',role:'student'},e=>events.push(e));
 const first=p.api.start('study','study');p.api.checkpoint({round:'D',ex:'handwriting',word:'private-answer',audioPhase:'microphone-request'});
 check(first&&events.length===1&&events[0].phase==='start','real start gets a stable run ID');
+check(Object.keys(events[0].checkpoint).length===0,'earlier events keep their original checkpoint snapshot');
 check(p.api.current()===first,'exercises can reference current run');
 p.api.complete('study');p.api.complete('study');check(events.filter(e=>e.phase==='complete').length===1,'completion emitted once');
 const second=p.api.start('study','study');check(second!==first,'consecutive Study has a new identity');

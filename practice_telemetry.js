@@ -21,7 +21,7 @@
         try { emit({ phase: phase, runId: run && run.id || null, mode: run && run.mode || null,
             game: run && run.game || null, startedAt: run && run.startedAt || null,
             lastActivityAt: run && run.lastActivityAt || null,
-            checkpoint: run && run.checkpoint || {}, detail: detail || {} }); } catch (_) {}
+            checkpoint: Object.assign({}, run && run.checkpoint || {}), detail: detail || {} }); } catch (_) {}
     }
     function interrupt(reason, inferred) {
         if (!run) return;

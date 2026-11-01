@@ -22,7 +22,7 @@
             if (!e.runId) return;
             var r = runs.get(e.runId) || { id: e.runId, mode: e.mode, game: e.game, start: null, end: null };
             if (e.phase === 'start') r.start = e.timestamp;
-            if (e.phase === 'complete' || e.phase === 'interrupted') r.end = e;
+            if (e.phase === 'complete' || (e.phase === 'interrupted' && (!r.end || r.end.phase !== 'complete'))) r.end = e;
             runs.set(e.runId, r);
         });
         var list = Array.from(runs.values()).sort(function (a,b) { return String(b.start || b.end && b.end.timestamp).localeCompare(String(a.start || a.end && a.end.timestamp)); });
