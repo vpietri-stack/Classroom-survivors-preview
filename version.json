@@ -1,5 +1,5 @@
 {
-  "version": "2026-11-01c",
+  "version": "2026-11-01d",
   "deployedAt": "2026-11-01",
-  "notes": "Preview only: resume interrupted Study with Chinese login prompt, local and cloud checkpoints."
+  "notes": "Preview only: resume interrupted Gomoku and UNO with original board/cards, exercises and timers; retain Study recovery."
 }

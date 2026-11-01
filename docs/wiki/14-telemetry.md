@@ -228,3 +228,7 @@ Lifecycle checkpoints are immutable event snapshots. Teacher outcomes give a rec
 ## Recovery is functional persistence (preview, 2026-11-01)
 
 PracticeTelemetry.snapshot/resume preserve the original Study run across login without a second start or credited session. Resumption adds a phase=resume breadcrumb. Study recovery stores functional partial answers/ink independently from privacy-bounded diagnostics and independent of diagnostic expiry/opt-out. Existing exercise and completed-session records retain their normal queue/ack delivery; completed sessions use a stable original run identity. Diagnostic absence still does not prove a crash.
+
+## Resumed game accounting (preview, 2026-11-01)
+
+Resumed Gomoku/UNO retain their original PracticeTelemetry run and emit resume rather than another start. Stable session/exercise event identities protect queue redelivery. Functional snapshots include private partial answers independently from the redacted diagnostic stream and are erased on completion/replacement. Original win/loss and ignored-short-loss accounting remains authoritative; no recovery event alone grants credit.

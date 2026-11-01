@@ -8,6 +8,9 @@ let gomokuStartTime = 0;
 let gomokuAccumulatedTime = 0;
 let lastGomokuMove = null;
 let gomokuMode = 'regular';
+let gomokuAiTimeout=null, gomokuAiDue=0;
+function scheduleGomokuAi(ms=600){clearTimeout(gomokuAiTimeout);gomokuAiDue=Date.now()+ms;gomokuAiTimeout=setTimeout(()=>{gomokuAiTimeout=null;gomokuAiTurn();if(window.GameRuntime)GameRuntime.tick();},ms);}
+function startGomokuSpeedClock(remaining){clearInterval(gomokuSpeedInterval);gomokuNextAiTime=Date.now()+remaining;gomokuSpeedInterval=setTimeout(()=>{speedAiTurn();gomokuSpeedInterval=setInterval(()=>{speedAiTurn();if(window.GameRuntime)GameRuntime.tick();},currentGomokuSpeedIntervalTime);if(window.GameRuntime)GameRuntime.tick();},remaining);}
 let gomokuSpeedInterval = null;
 let currentGomokuSpeedIntervalTime = 10000;
 let gomokuNextAiTime = 0;
@@ -73,7 +76,9 @@ function showGomokuModeSelection() {
 }
 
 function triggerGomoku(mode = gomokuMode) {
-    if (window.PracticeTelemetry) PracticeTelemetry.start('game', 'gomoku');
+    if(window.StudyRecovery)StudyRecovery.pause();
+    if(window.GameRecovery&&!(window.GameRuntime&&GameRuntime.restoring()))GameRecovery.pause();
+    if (window.PracticeTelemetry && !(window.GameRuntime&&GameRuntime.restoring())) PracticeTelemetry.start('game', 'gomoku');
     if (mode) gomokuMode = mode;
     activeGameMode = 'Gomoku';
     // Undo VS HiDPI if it was active (drops the HiDPI window-resize listener);
@@ -122,12 +127,13 @@ function triggerGomoku(mode = gomokuMode) {
         const seconds = currentGomokuSpeedIntervalTime / 1000;
         updateGomokuStatus(`Speed Mode! AI plays every ${seconds}s`);
         gomokuNextAiTime = Date.now() + currentGomokuSpeedIntervalTime;
-        gomokuSpeedInterval = setInterval(speedAiTurn, currentGomokuSpeedIntervalTime);
+        startGomokuSpeedClock(currentGomokuSpeedIntervalTime);
     } else {
         updateGomokuStatus("Your turn!");
     }
 
     drawGomokuBoard();
+    if(window.GameRecovery&&!(window.GameRuntime&&GameRuntime.restoring()))GameRecovery.begin();
 
     if (window.gomokuTimerInterval) clearInterval(window.gomokuTimerInterval);
     window.gomokuTimerInterval = setInterval(updateGomokuTimer, 100);
@@ -498,7 +504,7 @@ function completeGomokuMove(success) {
     } else {
         gomokuTurn = 'ai';
         updateGomokuStatus("Computer thinking...");
-        setTimeout(gomokuAiTurn, 600);
+        scheduleGomokuAi(600);
     }
 }
 
@@ -693,6 +699,8 @@ function scoreLine(line, p) {
 
 // --- GAME OVER ---
 async function endGomokuGame(result) {
+    if(!gomokuGameActive)return;
+    clearTimeout(gomokuAiTimeout);
     gomokuGameActive = false;
     clearInterval(window.gomokuTimerInterval);
     if (gomokuSpeedInterval) clearInterval(gomokuSpeedInterval);
@@ -771,6 +779,8 @@ async function endGomokuGame(result) {
 }
 
 function exitGomokuGame() {
+    if(window.GameRecovery)GameRecovery.pause();
+    clearTimeout(gomokuAiTimeout);
     if (window.PracticeTelemetry) PracticeTelemetry.interrupt('game_exit', false);
     gomokuGameActive = false;
     clearInterval(window.gomokuTimerInterval);

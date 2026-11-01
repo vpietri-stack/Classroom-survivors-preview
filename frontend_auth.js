@@ -13,7 +13,7 @@ const API_BASE = API_BASE_URL;
 // The version watchdog (startVersionWatchdog) compares this to the live
 // version.json; a mismatch means stale WeChat builds never self-heal or
 // permanently nag. See DEPLOY_VERSION_STAMP.md. Bump BOTH together.
-const APP_VERSION = '2026-11-01c';
+const APP_VERSION = '2026-11-01d';
 
 // --- SESSION TOKEN (c) design) ---
 // The server mints a signed token on login. We store it in localStorage
@@ -221,6 +221,7 @@ function queueExerciseEvent(exerciseType, mode, itemDetails = null, customAttemp
     }
     
     if (window.StudyRecovery) StudyRecovery.decorate(event);
+    if (window.GameRecovery) GameRecovery.decorate(event);
     analyticsQueue.push(event);
     persistAnalyticsQueue();
     csPageHeartbeat({ ex: exerciseType, mode: mode });
@@ -247,9 +248,11 @@ function queueSessionEvent(sessionType, data) {
         ps: csPageSessionId // restart telemetry page-session stamp
     };
     if (window.StudyRecovery) StudyRecovery.decorate(event);
+    if (window.GameRecovery) GameRecovery.decorate(event);
     analyticsQueue.push(event);
     persistAnalyticsQueue();
     if (window.StudyRecovery) StudyRecovery.complete(event);
+    if (window.GameRecovery) GameRecovery.complete(event);
     if (window.PracticeTelemetry) PracticeTelemetry.complete(sessionType);
     csPageHeartbeat({ sess: sessionType });
     if (authActiveUser) {
@@ -1674,6 +1677,7 @@ async function selectAvatar(avatarEmoji) {
 
 function saveUserToLocalAndStart(user) {
     if (window.StudyRecovery && authActiveUser && authActiveUser.id !== user.id) StudyRecovery.detach();
+    if (window.GameRecovery && authActiveUser && authActiveUser.id !== user.id) GameRecovery.detach();
     if (window.PracticeTelemetry && authActiveUser && authActiveUser.id !== user.id) PracticeTelemetry.detach('account_changed');
     // Cross-account reset (2026-09-16): in-memory session leftovers (SR
     // pending triple, queue, page-session breadcrumb) belong to the PREVIOUS
@@ -1848,7 +1852,8 @@ function finishLogin() {
     } else {
         targetBanner.classList.add('hidden');
     }
-    if (window.StudyRecovery) StudyRecovery.onLogin(() => { if (window.PreviewNotes) PreviewNotes.onLogin(); });
+    const gameLookup = window.GameRecovery ? GameRecovery.onLogin(() => {},true) : Promise.resolve();
+    if (window.StudyRecovery) StudyRecovery.onLogin(() => { gameLookup.then(()=>{if(window.GameRecovery)GameRecovery.showOfferOr(()=>{if(window.PreviewNotes)PreviewNotes.onLogin();});else if(window.PreviewNotes)PreviewNotes.onLogin();}); });
     else if (window.PreviewNotes) PreviewNotes.onLogin();
 }
 
@@ -1894,6 +1899,7 @@ function resolveContentFromClassTime(classTime, studentName) {
 
 function goBackToProfiles() {
     if (window.StudyRecovery) StudyRecovery.detach();
+    if (window.GameRecovery) GameRecovery.detach();
     if (window.PreviewNotes) PreviewNotes.close();
     // Hide start screen and go back to profile selection
     document.getElementById('startScreen').classList.add('hidden');

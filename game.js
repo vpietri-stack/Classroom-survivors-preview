@@ -1,3 +1,4 @@
+function gameQuestionLater(kind,fn,ms){return window.GameRuntime&&typeof GAME_RESUME_ENABLED!=='undefined'&&GAME_RESUME_ENABLED?GameRuntime.later(kind,fn,ms):setTimeout(fn,ms);}
 // --- CONTENT MANAGEMENT ---
 let SPELLING_WORDS = [];
 let SIGHT_WORDS = [];
@@ -807,6 +808,8 @@ function applyVsPromo() {
 }
 
 function showGameSelection() {
+    if(window.GameRecovery)GameRecovery.pause();
+    if(window.GameRuntime&&GameRuntime.isActive())GameRuntime.suspend();
     // Reset all screens
     const screens = ['startScreen', 'gomokuScreen', 'gomokuGameOverScreen', 'gameOverScreen', 'gameIntroOverlay', 'vsCharSelect', 'studentManagerOverlay', 'studyModeOverlay', 'unoScreen', 'unoGameOverScreen', 'spellingGame', 'wordRecGame', 'sentenceMatchGame', 'levelUpMenu'];
     screens.forEach(id => {
@@ -1083,6 +1086,7 @@ function startMinigameCountdown(scene) {
 }
 
 function startMiniGame(type, context) {
+    if(window.GameRuntime)GameRuntime.newQuestion();
     rewardContext = context;
     isFirstAttempt = true;
     currentMinigameType = type;
@@ -1108,6 +1112,7 @@ function startMiniGame(type, context) {
 }
 
 function claimReward(success) {
+    if(window.GameRuntime&&!GameRuntime.claim())return;
     if (window.NonSpellingFlow) NonSpellingFlow.cleanupGame();
     // Stop countdown timer
     if (minigameCountdownInterval) {
@@ -1129,6 +1134,7 @@ function claimReward(success) {
 
     if (rewardContext === 'gomoku' || activeGameMode === 'Gomoku') {
         completeGomokuMove(success);
+        if(window.GameRuntime)GameRuntime.tick();
         return;
     }
 
@@ -1163,10 +1169,11 @@ function claimReward(success) {
 }
 
 // --- PLACEHOLDERS FOR LARGE CHUNKS ---
-function loadContent() {
+function loadContent(recoveryContent) {
     let book, unit, page;
 
-    if (typeof authActiveUser !== 'undefined' && authActiveUser && authActiveUser.book && authActiveUser.unit && authActiveUser.page) {
+    if(recoveryContent&&recoveryContent.book){book=recoveryContent.book;unit=String(recoveryContent.unit);page=String(recoveryContent.page);selectedClassContent={book,unit,page};}
+    else if (typeof authActiveUser !== 'undefined' && authActiveUser && authActiveUser.book && authActiveUser.unit && authActiveUser.page) {
         book = authActiveUser.book;
         unit = authActiveUser.unit.toString();
         page = authActiveUser.page.toString();
@@ -1244,13 +1251,13 @@ var srLastServedKey = { vocab: null, sentences: null };
 
 // --- MINIGAMES ---
 
-function startSpellingGame() {
+function startSpellingGame(recoveryWord) {
     if (SPELLING_WORDS.length === 0) { handleMinigameSuccess('spelling'); return; }
     startExerciseTracking();
 
     // SR-aware selection
     const { book, unit, page } = selectedClassContent;
-    let word = getGameItemSR(book, unit, page, 'vocab', srInSessionFailures, srInSessionSuccesses, srLastServedKey.vocab);
+    let word = typeof recoveryWord==='string'?recoveryWord:getGameItemSR(book, unit, page, 'vocab', srInSessionFailures, srInSessionSuccesses, srLastServedKey.vocab);
     // SR can return undefined when everything is on cooldown or already
     // succeeded this session — fall back to any loaded word, never crash.
     if (!word) word = SPELLING_WORDS[Math.floor(Math.random() * SPELLING_WORDS.length)];
@@ -1501,6 +1508,7 @@ function removeSpellingLetter(slotFullIdx) {
 }
 
 function clearSpelling() {
+    if(window.GameRuntime)GameRuntime.cancelLater('spelling');
     const gameEl = document.getElementById('spellingGame');
     // Block CLEAR only during the success transition (when the result action is
     // shown) — during a WRONG reveal, allow CLEAR to skip the 5s wait.
@@ -1565,7 +1573,7 @@ function checkSpelling() {
         incrementExerciseAttempts();
 
         if (gameEl._spellingResetTimer) clearTimeout(gameEl._spellingResetTimer);
-        gameEl._spellingResetTimer = setTimeout(() => {
+        gameEl._spellingResetTimer = gameQuestionLater('spelling',() => {
             if (document.getElementById('spelling-result-action').classList.contains('hidden')) {
                 const n = JSON.parse(gameEl.dataset.letters).length;
                 gameEl.dataset.placement = JSON.stringify(new Array(n).fill(undefined));
@@ -1581,12 +1589,12 @@ function checkSpelling() {
 let recTimer;
 let recTimeLeft;
 
-function startWordRecGame() {
+function startWordRecGame(recoveryTarget) {
     if (SIGHT_WORDS.length === 0) { handleMinigameSuccess('rec'); return; }
 
     // Weighted selection
     const { book, unit, page } = selectedClassContent;
-    const target = getWeightedItemForGame(book, unit, page, 'vocab');
+    const target = typeof recoveryTarget==='string'?recoveryTarget:getWeightedItemForGame(book, unit, page, 'vocab');
 
     currentTTSWord = target;
     showTranslation('rec-translation', target);
@@ -1648,7 +1656,7 @@ function checkWordRec(selected, target, btn) {
     } else {
         synthError();
         btn.classList.add('bg-red-500', 'shake');
-        setTimeout(() => {
+        gameQuestionLater('rec',() => {
             btn.classList.remove('bg-red-500', 'shake');
             startWordRecGame();
         }, 500);
@@ -1789,6 +1797,7 @@ function deleteGrammarWord(item) {
 }
 
 function clearGrammar() {
+    if(window.GameRuntime)GameRuntime.cancelLater('grammar');
     // CLEAR works even while frozen (e.g. during the post-check reveal): it
     // cancels the pending reset and returns every placed word to the dock so
     // the player can start over.
@@ -1960,7 +1969,7 @@ function checkGrammar() {
         // the reset must RESTORE tiles — merely removing them would lose words.)
         grammarGameEl().dataset.frozen = "true";
         if (grammarGameEl()._grammarResetTimer) clearTimeout(grammarGameEl()._grammarResetTimer);
-        grammarGameEl()._grammarResetTimer = setTimeout(() => {
+        grammarGameEl()._grammarResetTimer = gameQuestionLater('grammar',() => {
             const dock = document.getElementById('word-dock');
             document.querySelectorAll('.drop-zone').forEach(zone => {
                 zone.querySelectorAll('.draggable.placed').forEach(p => {
@@ -2166,7 +2175,7 @@ function checkSentenceMatch() {
         gameEl.dataset.pairAttempts = JSON.stringify(pairAttempts);
 
         // Reset after 2 seconds
-        setTimeout(() => {
+        gameQuestionLater('match',() => {
             const tiles = document.querySelectorAll('.gm-sentence-b-tile');
             tiles.forEach(tile => {
                 returnGameModeTileToDock(tile);

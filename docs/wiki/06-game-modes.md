@@ -159,3 +159,11 @@ The shared typed widget renders apostrophe-led contraction answers beside their 
 ## Permanent session lifecycle (2026-10-30)
 
 UNO, Gomoku and Vampire Survivors allocate a practice run ID on actual start and close it through their existing completed-session event or explicit exit. Replays create distinct runs. A stale completion cannot claim another game's run. Lifecycle records grant no extra session/SR credit; starts without ends are not confirmed crashes.
+
+## Interrupted Gomoku / UNO (preview, 2026-11-01)
+
+GAME_RESUME_ENABLED follows the preview/local recovery gate; production paths cannot enable it by URL. Gomoku saves all 225 cells, mode/difficulty, turn, pending stone, viewport, remaining normal/speed AI delay and active duration. UNO saves all hands, ordered deck/discard, direction, penalties, chosen colours, vulnerability/free-play flags, active duration and exercise deadline. Time away does not consume the saved clocks.
+
+UNO keeps serializable intents during dealing, card flights and penalty/reward animations, then checkpoints the resulting turn. Restoration finishes or replays the interrupted transition from its saved pre-transaction state; visual animations may replay. A card in flight is retained separately, and initial discard selection is preserved. Remaining AI/turn/tension delays are rebuilt. Old scene timers and microphones are disposed before restoration; replayed actions block competing input. Both game-over paths guard repeated callbacks.
+
+The current spelling, recognition, sentence scramble/speech, sentence match, missing-word and find/fix question is included in the same checkpoint as its pending move/card reward. Partial answers, choices, attempts, SR outcomes, feedback, pending reset and Continue state are restored. Claiming a question is guarded once. Game session event IDs derive from the original practice run; exercise IDs also include question identity. Existing win/loss/two-minute target rules remain unchanged. Vampire Survivors, Tower Defense and the 3D beta have no recovery in this release.

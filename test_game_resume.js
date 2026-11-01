@@ -1,0 +1,42 @@
+const assert=require('assert'),{HttpRequest}=require('./api/node_modules/@azure/functions');
+const auth=require('./api/src/functions/shared/auth'),core=require('./api/src/functions/shared/gameResumeCore');
+const {makeHandler}=require('./api/src/functions/gameResume');
+process.env.SESSION_SECRET='game-resume-unit-only';delete process.env.APP_API_KEY;let count=0,writes=0,etag=0;const docs=new Map(),profiles=new Map();
+const ok=(v,s)=>{assert.ok(v,s);count++;console.log('PASS '+s);};
+const store={item(id,pk){return{read:async()=>{const d=docs.get(pk);if(!d)throw{code:404};return{resource:structuredClone(d)};},replace:async(d,o)=>{const old=docs.get(pk);if(o.accessCondition.condition!==old._etag)throw{code:412};writes++;d._etag=String(++etag);docs.set(pk,structuredClone(d));return{resource:d};}}},items:{create:async d=>{if(docs.has(d.studentId))throw{code:409};d._etag=String(++etag);docs.set(d.studentId,structuredClone(d));writes++;return{resource:d};}}};
+const handler=makeHandler(()=>store,async id=>profiles.get(id)||{},()=>true),disabled=makeHandler(()=>store,async()=>({}),()=>false);
+const token=(id,role='student')=>auth.signToken({sub:id,role},process.env.SESSION_SECRET);
+async function call(method,body,who='student_a',query='',h=handler){return h(new HttpRequest({method,url:'http://localhost/api/gameResume'+query,headers:{Origin:'http://localhost:8888',...(who?{'X-Auth-Token':token(who,who==='teacher'?'admin':'student')}:{})},body:body?{string:JSON.stringify(body)}:undefined}),{warn(){}});}
+function snap(run='run_a',writer='writer_a',seq=1,known=[]){return{schema:1,owner:'student_a',runId:run,writerId:writer,seq,createdAt:Date.now(),updatedAt:Date.now(),knownCompletions:known,game:'gomoku',state:{board:Array.from({length:15},()=>Array(15).fill(0)),mode:'regular',turn:'player'},elapsedMs:20,exercise:{attempts:1,elapsedMs:20},ui:{cSlots:[],cBank:[]},srResults:[],usedPairKeys:[]};}
+(async()=>{
+ ok((await call('GET',null,null)).status===401,'authentication required even in legacy mode');
+ ok((await call('GET',null,'student_a','?studentId=student_b')).status===403,'another student cannot read the checkpoint');
+ ok(!(await call('GET',null,'student_a','',disabled)).jsonBody.enabled,'backend remains disabled until preview configuration enables it');
+ let s=snap();ok(core.validate(s,'student_a'),'valid versioned snapshot accepted');
+ ok(!core.validate({...s,owner:'student_b'},'student_a'),'owner mismatch rejected');
+ ok(core.validate({...s,owner:'student_小明@example.cn'},'student_小明@example.cn'),'Chinese and email-style account identifiers remain supported');
+ ok(!core.validate({...s,unexpected:'secret'},'student_a'),'unknown top-level fields rejected');
+ ok(!core.validate({...s,ui:{text:'<img src=x onerror=alert(1)>'}},'student_a'),'untrusted markup rejected');
+ ok(!core.validate({...s,ui:{password:'secret'}},'student_a'),'credentials cannot enter saved state');
+ ok(!core.validate({...s,srResults:new Array(201).fill({})},'student_a'),'unbounded result history rejected');
+ ok((await call('POST',{action:'begin',runId:s.runId,baseVersion:0,snapshot:s})).status===200,'initial checkpoint stored');
+ const before=writes;await call('POST',{action:'checkpoint',runId:s.runId,snapshot:s});ok(writes===before,'identical save retry does not rewrite data');
+ s={...s,seq:2};ok((await call('POST',{action:'checkpoint',runId:s.runId,snapshot:s})).status===200,'new revision accepted for the current writer');
+ const other={...s,seq:3,writerId:'writer_b'};ok((await call('POST',{action:'checkpoint',runId:s.runId,snapshot:other})).status===409,'another page cannot overwrite the active writer');
+ ok((await call('POST',{action:'claim',runId:s.runId,baseVersion:1,snapshot:other})).status===409,'stale takeover requires a fresh checkpoint version');
+ const v=(await call('GET')).jsonBody.version;ok((await call('POST',{action:'claim',runId:s.runId,baseVersion:v,snapshot:other})).status===200,'explicit continuation can claim the current checkpoint');
+ ok((await call('POST',{action:'checkpoint',runId:s.runId,snapshot:{...s,seq:4}})).status===409,'old page loses write ownership after continuation elsewhere');
+ const profile={};core.completion(profile,[{type:'session',sessionType:'gomoku',eventId:'done',timestamp:new Date().toISOString(),data:{gameRunId:s.runId}}],['done']);profiles.set('student_a',profile);
+ ok(!(await call('GET')).jsonBody.snapshot,'accepted completion hides a stale pending checkpoint');
+ ok((await call('POST',{action:'claim',runId:s.runId,baseVersion:v,snapshot:other})).status===410,'a completed session cannot be resurrected');
+ let newer=snap('run_new','writer_c',1,[s.runId]);ok((await call('POST',{action:'begin',runId:newer.runId,baseVersion:0,supersedesRunId:s.runId,snapshot:newer})).status===200,'new game can replace an earlier unfinished session');
+ ok((await call('POST',{action:'complete',runId:newer.runId})).status===200,'completion creates a durable tombstone');
+ ok(!(await call('GET')).jsonBody.snapshot,'completed game has no resume offer');
+ const next=snap('run_next','writer_c',1,[s.runId,newer.runId]);ok((await call('POST',{action:'begin',runId:next.runId,baseVersion:0,snapshot:next})).status===200,'a lost completion acknowledgement cannot block the next game');
+ const oldMarker=profile.gameRecoveryCompletion;core.completion(profile,[{type:'session',sessionType:'gomoku',eventId:'duplicate',timestamp:new Date().toISOString(),data:{gameRunId:'wrong'}}],[]);ok(profile.gameRecoveryCompletion===oldMarker,'duplicate events do not change the completion receipt');
+ const legacy={};core.completion(legacy,[{type:'session',sessionType:'gomoku',eventId:'legacy_study',timestamp:new Date().toISOString(),data:{}}],['legacy_study']);ok(legacy.gameRecoveryCompletion.runId==='legacy_study','a completed game from an older client also clears an earlier resume offer');
+ const done={type:'session',sessionType:'uno',eventId:'g1',data:{gameRunId:'r1'}};ok(!core.canCredit([done],[]),'a duplicate recovered completion cannot increment a second time with a new SR sequence');ok(core.canCredit([done],['g1']),'newly accepted recovered completion retains normal credit');ok(core.canCredit([{type:'session',eventId:'s1',sessionType:'study',data:{}}],['s1']),'ordinary Study credit is unchanged');
+ const badUno={...s,game:'uno',state:{deck:[{color:'invalid',type:'number',value:1}],discard:[],players:[[],[],[],[]],currentPlayer:0,direction:1}};ok(!core.validate(badUno,'student_a'),'unknown card types and colours cannot enter the recovery state');ok(!core.validate({...badUno,state:{...badUno.state,deck:[],task:{kind:'arbitraryMethod',args:[]}}},'student_a'),'continuations are limited to known game actions');
+ const fs=require('fs'),vm=require('vm');function gate(pathname,search=''){const c={location:{hostname:'vpietri-stack.github.io',pathname,search,protocol:'https:'},URLSearchParams};c.window=c;vm.createContext(c);vm.runInContext(fs.readFileSync('config.js','utf8'),c);return vm.runInContext('GAME_RESUME_ENABLED',c);}ok(gate('/Classroom-survivors-preview/'),'preview can enable game recovery');ok(!gate('/Classroom-survivors/','?gameResume=1&resume=1'),'production cannot enable game recovery through URL parameters');ok(!gate('/Classroom-survivors-preview/','?gameResume=0'),'preview can exercise the original game behavior explicitly');
+ console.log('Game resume API/core: '+count+' checks passed.');
+})().catch(e=>{console.error(e);process.exitCode=1});

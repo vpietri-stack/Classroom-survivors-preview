@@ -94,3 +94,6 @@ const STUDY_RESUME_ENABLED = (() => {
     return (local || /^\/Classroom-survivors-preview(?:\/|$)/i.test(window.location.pathname))
         && new URLSearchParams(window.location.search).get('resume') !== '0';
 })();
+
+// Preview-only Gomoku and UNO continuation.
+const GAME_RESUME_ENABLED = STUDY_RESUME_ENABLED && new URLSearchParams(window.location.search).get('gameResume') !== '0';

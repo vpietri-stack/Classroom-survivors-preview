@@ -403,3 +403,7 @@ The recorder observes microphone request, AudioContext creation, recording start
 ## Interrupted Study speech (preview, 2026-11-01)
 
 Speech sentence gates export/import studyResumeState: attempts, feedback, transcript and Continue state. An interrupted starting/recording/busy operation restores idle with 录音已中断，可以重新录音，也可以继续。 No microphone is opened automatically and no audio bytes enter Study checkpoints. Disposing a Study runtime cancels its recorder; continuing the restored gate does not queue its already-completed grammar exercise again.
+
+## Game speech continuation (preview, 2026-11-01)
+
+GameRuntime reconstructs the accepted sentence and imports the existing speech gate recovery state without re-running checkGrammar or crediting its answer twice. An interrupted microphone remains idle with explicit retry/Continue. Functional recovery stores feedback/attempts only, never microphone audio, and cancels abandoned recorder callbacks.

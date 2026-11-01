@@ -424,7 +424,7 @@
     locked=!!saved.locked;solved=!!saved.solved;letters=saved.letters.slice();verdict=saved.verdict;
     current().attempts=saved.attempts||0;current().firstAttempt=saved.firstAttempt;current().complete=solved;
     render();message(saved.message||'',saved.messageKind||'');
-    if(locked)later(solved?next:resetAnswer,Math.max(0,Math.min(saved.remainingMs==null?100:saved.remainingMs,3000)));
+    if(locked&&(!solved||current().presentation==='study'))later(solved?next:resetAnswer,Math.max(0,Math.min(saved.remainingMs==null?100:saved.remainingMs,3000)));
   }
   function isActive() {
     if (!widgetRoot || !widgetRoot.isConnected) return false;

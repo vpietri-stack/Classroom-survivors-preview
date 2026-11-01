@@ -473,3 +473,7 @@ Publish only diagnostic/lifecycle changes on each environment's existing history
 This rollout is preview-only. Frontend is based on preview/main and published only to the Classroom-survivors-preview repository. The API is deployed through existing draft PR #1/admin-dashboard-update to SWA environment 1; never merge that PR merely to update staging. Keep separate histories and all preview speech/curriculum work.
 
 Environment 1 uses Val-EslApp / Students-admin-dashboard-preview with STUDY_RESUME_ENABLED=true and COSMOS_STUDY_RESUME_CONTAINER=study_resume_preview. Local verification uses Val-EslApp-Test / Students / study_resume_test. Containers share database throughput, partition by /studentId and exclude checkpoint contents from indexes. Production has no recovery flag/container setting and frontend config never enables recovery on the production path. User review precedes any later production activation.
+
+## Gomoku / UNO recovery preview extension (2026-11-01)
+
+Keep the existing isolated preview deployment: frontend from preview/main to the preview repository only; backend through draft PR #1/admin-dashboard-update to SWA environment 1 only. Add GAME_RESUME_ENABLED=true on environment 1 and reuse study_resume_preview; no new throughput/container is provisioned. Local tests use study_resume_test in Val-EslApp-Test. Production has no game recovery setting. Synchronize stamps and changed script queries, verify served bytes plus both hosted game flows, and await user review before any production rollout.

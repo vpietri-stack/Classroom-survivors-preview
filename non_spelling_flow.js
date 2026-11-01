@@ -86,12 +86,12 @@
         document.getElementById('grammarGame').classList.remove('nse-typed');
         typedGame = null;
     }
-    function startGame() {
+    function startGame(recovery) {
         if (!enabled() || !selectedClassContent) return false;
         cleanupGame();
         if (gameResultsOwner !== srGameResults) { gameResultsOwner = srGameResults; lastGameKey = null; }
         const { book, unit, page } = selectedClassContent;
-        const item = NonSpellingContent.select(book, unit, page, 1, {
+        const item = recovery?recovery.item:NonSpellingContent.select(book, unit, page, 1, {
             failures: srInSessionFailures, successes: srInSessionSuccesses, avoidKey: lastGameKey
         })[0];
         if (!item) return false;
@@ -115,9 +115,10 @@
         instruction.textContent = item.type === 'missing-word' ? '点击空格，用字母补全单词。' : '找出用错的单词并改正。';
         // The instruction belongs to the widget and is removed with it.
         startExerciseTracking();
-        const tracking = { recorded: false };
+        const tracking = { recorded: !!(recovery&&recovery.recorded) };
+        typedGame.item=item;typedGame.tracking=tracking;
         NonSpellingWidget.mount(container, item, {
-            presentation: 'game',
+            presentation: 'game', resumeState: recovery&&recovery.widget||null,
             nextLabel: rewardContext === 'gomoku' || rewardContext === 'uno' || activeGameMode === 'Gomoku' || activeGameMode === 'Uno' ? 'CONTINUE!' : 'GET POWER UP!',
             onCheck: result => {
                 recordTyped(item, 'game', result, tracking);
@@ -128,5 +129,5 @@
         document.getElementById('exercise-widget').prepend(instruction);
         return true;
     }
-    window.NonSpellingFlow = { enabled, prepareStudy, beginStudy, advanceStudy, restoreStudy: saved => { STUDY_STATE._mixedActive=true; document.getElementById('studyModeOverlay').classList.add('nse-mixed'); nextStudy(true,saved); }, cleanupStudy, startGame, cleanupGame };
+    window.NonSpellingFlow = { enabled, prepareStudy, beginStudy, advanceStudy, restoreStudy: saved => { STUDY_STATE._mixedActive=true; document.getElementById('studyModeOverlay').classList.add('nse-mixed'); nextStudy(true,saved); }, cleanupStudy, startGame, cleanupGame, restoreGame:saved=>startGame(saved), gameState:()=>typedGame?{item:typedGame.item,recorded:typedGame.tracking.recorded,widget:NonSpellingWidget.getState()}:null };
 })();

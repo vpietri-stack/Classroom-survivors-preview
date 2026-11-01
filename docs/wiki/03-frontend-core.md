@@ -397,3 +397,7 @@ PU2 Unit 2 preview 2026-10-15b corrects the page 19 matching pair to Tuesday com
 ## Study recovery state boundary (preview, 2026-11-01)
 
 StudyRuntime rebuilds controls using normal renderers, never stored HTML. Snapshots retain the chosen plan/order, partial inputs, locked feedback, attempts, remaining transition timer, SR outcomes, handwriting points and speech gate feedback. Handwriting exportRecovery/restoreTrace preserves functional raw normalized points separately from the consented research takeTrace. NonSpellingWidget.getState/options.resumeState and NonSpellingFlow.restoreStudy preserve typed boards without replaying checks. Tracked timers and a runtime epoch prevent abandoned callbacks from advancing a restored exercise.
+
+## Recoverable game controls (preview, 2026-11-01)
+
+Gomoku and UNO use GameRuntime alongside StudyRuntime. Spelling and recognition accept an optional saved target; loadContent accepts an optional original course. Grammar/matching restore tile order and feedback; NonSpellingFlow.gameState/restoreGame rebuild typed questions with original item, first-check outcome and partial input. A solved game widget waits for Continue; only Study widgets auto-advance. Semantic quiz timers have cancellation/epoch guards. Interrupted speaking restores idle for explicit retry without audio. Graphics, layout and textures are rebuilt for the current screen.

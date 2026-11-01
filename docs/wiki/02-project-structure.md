@@ -249,3 +249,7 @@ curriculum/widget/styles, rather than duplicating exercise implementations.
 ## Study recovery (preview, 2026-11-01)
 
 Study recovery is separate from diagnostic collection: study_recovery.js owns local/cloud saves, login choice and account isolation; study_runtime.js owns serializing and rebuilding the existing controls; study_recovery.css styles the Chinese prompt. The shared api/src/functions/shared/studyResumeCore.js validates the same bounded checkpoint in browser and API. studyResume.js exposes the signed checkpoint endpoint.
+
+## Gomoku and UNO continuation (preview, 2026-11-01)
+
+game_recovery.js owns the independent game checkpoint, Chinese login choice and menu buttons. game_runtime.js serializes logical board/card/quiz state and reconstructs controls using existing renderers. Shared gameResumeCore.js validates the bounded payload; gameResume.js provides signed self-only writes. No Phaser objects, saved HTML or media are persisted.

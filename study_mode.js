@@ -64,6 +64,7 @@ function showStudyNotice(msg) {
 
 // Entry point
 function initStudyMode(options = {}) {
+    if(window.GameRecovery)GameRecovery.pause();
     const notePlan = window.PreviewNotes && options.previewNoteId ? PreviewNotes.prepareStudy(options.previewNoteId) : null;
     if (options.previewNoteId && !notePlan) return false;
     if (window.ClientDiagnostics) ClientDiagnostics.checkpoint('study-start', { mode: 'study', active: true, word: '', letter: '' });

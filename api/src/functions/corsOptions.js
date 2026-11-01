@@ -8,7 +8,7 @@ const API_ROUTES = [
     'getStudents',
     'saveAnalytics',
     'clientDiagnostics',
-    'studyResume',
+    'studyResume', 'gameResume',
     'addStudent',
     'updateStudent',
     'setTargets',

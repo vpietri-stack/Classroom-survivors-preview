@@ -9,6 +9,7 @@ const UNO_ESL_TIME_LIMIT = 20000;
 
 // Expose these for external UI interactions (ESL, menus)
 let unoGameActive = false;
+let unoLaunchEpoch = 0;
 let unoStartTime = 0;
 let unoAccumulatedTime = 0;
 let unoWinner = null;
@@ -337,6 +338,9 @@ class UnoScene extends Phaser.Scene {
             if (el) el.innerText = String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
         }, 1000);
 
+        if(window.GameRuntime&&GameRuntime.initUno(this))return;
+        if(window.GameRuntime)GameRuntime.deal(this,0);
+        if(window.GameRecovery)GameRecovery.begin();
         // Start sequential dealing animation
         this.dealNext(0, () => {
             this.isProcessing = false;
@@ -346,6 +350,7 @@ class UnoScene extends Phaser.Scene {
 
     dealNext(step, cb) {
         if (!unoGameActive) return;
+        if(window.GameRuntime)GameRuntime.deal(this,step);
         if (step >= 28) {
             // Dealing finished. Now deal the first discard card.
             let first = this.deck.pop();
@@ -354,6 +359,7 @@ class UnoScene extends Phaser.Scene {
                 this.shuffleArr(this.deck);
                 first = this.deck.pop();
             }
+            if(window.GameRuntime)GameRuntime.initialDiscard(this,first);
             // Animate card from deck to discard
             this.animatePlay(first.tex, this.layout.deck.x, this.layout.deck.y, () => {
                 this.discard.push(first);
@@ -641,6 +647,7 @@ class UnoScene extends Phaser.Scene {
                 sayBtn.innerText = 'SAY UNO! 📣';
                 sayBtn.onclick = () => {
                     this.vulnerable[0] = false;
+                    if(window.GameRuntime)GameRuntime.updateUnoFlags(this);
                     sayBtn.remove();
                     this.playUnoSaySound();
                     this.unoCallout(0);
@@ -778,7 +785,7 @@ class UnoScene extends Phaser.Scene {
             this.snapEnabled = true;
             this.setStatus(this.playerNames[p] + "'s turn...");
             this.renderAll();
-            this.addTurnTimer(this.time.delayedCall(UNO_AI_DELAY, () => this.aiTurn(p)));
+            this._recoveryAiTimer=this.addTurnTimer(this.time.delayedCall(UNO_AI_DELAY, () => this.aiTurn(p)));
         }
     }
 
@@ -845,6 +852,7 @@ class UnoScene extends Phaser.Scene {
             
             this.renderAll(); // refresh hand
 
+            if(window.GameRuntime)GameRuntime.pendingEffect(this,0,card);
             this.animatePlay(card.tex, startX, this.layout.playerHandY, () => {
                 this.handleCardEffect(0, card);
             });
@@ -862,6 +870,7 @@ class UnoScene extends Phaser.Scene {
             this.renderAll(); 
             
             const nextPlayer = (this.currentPlayer + this.direction + 4) % 4;
+            if(window.GameRuntime)GameRuntime.transition(this,nextPlayer,1000);
             this.addTurnTimer(this.time.delayedCall(1000, () => {
                 this.currentPlayer = nextPlayer;
                 this.startTurn();
@@ -930,6 +939,7 @@ class UnoScene extends Phaser.Scene {
         if (card.type === 'skip' || card.type === 'reverse' || card.type === '+2' || card.type === '+4') {
             delay += 500;
         }
+        if(window.GameRuntime)GameRuntime.transition(this,nextPlayer,delay,pi);
         this.addTurnTimer(this.time.delayedCall(delay, () => {
             // Clear vulnerability if they missed the catch window
             if (pi > 0 && this.vulnerable[pi]) {
@@ -1078,6 +1088,7 @@ class UnoScene extends Phaser.Scene {
                     this.renderAll();
                     this.currentPlayer = 0; // Snap steals turn
                     const nextPlayer = (this.currentPlayer + this.direction + 4) % 4;
+                    if(window.GameRuntime)GameRuntime.transition(this,nextPlayer,500);
                     this.addTurnTimer(this.time.delayedCall(500, () => {
                         this.currentPlayer = nextPlayer;
                         this.startTurn();
@@ -1115,6 +1126,7 @@ class UnoScene extends Phaser.Scene {
                     this.renderAll();
                     
                     const nextPlayer = (this.currentPlayer + this.direction + 4) % 4;
+                    if(window.GameRuntime)GameRuntime.transition(this,nextPlayer,1000);
                     this.addTurnTimer(this.time.delayedCall(1000, () => {
                         this.currentPlayer = nextPlayer;
                         this.startTurn();
@@ -1145,6 +1157,7 @@ class UnoScene extends Phaser.Scene {
                     hand.splice(pk.i, 1);
                     this.renderAll();
 
+                    if(window.GameRuntime)GameRuntime.pendingEffect(this,pi,card);
                     this.animatePlay('card_back', this.layout.aiX[pi-1], this.layout.aiY[pi-1], () => {
                         this.handleCardEffect(pi, card);
                     });
@@ -1161,6 +1174,7 @@ class UnoScene extends Phaser.Scene {
                                 this.addTurnTimer(this.time.delayedCall(800, () => this.tensionBlackCardESL()));
                             } else {
                                 const nextPlayer = (this.currentPlayer + this.direction + 4) % 4;
+                                if(window.GameRuntime)GameRuntime.transition(this,nextPlayer,1000);
                                 this.addTurnTimer(this.time.delayedCall(1000, () => {
                                     this.currentPlayer = nextPlayer;
                                     this.startTurn();
@@ -1182,6 +1196,7 @@ class UnoScene extends Phaser.Scene {
                         this.renderAll();
                         const nextPlayer = (this.currentPlayer + this.direction + 4) % 4;
                         let delay = (this.currentPlayer !== 0) ? 700 : 500;
+                        if(window.GameRuntime)GameRuntime.transition(this,nextPlayer,delay);
                         this.addTurnTimer(this.time.delayedCall(delay, () => {
                             this.currentPlayer = nextPlayer;
                             this.startTurn();
@@ -1203,6 +1218,7 @@ class UnoScene extends Phaser.Scene {
             hand.splice(pk.i, 1);
             this.renderAll();
 
+            if(window.GameRuntime)GameRuntime.pendingEffect(this,pi,card);
             this.animatePlay('card_back', this.layout.aiX[pi-1], this.layout.aiY[pi-1], () => {
                 this.handleCardEffect(pi, card);
             });
@@ -1216,6 +1232,7 @@ class UnoScene extends Phaser.Scene {
         }
         if (this.players[pi].length === 0) {
             unoWinner = pi; 
+            if(window.GameRuntime)GameRuntime.win(this,pi);
             this.renderAll(); 
             this.time.delayedCall(800, () => this.endUno(pi)); 
             return true;
@@ -1537,26 +1554,30 @@ class UnoScene extends Phaser.Scene {
     playUnoSaySound() { if (typeof osc === 'function') { osc('sine', 600, 0.2, 0.1); setTimeout(() => osc('sine', 800, 0.2, 0.2), 100); } }
 
     // --- ESL ---
-    tensionBlackCardESL() {
+    tensionBlackCardESL(remaining=3000) {
+        if(window.GameRuntime)GameRuntime.tension(this,remaining);
+        if(this._tensionInterval)clearInterval(this._tensionInterval);
+        const tensionEnd=Date.now()+remaining;
         this.isProcessing = true;
         this.snapEnabled = false;
         document.getElementById('unoTensionOverlay').classList.remove('hidden');
-        let count = 3;
+        let count = Math.max(1,Math.ceil(remaining/1000));
         document.getElementById('unoTensionCountdown').innerText = count;
         if (typeof osc === 'function') { osc('triangle', 300, 0.4, 0.3); setTimeout(() => osc('square', 250, 0.4, 0.4), 100); }
 
-        const iv = setInterval(() => {
-            count--;
+        const iv = this._tensionInterval = setInterval(() => {
+            count=Math.ceil((tensionEnd-Date.now())/1000);
             if (count > 0) {
                 document.getElementById('unoTensionCountdown').innerText = count;
-                if (typeof osc === 'function') osc('triangle', 300 + (3 - count) * 50, 0.4, 0.2);
+                if (typeof osc === 'function' && count!==this._lastTensionCount) osc('triangle', 300 + (3 - count) * 50, 0.4, 0.2);
+                this._lastTensionCount=count;
             } else {
                 clearInterval(iv);
                 document.getElementById('unoTensionOverlay').classList.add('hidden');
                 if (typeof osc === 'function') osc('square', 600, 0.3, 0.4);
                 this.triggerUnoESL('black');
             }
-        }, 1000);
+        }, 100);
     }
 
     triggerUnoESL(ctx) {
@@ -1595,6 +1616,7 @@ class UnoScene extends Phaser.Scene {
                     this.drawCards(0, 1);
                     const nextPlayer = (this.currentPlayer + this.direction + 4) % 4;
                     this.renderAll();
+                    if(window.GameRuntime)GameRuntime.transition(this,nextPlayer,500);
                     this.addTurnTimer(this.time.delayedCall(500, () => {
                         this.currentPlayer = nextPlayer;
                         this.startTurn();
@@ -1606,6 +1628,7 @@ class UnoScene extends Phaser.Scene {
                     this.drawCards(0, 2);
                     const nextPlayer = (this.currentPlayer + this.direction + 4) % 4;
                     this.renderAll();
+                    if(window.GameRuntime)GameRuntime.transition(this,nextPlayer,500);
                     this.addTurnTimer(this.time.delayedCall(500, () => {
                         this.currentPlayer = nextPlayer;
                         this.startTurn();
@@ -1625,6 +1648,7 @@ class UnoScene extends Phaser.Scene {
                     this.currentPlayer = 0;
                     const nextPlayer = (this.currentPlayer + this.direction + 4) % 4;
                     this.renderAll();
+                    if(window.GameRuntime)GameRuntime.transition(this,nextPlayer,500);
                     this.addTurnTimer(this.time.delayedCall(500, () => {
                         this.currentPlayer = nextPlayer;
                         this.startTurn();
@@ -1635,6 +1659,7 @@ class UnoScene extends Phaser.Scene {
     }
 
     async endUno(winner) {
+        if(!unoGameActive)return;
         unoGameActive = false;
         if (window.unoTimerInterval) clearInterval(window.unoTimerInterval);
         unoAccumulatedTime += (Date.now() - unoStartTime);
@@ -1713,6 +1738,8 @@ class UnoScene extends Phaser.Scene {
     }
 
     cleanupScene() {
+        clearInterval(this._tensionInterval);
+        if(unoESLTimerInterval){clearInterval(unoESLTimerInterval);unoESLTimerInterval=null;}
         // Clear all pending turn timers
         this.clearAllTurnTimers();
         // Kill all active tweens (camera tilt, card animations, etc.)
@@ -1745,7 +1772,10 @@ function completeUnoESLQuestion(success) {
 }
 
 function triggerUno() {
-    if (window.PracticeTelemetry) PracticeTelemetry.start('game', 'uno');
+    const launch=++unoLaunchEpoch;
+    if(window.StudyRecovery)StudyRecovery.pause();
+    if(window.GameRecovery&&!(window.GameRuntime&&GameRuntime.restoring()))GameRecovery.pause();
+    if (window.PracticeTelemetry && !(window.GameRuntime&&GameRuntime.restoring())) PracticeTelemetry.start('game', 'uno');
     activeGameMode = 'Uno';
     // Re-show the shared Phaser canvas: showGameSelection()/exitVampireSurvivors()
     // set display:none to hide it on the menu, and triggerUno never restored it,
@@ -1769,8 +1799,10 @@ function triggerUno() {
         config.parent = 'uno-phaser-container';
         game = new Phaser.Game(config);
         game.events.once('ready', () => {
+            if(launch!==unoLaunchEpoch)return;
             game.scene.stop('MainScene');
             setTimeout(() => {
+            if(launch!==unoLaunchEpoch)return;
                 if (game && game.scale) {
                     const parentEl = document.getElementById('uno-phaser-container');
                     // HiDPI: render UNO crisp into its container (backing = container x DPR)
@@ -1798,6 +1830,7 @@ function triggerUno() {
 
         // Defer refresh and start
         setTimeout(() => {
+            if(launch!==unoLaunchEpoch)return;
             // HiDPI: render UNO crisp into its container (backing = container x DPR)
             if (typeof enterHiDpi === 'function') { enterHiDpi(parentEl); }
             else if (game && game.scale) { game.scale.parent = parentEl; game.scale.parentIsWindow = false; if (parentEl) game.scale.resize(parentEl.clientWidth, parentEl.clientHeight); game.scale.refresh(); }
@@ -1807,6 +1840,8 @@ function triggerUno() {
 }
 
 function exitUnoGame() {
+    unoLaunchEpoch++;
+    if(window.GameRecovery&&!(window.GameRuntime&&GameRuntime.restoring()))GameRecovery.pause();
     if (window.PracticeTelemetry) PracticeTelemetry.interrupt('game_exit', false);
     console.log('[DEBUG] exitUnoGame called, game:', !!game, 'isActive:', (game && game.scene) ? game.scene.isActive('UnoScene') : false);
     unoGameActive = false;
