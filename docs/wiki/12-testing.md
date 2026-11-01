@@ -1,5 +1,15 @@
 # Testing
 
+Preview adaptive speech integration: `test_speech_adaptive_app.js` drives the real
+main preview entry, Study/game word and sentence callers, short native-rate audio,
+word-level feedback, earned credit/reward, runtime restoration, microphone hiding,
+background preparation recovery, stale workers and visible-time timeout. Its
+worker decisions are fixtures; native worker inference remains a separate check.
+`test_speech_hygiene.js` also verifies actual Recorder onset preservation. Older
+non-speech recovery/curriculum tests explicitly disable the new adapter in their
+fixtures, preserving their existing focus. Run the root suite before committing.
+
+
 `test_speech_adaptive_runtime.js` covers verified HTTP-cache hits, compressed cold/resumed WASM transfer, old-browser raw fallback and persistent byte equality. Native checks should force a runtime HTTP-cache miss and reject unplanned full-WASM downloads during session creation, so seeding model caches cannot hide the runtime's real first-use path.
 
 `test_speech_adaptive_mirrors.js` covers the actual ModelScope package (reconstructed from exact reversible fixtures), read-only legacy migration, poisoned chunk repair, wrong same-length mirror data without exposed range headers, early route rejection, verified cache retention, pinned cold/resumed source conversion, compatibility-download failure and budget. Cold/legacy smoke checks must include the real field package, not only Git-canonical cache entries.

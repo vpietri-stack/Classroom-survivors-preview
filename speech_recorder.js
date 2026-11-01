@@ -15,7 +15,8 @@
   }
 
   class Recorder {
-    constructor() {
+    constructor(options) {
+      this.preserveOnset = !!(options && options.preserveOnset);
       this.audioCtx = null;
       this.stream = null;
       this.source = null;
@@ -135,7 +136,7 @@
       // keep everything from the first meaningful-amplitude window onward.
       const pcm = mergeChunks(this._chunks);
       const rate = this._actualRate || SAMPLE_RATE;
-      const start = findSpeechStart(pcm, rate);
+      const start = this.preserveOnset ? 0 : findSpeechStart(pcm, rate);
       const trimmed = pcm.slice(start);
       const wav = encodeWav(trimmed, rate);
       this._chunks = []; // release raw PCM after the WAV is encoded

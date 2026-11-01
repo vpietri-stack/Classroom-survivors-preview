@@ -94,6 +94,7 @@
             nodes('#scramble-slots .study-slot').forEach((e,i) => { const v=ui.cSlots[i]; if(v){e.innerText=v.text;e.className=v.cls;} });
             $('scramble-bank').replaceChildren();
             ui.cBank.forEach(char => { const b=document.createElement('button');b.className='study-letter-btn';b.innerText=char;b.dataset.char=char;b.onclick=()=>addLetterToSlot(char,b,currentTTSWord);$('scramble-bank').appendChild(b); });
+            if (saved.speech) mountStudyWordSpeechGate(saved.speech);
         }
         if (s.round === 'E' && !ui.typed) {
             nodes('#sentence-drop-zone .sentence-slot').forEach((e,i) => { const v=ui.eSlots[i];if(v){const b=createWordTile(v.text,i);b.className=v.cls;b.dataset.word=v.text;e.appendChild(b);} });

@@ -35,6 +35,22 @@ function mountStudySpeechGate(saved) {
         resumeState: saved || null, onDone: advanceRoundESentence }));
 }
 
+function advanceRoundCWord() {
+    if (!STUDY_STATE.active) return;
+    STUDY_STATE.currentWordIndex++;
+    startExerciseTracking(); STUDY_STATE.isTransitioning = false; STUDY_STATE._roundCFrozen = false;
+    nextRoundCWord();
+}
+function mountStudyWordSpeechGate(saved) {
+    const area = document.getElementById('scramble-slots');
+    if (!area || !window.SpeechUI) return;
+    const tiles = SpeechUI.completedWordTiles(area, currentTTSWord);
+    document.getElementById('roundC-actions').style.display = 'none';
+    const bank = document.getElementById('scramble-bank');
+    bank.replaceChildren(SpeechUI.makeSentenceGate({ target: currentTTSWord, wordTiles: tiles,
+        mode: 'study', resumeState: saved || null, onDone: advanceRoundCWord }));
+}
+
 
 const STUDY_STATE = {
     active: false,
@@ -278,7 +294,7 @@ function nextRoundCWord() {
             
             <div id="scramble-bank" class="flex flex-wrap justify-center gap-[var(--gap-sm)] w-full px-2"></div>
 
-            <div class="flex gap-3 w-full justify-center">
+            <div id="roundC-actions" class="flex gap-3 w-full justify-center">
                 <button onclick="checkRoundC()" class="game-btn bg-green-500 py-3 px-6 flex-1 max-w-[160px]">CHECK</button>
                 <button onclick="clearRoundC()" class="game-btn bg-gray-500 py-3 px-6 flex-1 max-w-[160px]">CLEAR</button>
             </div>
@@ -449,13 +465,10 @@ function checkRoundC() {
         playHappySound();
         srStudyResults.push({ type: 'vocab', key: itemKey(targetWord), firstAttempt: exerciseAttempts === 1 });
         queueExerciseEvent('wordScramble', 'study', targetWord);
-        studyLater('scramble_next', () => {
-            STUDY_STATE.currentWordIndex++;
-            startExerciseTracking();
-            STUDY_STATE.isTransitioning = false;
-            STUDY_STATE._roundCFrozen = false;
-            nextRoundCWord();
-        }, 1000);
+        if (window.SpeechUI && SpeechUI.adaptiveEnabled()) {
+            mountStudyWordSpeechGate();
+            if (window.StudyRecovery) StudyRecovery.capture();
+        } else studyLater('scramble_next', advanceRoundCWord, 1000);
         return;
     }
 
@@ -1022,7 +1035,7 @@ function checkRoundE() {
         // Speech step: now that the sentence is built correctly, ask the student
         // to say it aloud (Whisper). Skipped silently if the model isn't ready
         // yet, so it never blocks progression or shows a spinner.
-        if (window.SpeechStatus && window.SpeechStatus.isReady() && window.SpeechUI && window.SpeechUI.makeSentenceGate) {
+        if (window.SpeechUI && window.SpeechUI.makeSentenceGate && (SpeechUI.adaptiveEnabled() || window.SpeechStatus && window.SpeechStatus.isReady())) {
             mountStudySpeechGate();
         } else {
             // Log WHY the gate was skipped — without this the skip is invisible

@@ -11,7 +11,7 @@ const server=http.createServer((req,res)=>{
 });
 async function fixture(page,id='notes-a',placement={book:'PU3',unit:'9',page:'111'},notes={}){
  await page.evaluate(({id,placement,notes})=>{
-  window.playTTS=()=>{};window.synthGem=()=>{};window.synthError=()=>{};window.playHappySound=()=>{};window.SpeechStatus={isReady:()=>false};
+  window.playTTS=()=>{};window.synthGem=()=>{};window.synthError=()=>{};window.playHappySound=()=>{};window.SpeechStatus={isReady:()=>false};if(window.AdaptiveSpeech)AdaptiveSpeech.enabled=false;
   if(window.HWRecognition) HWRecognition.load=()=>Promise.resolve();
   if(typeof STUDY_STATE!=='undefined'&&STUDY_STATE.active)exitStudyMode();
   resetInMemorySessionState();

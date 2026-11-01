@@ -54,6 +54,15 @@ function makeRecorderSandbox() {
 }
 
 (async () => {
+  {
+    const { sandbox } = makeRecorderSandbox();
+    const rec = new sandbox.window.Recorder({ preserveOnset: true });
+    await rec.start();
+    const samples = new Float32Array(6400).fill(0.4); samples.fill(0.003, 0, 1600);
+    rec.processor._emit(samples);
+    const blob = await rec.stop(), wav = new DataView(blob._buf.buffer);
+    ok('adaptive recorder: retains every onset sample instead of front-trimming', wav.byteLength === 44 + 6400 * 2 && wav.getInt16(44, true) > 0);
+  }
   // --- 1a. stop() closes the AudioContext and nulls graph references -------
   {
     const { sandbox, closed } = makeRecorderSandbox();

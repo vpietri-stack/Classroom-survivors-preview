@@ -30,6 +30,7 @@
 .speech-target-word{display:inline-block;padding:7px 11px;border-radius:10px;background:rgba(100,116,139,.08);color:inherit;font-size:19px;}
 .speech-target-word.heard{background:#e1f3e3;color:#24663e;}
 .speech-reading-tile.speech-reading-neutral{background:linear-gradient(180deg,#818cf8,#6366f1)!important;color:white!important;border-color:#4338ca!important;box-shadow:0 3px 0 #4338ca!important;animation:none!important;}
+.speech-reading-tile.correct{background:linear-gradient(180deg,#4ade80,#16a34a)!important;color:white!important;border-color:#15803d!important;box-shadow:0 3px 0 #15803d!important;animation:none!important;}
 .speech-target-note{font-size:12px;margin:6px 0;}
 /* Inline recording indicator (no overlay — sentence stays visible) */
 .rec-inline{display:none;flex-direction:column;align-items:center;gap:8px;margin-top:10px;}
@@ -143,7 +144,9 @@
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'speech-rec-btn game-btn text-xl px-8 py-4 rounded-2xl shadow-lg';
-    const rec = new global.Recorder();
+    const engine = opts.engine || global.LocalEngine;
+    const adaptive = !!(global.AdaptiveSpeech && engine === global.AdaptiveSpeech);
+    const rec = new global.Recorder({ preserveOnset: adaptive });
     let state = 'idle'; // 'idle' | 'starting' | 'recording' | 'busy'
     let safetyTimer = null;
     let waitTimer = null;
@@ -191,7 +194,7 @@
       if (disposed) return; disposed = true; generation++; clearWait(); clearSafety();
       if (assessment) assessment.abort(); stopRecorder();
       if (global._activeRecorder === rec) { hideInline(); global._activeRecorder = null; }
-      btn.disabled = true; unwatch(); if (opts.onDispose) opts.onDispose();
+      btn.disabled = true; unwatch(); document.removeEventListener('visibilitychange', hiddenCapture); if (opts.onDispose) opts.onDispose();
     };
     btn.setSpeechIdleText = function (text) { opts.idleText = text; if (!disposed && state === 'idle') updateUI(); };
 
@@ -208,7 +211,7 @@
         else alert('Microphone unavailable. Allow mic access in your browser/WeChat settings.');
         return;
       }
-      if (global.LocalEngine && global.LocalEngine.isBusy && global.LocalEngine.isBusy()) {
+      if (engine && engine.isBusy && engine.isBusy()) {
         const error = new Error('Previous recording is still finishing'); error.code = 'SPEECH_BUSY'; if (opts.onError) opts.onError(error); return;
       }
       const ticket = ++generation;
@@ -247,7 +250,7 @@
       clearSafety();
       hideInline();
       updateUI();
-      notify(); limitWait(30000, 'Speech assessment timed out');
+      notify(); if (!adaptive) limitWait(30000, 'Speech assessment timed out');
       const audioMs = recStartTs ? Date.now() - recStartTs : null;
       rec.stop().then(function (blob) {
         if (!current(ticket)) return;
@@ -261,18 +264,18 @@
         // instead of a doomed transcription round-trip.
         return wavStats(blob).then(function (stats) {
           if (!current(ticket)) return;
-          if (stats && stats.durMs < MIN_SPEECH_MS) {
+          if (!adaptive && stats && stats.durMs < MIN_SPEECH_MS) {
             toIdle();
             if (opts.onGated) opts.onGated('too_short', { audioMs: audioMs, durMs: Math.round(stats.durMs), peak: stats.peak, blob: blob, sampleRate: stats.sampleRate, ownerId: recordingOwnerId });
             return;
           }
-          if (stats && stats.peak < MIN_PEAK_AMP) {
+          if (!adaptive && stats && stats.peak < MIN_PEAK_AMP) {
             toIdle();
             if (opts.onGated) opts.onGated('too_quiet', { audioMs: audioMs, durMs: Math.round(stats.durMs), peak: stats.peak, blob: blob, sampleRate: stats.sampleRate, ownerId: recordingOwnerId });
             return;
           }
           const t0 = Date.now();
-          return global.LocalEngine.transcribe(blob, { signal: assessment.signal, ...(opts.assessmentTarget ? { target: opts.assessmentTarget } : {}) }).then(function (r) {
+          return engine.transcribe(blob, { signal: assessment.signal, onProgress: opts.onProgress, ...(opts.assessmentTarget ? { target: opts.assessmentTarget } : {}) }).then(function (r) {
             if (!current(ticket)) return;
             toIdle();
             spHeartbeat({ spLastMs: Date.now() - t0 }); // last transcribe duration
@@ -309,6 +312,13 @@
       toIdle();
       if (opts.onCancel) opts.onCancel();
     }
+
+    function hiddenCapture() {
+      if (!document.hidden || state !== 'recording' && state !== 'starting') return;
+      generation++; stopRecorder(); toIdle();
+      if (opts.onCancel) opts.onCancel();
+    }
+    document.addEventListener('visibilitychange', hiddenCapture);
 
     btn.addEventListener('click', function () {
       if (state === 'idle') startRecording();
@@ -778,6 +788,8 @@
     const recBtn = makeRecordButton({
       idleText: '🎙️ 开始朗读',
       assessmentTarget: target,
+      engine: global.AdaptiveSpeech && global.AdaptiveSpeech.enabled ? global.AdaptiveSpeech : global.LocalEngine,
+      onProgress: function (pct) { if (alive()) feedback.textContent = '正在准备朗读功能 ' + Math.round(pct) + '%。可以切换到其他页面，也可以继续。'; },
       onStateChange: function (state) {
         if (!alive()) return;
         if (state === 'starting') { clearHints(); transcript.hidden = true; cont.hidden = false; feedback.textContent = '正在打开麦克风…'; }
@@ -834,6 +846,10 @@
       logSpeechEvent('practice', mode, summary, recordings || null); onDone(summary);
     };
     buttons.appendChild(recBtn); buttons.appendChild(cont); spHeartbeat({ spGate: 1, spFails: 0 });
+    if (global.AdaptiveSpeech && global.AdaptiveSpeech.enabled && !global.AdaptiveSpeech.isReady()) {
+      cont.hidden = false;
+      feedback.textContent = '朗读功能正在准备。可以稍后再练，也可以继续。';
+    }
     queryMicPermission().then(function (state) { if (alive() && state === 'denied') technicalError(new Error('Permission denied'), true); });
     wrap.studyResumeState = function () { return { recordings, gradedTries, errors, outcome, hintedWords,
       recordingState:recBtn.dataset.speechState||'idle', message:feedback.textContent, transcript:transcript.querySelector('p').textContent,
@@ -867,7 +883,23 @@
     return function () { cancelled = true; clearInterval(iv); };
   }
 
+  // Completed spelling becomes one tile per spoken word, in the answer's place.
+  function completedWordTiles(container, target) {
+    const matches = Array.from(String(target).matchAll(/[\p{L}\p{N}]+(?:['’\-][\p{L}\p{N}]+)*/gu));
+    const tiles = matches.map((match, i) => {
+      const tile = document.createElement('span');
+      tile.className = 'study-word-tile !bg-green-500 correct';
+      tile.dataset.word = match[0];
+      tile.textContent = target.slice(match.index, matches[i + 1]?.index ?? target.length).trim();
+      return tile;
+    });
+    container.replaceChildren(...tiles);
+    return tiles;
+  }
+
   global.SpeechUI = {
+    completedWordTiles: completedWordTiles,
+    adaptiveEnabled: function () { return !!(global.AdaptiveSpeech && global.AdaptiveSpeech.enabled); },
     injectAssets: injectAssets,
     makeRecordButton: makeRecordButton,
     makeSentenceGate: makeSentenceGate,

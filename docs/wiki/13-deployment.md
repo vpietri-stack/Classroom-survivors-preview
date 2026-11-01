@@ -1,5 +1,16 @@
 # Deployment & Release Discipline
 
+Preview 2026-11-01f integrates adaptive speech into the main app and adds word
+practice after Study B and game word scramble. Build on preview/main including
+Study/game recovery; keep its API, curriculum and diagnostics isolation. Publish
+`speech_adaptive_app.js`, refreshed recorder/UI/preload, Study/game callers and
+runtime recovery together. Preload one adaptive worker; retain frozen worker,
+manifest, model hashes, helper/cache/runtime URLs. Synchronize the stamp trio
+and dashboard auth query; refresh only changed script queries. Verify main-entry
+served bytes and actual adaptive inference. Push preview/main only; production
+needs separate explicit approval.
+
+
 Adaptive preview 2026-10-29f adds the pinned compressed browser runtime and ONNX Runtime MIT notice. Keep its matching library wrapper/binary together. Verify cache-only probes, cold and resumed transfers, prepared-byte runtime consumption and old-browser fallback. Update bootstrapv6,workerv5,asset/manifestv5 and synchronized preview stamps. Totals include the existing runtime rather than adding it twice; no production change.
 
 Adaptive preview 2026-10-29e publishes a versioned transport manifest with segment hashes, pinned mirror variants and verified compatibility updates. Publish the update JSON/gzip files and compressed metadata together; verify Git/published bytes and actual ModelScope cache migration. Bootstrap v5, worker v4 and asset/manifest v4 are synchronized with preview stamps. Preserve the frozen model, legacy cache and production app. A mirror with the same model name is not automatically byte-compatible.

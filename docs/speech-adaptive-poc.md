@@ -1,6 +1,6 @@
 # Adaptive speech practice preview
 
-`speech_adaptive_poc.html` is a standalone, account-free teacher experiment. It does not change the app's current speaking step, notes, progression, collection, API or production deployment.
+`speech_adaptive_poc.html` is a standalone, account-free teacher experiment. The main preview app also uses this frozen checker from 2026-11-01f for sentence practice and word practice after Study Round B/game word scramble. Production, notes, collection and APIs remain unchanged.
 
 The selected approach retains the existing Whisper tiny.en q8 numerical weights. It compares captured audio with the expected text **after independent transcription**, accepts clear and close readings, and shows green/neutral words on the original target tiles. Retry is optional. This is encouragement, not a validated pronunciation grade.
 

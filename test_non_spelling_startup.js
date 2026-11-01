@@ -66,7 +66,7 @@ console.log('PASS: non-spelling selection starts safely on all ' + checked + ' l
         await page.goto(pathToFileURL(path.join(__dirname, 'index.html')).href + '?testMode=true&studentBook=PU1&studentUnit=2&studentPage=26');
         await page.waitForFunction(() => window.NonSpellingFlow && window.NonSpellingWidget);
         await page.evaluate(() => {
-            window.playTTS = () => {}; window.SpeechStatus = { isReady: () => false };
+            window.playTTS = () => {}; window.SpeechStatus = { isReady: () => false }; if (window.AdaptiveSpeech) AdaptiveSpeech.enabled = false;
             apiFetch = async () => ({ ok: true, status: 200, json: async () => ({success:true}) });
             authActiveUser = { id: 'study-start-regression', role: 'student', sessionCount: 3, srState: {vocab:{},sentences:{},sentencePairs:{}}, targets: [] };
             selectedStudent = 'Test pupil';

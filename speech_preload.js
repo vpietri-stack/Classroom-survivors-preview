@@ -7,12 +7,16 @@
 (function (global) {
   'use strict';
 
+  // Preview uses the same single adaptive worker as its word/sentence gates.
+  // Do not load a second legacy pipeline alongside it on memory-limited tablets.
+  const engine = global.AdaptiveSpeech && global.AdaptiveSpeech.enabled ? global.AdaptiveSpeech : global.LocalEngine;
+
   const SpeechStatus = {
     state: 'idle',        // idle | loading | preparing | ready | error | unsupported
     pct: 0,
     file: '',
     message: '',
-    supported: !!(global.LocalEngine && global.Recorder && global.Recorder.isSupported && global.Recorder.isSupported()),
+    supported: !!(engine && global.Recorder && global.Recorder.isSupported && global.Recorder.isSupported()),
     _started: false,
 
     isReady: function () { return this.state === 'ready'; },
@@ -20,7 +24,7 @@
     // Begin preload (idempotent).
     start: function () {
       if (this._started) return;
-      if (!global.LocalEngine) { this.state = 'error'; this.message = 'engine missing'; return; }
+      if (!engine) { this.state = 'error'; this.message = 'engine missing'; return; }
       this._started = true;
 
       if (!this.supported) {
@@ -32,7 +36,7 @@
 
       this.state = 'loading';
       try {
-        global.LocalEngine.load((pct, file) => {
+        engine.load((pct, file) => {
           this.pct = pct;
           this.file = file || '';
           this.state = pct >= 100 ? 'preparing' : 'loading';
@@ -55,8 +59,8 @@
     // in-flight load state and re-runs start(), so a student can recover from a
     // transient download failure without a full page reload.
     retry: function () {
-      if (global.LocalEngine && typeof global.LocalEngine.resetLoad === 'function') {
-        global.LocalEngine.resetLoad();
+      if (engine && typeof engine.resetLoad === 'function') {
+        engine.resetLoad();
       }
       this._started = false;
       this.state = 'loading';

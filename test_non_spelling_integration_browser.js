@@ -30,7 +30,7 @@ async function waitBoard(page, index) { await page.waitForFunction(i => STUDY_ST
         await page.waitForFunction(() => window.NonSpellingFlow && window.NonSpellingWidget);
         await page.evaluate(() => {
             window.playTTS = () => {}; window.synthError = () => {}; window.playHappySound = () => {};
-            window.SpeechStatus = { isReady: () => false };
+            window.SpeechStatus = { isReady: () => false }; if (window.AdaptiveSpeech) AdaptiveSpeech.enabled = false;
             window.__savedRequests = [];
             apiFetch = async (url, options = {}) => {
                 const body = options.body ? JSON.parse(options.body) : {};

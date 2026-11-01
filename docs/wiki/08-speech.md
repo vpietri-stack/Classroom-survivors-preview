@@ -1,5 +1,36 @@
 # Speech Recognition & Pronunciation Scoring
 
+## Preview app integration — 1 November 2026
+
+The main preview now uses the frozen adaptive worker for both existing sentence
+speaking steps and new word practice after Study Round B/internal C and the game
+spelling/word-scramble exercise. Production remains gated off. The standalone
+research page and its model/settings stay unchanged.
+
+Completed spelling letters become one tile per spoken word in the same answer
+area. The microphone resets those tiles to purple; only recognised words turn
+green. Multiword vocabulary receives separate word decisions. There is no
+repeated target or second feedback row, letter pronunciation grading, red speech
+failure, or percentage. Students can retry or Continue; preparation and errors
+also offer Continue. Spelling SR/events are earned once before speech, and game
+Continue reveals the already earned reward without repeating its accounting.
+
+`speech_adaptive_app.js` shares one worker between preload and all main-app speech
+gates. The legacy engine remains available to other callers but is not preloaded
+alongside the adaptive engine. The adaptive recorder preserves the onset, uses
+native-rate PCM WAV and resamples exactly once without repetition. It bypasses
+the legacy one-second sentence gate; the frozen worker owns voice/length checks.
+Preparation uses verified resumable assets with a five-minute visible-time
+budget; warm checking uses five seconds. Background preparation/checking pauses
+its deadline and can recover saved downloads; hidden microphone capture stops.
+Aborted preparation waits detach without discarding shared preparation, while
+aborting assessment releases its worker. No audio is uploaded or persisted.
+
+Study/game runtime recovery includes the new word speaking step and feedback.
+Restoring it keeps the microphone stopped and never repeats spelling credit or
+events. Existing resume/API formats are reused; no backend change is required.
+
+
 Preview 2026-10-29f makes the existing browser WASM runtime resumable and SHA-verified too. Reuse verified HTTP-cache bytes when available; otherwise transfer its 5.49 MB compressed copy (23.01 MB raw fallback), persist it, and serve the exact bytes to the matching local library wrapper. Session creation must not make an uncontrolled full-WASM network request. No additional speech model or recognition change; manifest transportVersion3, bootstrapv6,workerv5,asset/manifestv5.
 
 Preview 2026-10-29e fixes ModelScope/Git package compatibility during preparation. Segment hashes reject wrong mirror/cache bytes before assembly; known ModelScope cache files are converted read-only into the exact frozen bytes with 316 KB of compressed updates. Immutable pinned ModelScope sources are separate from canonical Git routes, and existing legacy entries stay unchanged. Metadata can use compressed transport. Bootstrap/worker/manifest queries advance without changing model decisions. See [adaptive POC](../speech-adaptive-poc.md).

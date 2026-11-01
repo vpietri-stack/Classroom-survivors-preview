@@ -1252,6 +1252,8 @@ var srLastServedKey = { vocab: null, sentences: null };
 // --- MINIGAMES ---
 
 function startSpellingGame(recoveryWord) {
+    const oldSpeech = document.getElementById('spelling-speech-gate');
+    if (oldSpeech) oldSpeech.remove();
     if (SPELLING_WORDS.length === 0) { handleMinigameSuccess('spelling'); return; }
     startExerciseTracking();
 
@@ -1527,6 +1529,22 @@ function clearSpelling() {
     display.classList.remove('shake');
 }
 
+function mountGameWordSpeechGate(saved) {
+    const gameEl = document.getElementById('spellingGame');
+    const target = gameEl.dataset.targetWord;
+    const result = document.getElementById('spelling-result-action');
+    result.classList.add('hidden');
+    const display = document.getElementById('spelling-input-display');
+    const tiles = SpeechUI.completedWordTiles(display, target);
+    const keyboard = document.getElementById('spelling-keyboard');
+    keyboard.replaceChildren();
+    const gate = SpeechUI.makeSentenceGate({ target: target, wordTiles: tiles, mode: 'game', resumeState: saved || null,
+        onDone: function () { gate.remove(); result.classList.remove('hidden'); if (window.GameRuntime) GameRuntime.tick(); } });
+    gate.id = 'spelling-speech-gate';
+    keyboard.appendChild(gate);
+    if (window.GameRuntime) GameRuntime.tick();
+}
+
 function checkSpelling() {
     const gameEl = document.getElementById('spellingGame');
     if (gameEl.dataset.feedbackMode === "true") return; // already revealed
@@ -1551,6 +1569,7 @@ function checkSpelling() {
         gameEl.dataset.feedbackMode = "true";
         buildSpellingSlots();
         handleMinigameSuccess('spelling');
+        if (window.SpeechUI && SpeechUI.adaptiveEnabled()) mountGameWordSpeechGate();
     } else {
         // Not all slots filled? give a soft nudge but don't reveal.
         if (placedCount < targetLetters.length) { synthError(); return; }
@@ -1934,7 +1953,7 @@ function checkGrammar() {
         // Speech step: now that the sentence is built correctly, ask the student
         // to say it aloud (Whisper). Skipped silently if the model isn't ready
         // yet, so it never blocks the reward or shows a spinner.
-        if (window.SpeechStatus && window.SpeechStatus.isReady() && window.SpeechUI && window.SpeechUI.makeSentenceGate) {
+        if (window.SpeechUI && window.SpeechUI.makeSentenceGate && (SpeechUI.adaptiveEnabled() || window.SpeechStatus && window.SpeechStatus.isReady())) {
             const actions = document.getElementById('grammar-actions');
             if (actions) actions.classList.add('hidden');
             // Place the speech gate INTO the now-empty word-dock so the user doesn't scroll.

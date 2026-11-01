@@ -1,5 +1,36 @@
 # Game Modes & Minigames
 
+## Preview app integration — 1 November 2026
+
+The main preview now uses the frozen adaptive worker for both existing sentence
+speaking steps and new word practice after Study Round B/internal C and the game
+spelling/word-scramble exercise. Production remains gated off. The standalone
+research page and its model/settings stay unchanged.
+
+Completed spelling letters become one tile per spoken word in the same answer
+area. The microphone resets those tiles to purple; only recognised words turn
+green. Multiword vocabulary receives separate word decisions. There is no
+repeated target or second feedback row, letter pronunciation grading, red speech
+failure, or percentage. Students can retry or Continue; preparation and errors
+also offer Continue. Spelling SR/events are earned once before speech, and game
+Continue reveals the already earned reward without repeating its accounting.
+
+`speech_adaptive_app.js` shares one worker between preload and all main-app speech
+gates. The legacy engine remains available to other callers but is not preloaded
+alongside the adaptive engine. The adaptive recorder preserves the onset, uses
+native-rate PCM WAV and resamples exactly once without repetition. It bypasses
+the legacy one-second sentence gate; the frozen worker owns voice/length checks.
+Preparation uses verified resumable assets with a five-minute visible-time
+budget; warm checking uses five seconds. Background preparation/checking pauses
+its deadline and can recover saved downloads; hidden microphone capture stops.
+Aborted preparation waits detach without discarding shared preparation, while
+aborting assessment releases its worker. No audio is uploaded or persisted.
+
+Study/game runtime recovery includes the new word speaking step and feedback.
+Restoring it keeps the microphone stopped and never repeats spelling credit or
+events. Existing resume/API formats are reused; no backend change is required.
+
+
 Preview 2026-10-28c grammar speech feedback colours the existing completed tiles: purple on microphone start, green for words heard, purple for uncertainty. It checks the accepted sentence actually built, including valid alternative orders, and omits the duplicated prompt and feedback sentence. Rewards remain tied to the unscramble.
 
 
