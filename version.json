@@ -1,5 +1,5 @@
 {
-  "version": "2026-11-01d",
+  "version": "2026-11-01e",
   "deployedAt": "2026-11-01",
-  "notes": "Preview only: resume interrupted Gomoku and UNO with original board/cards, exercises and timers; retain Study recovery."
+  "notes": "Preview only: Gomoku and UNO recovery; completion and delayed progress updates have independent receipts."
 }

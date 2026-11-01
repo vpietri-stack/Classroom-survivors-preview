@@ -73,6 +73,8 @@
                 user.gameRecoveryCompletion = { runId: e.data && e.data.gameRunId || e.eventId, completedAt: new Date(when).toISOString() };
         }
     }
-    function canCredit(events,acceptedIds){const accepted=new Set(acceptedIds||[]);return !(events||[]).some(e=>e.type==='session'&&e.data&&e.data.gameRunId)||(events||[]).some(e=>e.type==='session'&&accepted.has(e.eventId)&&!(e.data&&e.data.ignored));}
-    return { canCredit, MAX_BYTES, id, ownerId, bytes, validate, pending, completion };
+    function creditRuns(events){return (events||[]).filter(e=>e.type==='session'&&e.data&&id(e.data.gameRunId)).map(e=>e.data.gameRunId);}
+    function canCredit(events,acceptedIds,user={}){const runs=creditRuns(events);return !runs.length||runs.some(run=>!(user.gameRecoveryCredits||[]).includes(run));}
+    function markCredit(user,events){const runs=creditRuns(events);if(runs.length)user.gameRecoveryCredits=Array.from(new Set((user.gameRecoveryCredits||[]).concat(runs))).slice(-40);}
+    return { canCredit, markCredit, MAX_BYTES, id, ownerId, bytes, validate, pending, completion };
 });

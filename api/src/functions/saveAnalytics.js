@@ -361,8 +361,8 @@ app.http('saveAnalytics', {
                 studyResume.completion(user, cleanEvents, addedEventIds);
                 gameResume.completion(user, cleanEvents, addedEventIds);
                 // A stale device can retry a recovered game with a newer SR sequence.
-                // Only a newly accepted session can grant its counter credit.
-                const recoveryCredit = gameResume.canCredit(cleanEvents, addedEventIds);
+                // Track the actual counter grant independently from event acknowledgement.
+                const recoveryCredit = gameResume.canCredit(cleanEvents, addedEventIds, user);
                 // SR newer-wins (2026-09-10, Doris stuck-flag fix): each client
                 // SR update carries a monotonic srSeq. Stale replays (lost
                 // response retried, beacon+fetch duplicates) must not re-apply
@@ -390,10 +390,11 @@ app.http('saveAnalytics', {
                         user.srState = srState;
                     }
                     if (srSeq !== undefined && srSeq !== null) user.srSeq = srSeq;
-                    if (incrementSession && recoveryCredit) user.sessionCount = (user.sessionCount || 0) + 1;
+                    if (incrementSession && recoveryCredit) { user.sessionCount = (user.sessionCount || 0) + 1; gameResume.markCredit(user,cleanEvents); }
                     srApplied = true;
                 } else if (incrementSession && recoveryCredit && (srSeq === undefined || srSeq === null)) {
                     user.sessionCount = (user.sessionCount || 0) + 1;
+                    gameResume.markCredit(user,cleanEvents);
                     srApplied = true;
                 }
                 sessionCount = user.sessionCount || 0;

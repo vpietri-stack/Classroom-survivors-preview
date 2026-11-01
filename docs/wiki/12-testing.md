@@ -331,3 +331,5 @@ Release verification additionally uses temporary, cleaned-up fixture accounts in
 ## Game recovery verification (preview, 2026-11-01)
 
 The preview frontend npm test includes test_game_resume.js (signed authorization, bounded validation, ETag/writer concurrency, tombstones and duplicate credit) and test_game_resume_browser.js (real Chrome renderer crashes, Gomoku boards/difficulty/speed clock, all UNO hands/deck, interrupted questions/speech, animation and stacked-penalty replay once, partial typed/sentence/matching state, remote/offline continuation, account isolation and single completion). Study recovery tests remain in the suite. Verify real isolated HTTP/Cosmos credits with a cleaned temporary fixture, then repeat normal login and both games on the actual hosted preview. Never test by changing real student progress.
+
+Completion ordering: gameRecoveryCredits retains the last 40 run IDs whose SR counter increment actually applied. The completion event receipt alone never suppresses a delayed first increment; duplicate/newer-sequence deliveries cannot grant it twice. Event-first and progress-first cases are checked separately.
