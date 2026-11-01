@@ -7,7 +7,8 @@ function arg(k) { const i = process.argv.indexOf(k); return i < 0 ? '' : process
     const database = arg('--database'), action = arg('--action') || 'status';
     if (!database || !['status','enable-all','stop-all'].includes(action)) throw Error('Use --database <name> --action status|enable-all|stop-all');
     const client = new CosmosClient({ endpoint: cfg.COSMOS_ENDPOINT, key: cfg.COSMOS_KEY, connectionPolicy: { requestTimeout: 20000 } });
-    const c = client.database(database).container('client_diagnostics');
+    const containerName = arg('--container') || 'client_diagnostics';
+    const c = client.database(database).container(containerName);
     if (action !== 'status') {
         const days = Math.max(1,Math.min(Number(arg('--days')) || 7,14));
         await c.items.upsert({ id:'config', studentId:'_global', type:'client_diagnostics_config', scope:'all_students',
@@ -25,7 +26,7 @@ function arg(k) { const i = process.argv.indexOf(k); return i < 0 ? '' : process
         for(const k of ['uploads','failures','http429','readRU','writeRU','storageWrites','storageMs','queueDropped'])measured[k]+=Number(m[k])||0;
         for(const k of ['maxStorageMs','maxLagMs'])measured[k]=Math.max(measured[k],Number(m[k])||0);
     }
-    const result={database,policy:policy&&{enabled:policy.enabled,endsAt:policy.endsAt,scope:policy.scope},since,
+    const result={database,container:containerName,policy:policy&&{enabled:policy.enabled,endsAt:policy.endsAt,scope:policy.scope},since,
         activeAccounts:new Set(usage.map(u=>u.studentId)).size,reservedBatches:usage.reduce((s,u)=>s+u.batches,0),
         reservedEvents:usage.reduce((s,u)=>s+u.events,0),reservedBytes:usage.reduce((s,u)=>s+u.bytes,0),measured,
         note:'RU/performance values are uploaded heartbeat samples, not an invoice or complete native-memory measurement. Final unsent samples may be absent; quota counters include reservations/retries.'};
