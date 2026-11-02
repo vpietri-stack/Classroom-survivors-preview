@@ -17,6 +17,12 @@ the remaining sections document subsystem release requirements and history.
 
 # Deployment & Release Discipline
 
+Preview 2026-11-02a updates speech UI/readiness only. Refresh UI, Study, game and
+game-runtime queries together with synchronized auth stamps. Keep the adaptive
+bridge/worker/model/asset URLs stable. Verify main-preview served bytes, badge
+layout, readiness skips and the existing production gates; do not push origin.
+
+
 Preview 2026-11-01f integrates adaptive speech into the main app and adds word
 practice after Study B and game word scramble. Build on preview/main including
 Study/game recovery; keep its API, curriculum and diagnostics isolation. Publish

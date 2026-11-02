@@ -39,7 +39,7 @@ const server = http.createServer((req, res) => {
         postMessage(r) {
           this.requests.push(r);
           if (r.action === 'assess' && !window.__hold) queueMicrotask(() => this.emit({ transcript: 'an imperfect blind transcript', status: 'checked', totalMs: 15,
-            targetWords: r.target.match(/[\p{L}\p{N}]+(?:['’\-][\p{L}\p{N}]+)*/gu).map((text, i) => ({ text, heardClear: i === 0 })) }));
+            targetWords: r.target.match(/[\p{L}\p{N}]+(?:['’\-][\p{L}\p{N}]+)*/gu).map((text, i) => ({ text, heardClear: window.__accept === 'all' || window.__accept !== 'none' && i === 0 })) }));
         }
         emit(data) { this.onmessage?.({ data: { id: this.requests.at(-1).id, ...data } }); }
         terminate() { this.alive = false; }
@@ -71,22 +71,60 @@ const server = http.createServer((req, res) => {
       document.getElementById('studyModeOverlay').classList.remove('hidden'); startRoundC();
       roundCSlots().forEach((tile, i) => { tile.innerText = currentTTSWord[i]; }); checkRoundC();
     });
-    ok(await page.locator('#scramble-slots .study-word-tile').count() === 2, 'Study completes spelling into whole-word tiles, with no duplicate sentence');
-    ok(await page.locator('#scramble-bank .speech-practice-continue').isVisible(), 'slow first preparation offers Continue instead of blocking the child');
-    ok(await page.evaluate(() => srStudyResults.length === 1 && __events.filter(e => e[0] === 'wordScramble').length === 1), 'spelling credit is recorded before speech');
-    ok(await page.evaluate(() => __workers.length === 1 && AdaptiveSpeech.isBusy() === false), 'preload and word practice share one worker');
+    ok(await page.locator('#scramble-bank .speech-sentence-gate').count() === 0, 'cold model skips Study word speaking instead of showing preparation controls');
+    await page.waitForFunction(() => STUDY_STATE.currentWordIndex === 1);
+    ok(await page.evaluate(() => srStudyResults.length === 1 && __events.filter(e => e[0] === 'wordScramble').length === 1), 'skipping cold speech advances once and preserves spelling credit');
+    await page.evaluate(() => {
+      window.SpeechStatus = { isReady: () => true }; // stale preload status must not override real adaptive readiness
+      STUDY_STATE.sentences = ['This is a pen.', 'This is a dog.']; startRoundE();
+      Array.from(document.querySelectorAll('#sentence-drop-zone .sentence-slot')).forEach(zone => zone.appendChild(createWordTile(zone.dataset.expected, 0)));
+      checkRoundE();
+    });
+    ok(await page.locator('#sentence-word-bank .speech-sentence-gate').count() === 0, 'cold model skips Study sentence speaking even with a stale ready status');
+    await page.waitForFunction(() => STUDY_STATE.currentSentenceIndex === 1);
+    await page.evaluate(() => {
+      StudyRuntime.suspend(); SPELLING_WORDS = ['ball']; startSpellingGame('ball');
+      const e = document.getElementById('spellingGame'), letters = JSON.parse(e.dataset.letters), used = new Set();
+      e.dataset.placement = JSON.stringify([...'ball'].map(c => { const i=letters.findIndex((v,i)=>v===c&&!used.has(i));used.add(i);return i; }));
+      buildSpellingSlots(); checkSpelling();
+    });
+    ok(await page.locator('#spelling-speech-gate').count() === 0 && await page.locator('#spelling-result-action').isVisible(), 'cold model skips game word speaking and exposes the earned reward');
+    await page.evaluate(() => {
+      document.getElementById('spellingGame').classList.add('hidden'); startGrammarGame('This is a pen.');
+      Array.from(document.querySelectorAll('#word-dock > .draggable')).forEach(tile => tile.remove());
+      'This is a pen.'.split(' ').forEach((word,i) => { const tile=document.createElement('div');tile.className='draggable placed';tile.dataset.word=word;tile.textContent=word;document.querySelectorAll('#sentence-container .drop-zone')[i].appendChild(tile); });
+      checkGrammar();
+    });
+    ok(await page.locator('#grammar-speech-gate').count() === 0 && await page.locator('#grammar-result-action').isVisible(), 'cold model skips game sentence speaking and keeps its reward');
+    ok(await page.evaluate(() => __workers.length === 1 && __workers[0].alive), 'skipped exercises leave the original model preparation running');
     await page.evaluate(() => __workers[0].emit({ ready: true }));
     await page.waitForFunction(() => AdaptiveSpeech.isReady());
+    await page.evaluate(() => {
+      document.getElementById('grammarGame').classList.add('hidden'); STUDY_STATE.active=true;STUDY_STATE.isTransitioning=false;
+      srStudyResults=[];__events=[];STUDY_STATE.words=['ice cream','ball'];STUDY_STATE.sentences=['This is a pen.'];
+      document.getElementById('studyModeOverlay').classList.remove('hidden');startRoundC();
+      roundCSlots().forEach((tile,i)=>tile.innerText=currentTTSWord[i]);checkRoundC();
+    });
+    ok(await page.locator('#scramble-slots .study-word-tile').count() === 2, 'ready model offers whole-word speaking tiles');
     async function record(selector) {
       await page.locator(selector + ' .speech-rec-btn').click();
       await page.waitForFunction(s => document.querySelector(s + ' .speech-rec-btn').dataset.speechState === 'recording', selector);
-      ok(await page.locator('.speech-reading-neutral').count() > 0, 'microphone start resets previous success to purple');
+      const tiles = {'#scramble-bank':'#scramble-slots','#sentence-word-bank':'#sentence-drop-zone','#spelling-speech-gate':'#spelling-input-display','#grammar-speech-gate':'#sentence-container'}[selector];
+      ok(await page.locator(tiles+' .speech-reading-neutral').count() > 0 && await page.locator(tiles+' .speech-reading-heard').count() === 0, 'new attempt resets prior greens and checkmarks to purple');
       await page.locator(selector + ' .speech-rec-btn').click();
       await page.waitForFunction(s => document.querySelector(s + ' .speech-rec-btn').dataset.speechState === 'idle', selector);
     }
     await record('#scramble-bank');
     ok(await page.evaluate(() => __recorderOptions.preserveOnset && __workers[0].requests.at(-1).audio.length === 4800 && __workers[0].requests.at(-1).audio[0] > 0), '300ms word reaches the adaptive checker at16kHz, with onset intact and no repetition');
     ok(await page.locator('#scramble-slots .correct').count() === 1 && await page.locator('#scramble-slots .speech-reading-neutral').count() === 1, 'multiword vocabulary receives separate green/purple word decisions');
+    ok((await page.locator('#scramble-bank .heard-feedback').textContent()) === '读得不错！不过，有些词我们没能听清楚。你可以再试一次，也可以继续，由你决定！', 'partial recognition uses the approved encouraging message');
+    ok(await page.locator('#scramble-slots .speech-reading-heard').count() === 1 && await page.locator('#scramble-slots .speech-reading-heard').textContent() === 'ice', 'checkmark state does not alter the target word text');
+    ok(await page.locator('#scramble-slots .speech-reading-heard').evaluate(e=>getComputedStyle(e,'::after').content.includes('✓')), 'recognised word renders a bottom-right checkmark');
+    await page.evaluate(()=>window.__accept='all');await record('#scramble-bank');
+    ok(await page.locator('#scramble-slots .speech-reading-heard').count() === 2 && await page.locator('#scramble-bank .heard-feedback').textContent() === '太棒了！你读得非常好！', 'all-green readings show checkmarks and the clear success message');
+    await page.evaluate(()=>window.__accept='none');await record('#scramble-bank');
+    ok(await page.locator('#scramble-slots .speech-reading-heard').count() === 0 && await page.locator('#scramble-bank .heard-feedback').textContent() === '抱歉，这次我们没能听清你读的内容。你可以再试一次，也可以继续，由你决定！', 'no recognised words stay unmarked with the approved retry-or-continue message');
+    await page.evaluate(()=>window.__accept=null);await record('#scramble-bank');
     if (process.env.SPEECH_QA_DIR) { fs.mkdirSync(process.env.SPEECH_QA_DIR, { recursive: true }); await page.screenshot({ path: path.join(process.env.SPEECH_QA_DIR, 'study-word.png'), fullPage: true }); }
     const study = await page.evaluate(() => ({ ...StudyRuntime.capture(), createdAt: new Date().toISOString(), runId: 'fixture-study' }));
     await page.evaluate(saved => StudyRuntime.restore(saved), study);
@@ -127,6 +165,7 @@ const server = http.createServer((req, res) => {
       checkGrammar();
     });
     await record('#grammar-speech-gate');
+    const grammarSaved = await page.evaluate(()=>GameRuntime.capture());
     ok(await page.evaluate(() => __workers.length === 1 && __workers[0].requests.at(-1).target === 'This is a pen.'), 'game sentences use the same improved worker and accepted sentence');
     await page.locator('#grammar-speech-gate .speech-practice-continue').click();
     await page.evaluate(() => document.getElementById('grammarGame').classList.add('hidden'));
@@ -145,6 +184,15 @@ const server = http.createServer((req, res) => {
     ok(await page.locator('#spelling-speech-gate .speech-practice-continue').isVisible() && await page.locator('#spelling-input-display .correct').count() === 0, 'assessment timeout leaves neutral feedback and optional Continue');
     await page.locator('#spelling-speech-gate .speech-practice-continue').click();
     ok(await page.locator('#spelling-result-action').isVisible(), 'recognition timeout cannot lose the spelling reward');
+    await page.evaluate(saved => StudyRuntime.restore(saved), study);
+    ok(await page.locator('#scramble-bank .speech-sentence-gate').count() === 0, 'restored word speech is also skipped when its model is unavailable');
+    await page.clock.runFor(1100);
+    ok(await page.evaluate(()=>STUDY_STATE.currentWordIndex===1&&srStudyResults.length===1), 'skipping restored word speech advances once without another spelling credit');
+    await page.evaluate(()=>StudyRuntime.suspend());
+    await page.evaluate(saved=>GameRuntime.restore(saved),before.saved);
+    ok(await page.locator('#spelling-speech-gate').count()===0&&await page.locator('#spelling-result-action').isVisible(), 'unavailable model during game word recovery exposes the original reward');
+    await page.evaluate(saved=>GameRuntime.restore(saved),grammarSaved);
+    ok(await page.locator('#grammar-speech-gate').count()===0&&await page.locator('#grammar-result-action').isVisible(), 'unavailable model during game sentence recovery exposes the original reward');
     await page.goto(base + '/Classroom-survivors-preview/index.html');
     await page.waitForFunction(() => window.AdaptiveSpeech && __workers.length === 1);
     await page.clock.install();

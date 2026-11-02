@@ -24,6 +24,7 @@ function advanceRoundESentence() {
     nextRoundESentence();
 }
 function mountStudySpeechGate(saved) {
+    if (!window.SpeechUI || !SpeechUI.isReady()) { studyLater('sentence_next', advanceRoundESentence, 1000); return; }
     const drop = document.getElementById('sentence-drop-zone');
     if (!drop || !window.SpeechUI) return;
     const controls = drop.parentElement.lastElementChild;
@@ -42,6 +43,7 @@ function advanceRoundCWord() {
     nextRoundCWord();
 }
 function mountStudyWordSpeechGate(saved) {
+    if (!window.SpeechUI || !SpeechUI.isReady()) { studyLater('scramble_next', advanceRoundCWord, 1000); return; }
     const area = document.getElementById('scramble-slots');
     if (!area || !window.SpeechUI) return;
     const tiles = SpeechUI.completedWordTiles(area, currentTTSWord);
@@ -465,7 +467,7 @@ function checkRoundC() {
         playHappySound();
         srStudyResults.push({ type: 'vocab', key: itemKey(targetWord), firstAttempt: exerciseAttempts === 1 });
         queueExerciseEvent('wordScramble', 'study', targetWord);
-        if (window.SpeechUI && SpeechUI.adaptiveEnabled()) {
+        if (window.SpeechUI && SpeechUI.adaptiveEnabled() && SpeechUI.isReady()) {
             mountStudyWordSpeechGate();
             if (window.StudyRecovery) StudyRecovery.capture();
         } else studyLater('scramble_next', advanceRoundCWord, 1000);
@@ -1035,7 +1037,7 @@ function checkRoundE() {
         // Speech step: now that the sentence is built correctly, ask the student
         // to say it aloud (Whisper). Skipped silently if the model isn't ready
         // yet, so it never blocks progression or shows a spinner.
-        if (window.SpeechUI && window.SpeechUI.makeSentenceGate && (SpeechUI.adaptiveEnabled() || window.SpeechStatus && window.SpeechStatus.isReady())) {
+        if (window.SpeechUI && window.SpeechUI.makeSentenceGate && SpeechUI.isReady()) {
             mountStudySpeechGate();
         } else {
             // Log WHY the gate was skipped — without this the skip is invisible

@@ -75,7 +75,7 @@ async function crash(context,page){const crashed=page.waitForEvent('crash');cons
  for(const word of ['a','pen.'])await page.locator('#sentence-word-bank .study-word-tile').filter({hasText:new RegExp('^'+word.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'$')}).first().click();
  await page.evaluate(()=>checkRoundE());await page.locator('.speech-rec-btn').click();await page.waitForFunction(()=>document.querySelector('.speech-rec-btn').dataset.speechState==='recording');await page.waitForTimeout(40);
  const speechBefore=await saved(page);ok(speechBefore.snapshot.speech.recordingState==='recording','the checkpoint identifies an interrupted speaking step');
- page=await crash(context,page);await page.locator('#study-resume-yes').click();await page.waitForFunction(()=>StudyRecovery.active());
+ page=await crash(context,page);await page.evaluate(()=>SpeechStatus={isReady:()=>true});await page.locator('#study-resume-yes').click();await page.waitForFunction(()=>StudyRecovery.active());
  ok(await page.locator('.speech-sentence-gate').count()===1,'the correctly built sentence resumes at its speaking step');
  ok(await page.locator('.speech-rec-btn').getAttribute('data-speech-state')!=='recording'&&(await page.locator('.heard-feedback').textContent()).includes('录音已中断'),'microphone stays stopped and the child can explicitly retry');
  ok(await page.locator('.speech-practice-continue').isVisible(),'interrupted speaking can still use the normal Continue action');

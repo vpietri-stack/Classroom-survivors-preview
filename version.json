@@ -1,5 +1,5 @@
 {
-  "version": "2026-11-01f",
-  "deployedAt": "2026-11-01",
-  "notes": "Preview only: adaptive word and sentence speech, preserving earned spelling and resumable Study/game progress."
+  "version": "2026-11-02a",
+  "deployedAt": "2026-11-02",
+  "notes": "Preview only: clearer speech feedback and checkmarks; skip speaking until its model is ready."
 }

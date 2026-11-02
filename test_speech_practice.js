@@ -44,7 +44,7 @@ async function main() {
     await open('different'); assert.equal(await page.locator('.speech-practice-continue').isVisible(), false); checks++;
     await record('different', false);
     assert.equal(await page.locator('.speech-practice-continue').isVisible(), true);
-    assert(!/%|再试一次|错误:/.test(await page.locator('.heard-feedback').innerText())); checks++;
+    assert(!/%|错误:/.test(await page.locator('.heard-feedback').innerText())); checks++;
     await record('match', false); await record('different', false);
     assert.deepEqual(await page.evaluate(() => scores), [1, 1, 1]); checks++;
     await page.locator('.speech-practice-continue').click();

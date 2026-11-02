@@ -31,6 +31,12 @@ behavioral contracts in the historical inventory; do not remove tests for cost.
 
 # Testing
 
+Speech feedback/readiness regression checks extend `test_speech_adaptive_app.js`:
+all/some/no word messages, CSS checkmarks without changing target text, clearing
+badges on retry, four unready exercise paths despite stale status, and restored
+speaking bypass without duplicate credit/rewards. Ready-model recovery fixtures
+explicitly restore readiness for microphone-interruption checks.
+
 Preview adaptive speech integration: `test_speech_adaptive_app.js` drives the real
 main preview entry, Study/game word and sentence callers, short native-rate audio,
 word-level feedback, earned credit/reward, runtime restoration, microphone hiding,

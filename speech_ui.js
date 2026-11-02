@@ -31,6 +31,8 @@
 .speech-target-word.heard{background:#e1f3e3;color:#24663e;}
 .speech-reading-tile.speech-reading-neutral{background:linear-gradient(180deg,#818cf8,#6366f1)!important;color:white!important;border-color:#4338ca!important;box-shadow:0 3px 0 #4338ca!important;animation:none!important;}
 .speech-reading-tile.correct{background:linear-gradient(180deg,#4ade80,#16a34a)!important;color:white!important;border-color:#15803d!important;box-shadow:0 3px 0 #15803d!important;animation:none!important;}
+.speech-reading-heard,.speech-target-word.heard{position:relative;padding-right:27px!important;}
+.speech-reading-heard::after,.speech-target-word.heard::after{content:'✓';position:absolute;right:3px;bottom:3px;width:17px;height:17px;line-height:17px;border-radius:50%;background:#fff;color:#15803d;font:900 14px/17px sans-serif;text-align:center;box-shadow:0 1px 2px #16653455;}
 .speech-target-note{font-size:12px;margin:6px 0;}
 /* Inline recording indicator (no overlay — sentence stays visible) */
 .rec-inline{display:none;flex-direction:column;align-items:center;gap:8px;margin-top:10px;}
@@ -700,6 +702,7 @@
     opts = opts || {}; injectAssets();
     const target = opts.target || '', level = opts.level || 2, mode = opts.mode || 'study', book = opts.book || currentBook();
     const wordTiles = Array.from(opts.wordTiles || []).filter(Boolean);
+    const expectedWordCount = (target.match(/[\p{L}\p{N}]+(?:['’\-][\p{L}\p{N}]+)*/gu) || []).length;
     const onDone = typeof opts.onDone === 'function' ? opts.onDone : function () {};
     let done = false, disposed = false, recordings = 0, gradedTries = 0, errors = 0, outcome = 'not_recorded', hintedWords = 0;
     const wrap = document.createElement('div');
@@ -724,7 +727,7 @@
       hintedWords = 0;
       if (wordTiles.length) {
         wordTiles.forEach(tile => {
-          tile.classList.remove('!bg-green-500', '!bg-red-500', 'correct', 'wrong');
+          tile.classList.remove('!bg-green-500', '!bg-red-500', 'correct', 'wrong', 'speech-reading-heard');
           tile.classList.add('speech-reading-tile', 'speech-reading-neutral');
           tile.setAttribute('aria-label', tile.textContent + '：未判断');
         });
@@ -748,7 +751,7 @@
           const heard = n > 0 && meta.targetWords.slice(offset, offset + n).every(w => w.heardClear);
           if (heard) {
             tile.classList.remove('speech-reading-neutral');
-            tile.classList.add('!bg-green-500', 'correct');
+            tile.classList.add('!bg-green-500', 'correct', 'speech-reading-heard');
             tile.setAttribute('aria-label', tile.textContent + '：这次听清了');
           }
           hintedWords += meta.targetWords.slice(offset, offset + n).filter(w => w.heardClear).length;
@@ -764,6 +767,11 @@
       if (!alive()) return;
       feedback.textContent = message; cont.hidden = false;
       recBtn.setSpeechIdleText('🎙️ 再读一次');
+    }
+    function readingMessage() {
+      if (expectedWordCount > 0 && hintedWords === expectedWordCount) return '太棒了！你读得非常好！';
+      if (hintedWords > 0) return '读得不错！不过，有些词我们没能听清楚。你可以再试一次，也可以继续，由你决定！';
+      return '抱歉，这次我们没能听清你读的内容。你可以再试一次，也可以继续，由你决定！';
     }
     function technicalError(err, permission) {
       if (!alive()) return; outcome = 'unassessed'; transcript.hidden = true;
@@ -806,7 +814,7 @@
           outcome = 'unassessed'; transcript.hidden = true; capture(text, meta, null, 'hallucination');
           logSpeechEvent('gated', mode, { target: target, level: level, reason: 'hallucination', flow: 'optional_practice_v1', ua: UA }, recordings);
           if (hintedWords) { gradedTries++; outcome = 'target_heard'; }
-          offer(hintedWords ? '有些词已经听清了，谢谢你认真朗读！可以再练一次，也可以继续。' : '谢谢你练习！这次没有听清楚，可以再读一次，也可以继续。'); return;
+          offer(readingMessage()); return;
         }
         gradedTries++;
         // Retrying never changes the match threshold. These are transcription
@@ -823,14 +831,12 @@
         }, recordings);
         capture(text, meta, result, 'graded');
         transcript.querySelector('p').textContent = '我听到的可能是：“' + String(text || '').slice(0, 1000) + '”'; transcript.hidden = false;
-        offer(hintedWords ? '谢谢你认真朗读！这次已经听到了这些词。可以再练一次，也可以继续。' :
-          '谢谢你练习！想再练一次可以重新录音，也可以继续。');
+        offer(readingMessage());
       },
       onGated: function (reason, meta) {
         if (!alive()) return; outcome = 'unassessed'; transcript.hidden = true; capture('', meta, null, reason);
         logSpeechEvent('gated', mode, { target: target, level: level, reason: reason, flow: 'optional_practice_v1', audioMs: meta && meta.audioMs, durMs: meta && meta.durMs, ua: UA }, recordings || 1);
-        offer(reason === 'too_short' ? '录音有点短。可以读完句子再点停止，也可以继续。' :
-          '没有听清声音。可以靠近麦克风再读一次，也可以继续。');
+        offer(readingMessage());
       },
       onError: function (err) { technicalError(err, isPermissionError(err)); },
       onPermissionDenied: function (err) { technicalError(err || new Error('Permission denied'), true); }
@@ -900,6 +906,10 @@
   global.SpeechUI = {
     completedWordTiles: completedWordTiles,
     adaptiveEnabled: function () { return !!(global.AdaptiveSpeech && global.AdaptiveSpeech.enabled); },
+    isReady: function () {
+      return global.AdaptiveSpeech && global.AdaptiveSpeech.enabled ? global.AdaptiveSpeech.isReady() :
+        !!(global.SpeechStatus && global.SpeechStatus.isReady());
+    },
     injectAssets: injectAssets,
     makeRecordButton: makeRecordButton,
     makeSentenceGate: makeSentenceGate,

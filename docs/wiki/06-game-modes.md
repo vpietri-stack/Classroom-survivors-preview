@@ -11,8 +11,9 @@ Completed spelling letters become one tile per spoken word in the same answer
 area. The microphone resets those tiles to purple; only recognised words turn
 green. Multiword vocabulary receives separate word decisions. There is no
 repeated target or second feedback row, letter pronunciation grading, red speech
-failure, or percentage. Students can retry or Continue; preparation and errors
-also offer Continue. Spelling SR/events are earned once before speech, and game
+failure, or percentage. New and restored speaking steps are skipped when the
+model is not ready; its background preparation continues. Problems after a
+recording still offer Retry/Continue. Spelling SR/events are earned once before speech, and game
 Continue reveals the already earned reward without repeating its accounting.
 
 `speech_adaptive_app.js` shares one worker between preload and all main-app speech

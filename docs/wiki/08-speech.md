@@ -1,5 +1,18 @@
 # Speech Recognition & Pronunciation Scoring
 
+Preview feedback update (2 November 2026): recognised words carry a bottom-right
+checkmark; it is a CSS badge so target text and ordered word matching stay intact.
+Each new recording removes both the green state and badge. Feedback distinguishes
+all/some/no green target words using the approved Simplified Chinese messages:
+“太棒了！你读得非常好！”, “读得不错！不过，有些词我们没能听清楚。你可以再试一次，也可以继续，由你决定！”
+and “抱歉，这次我们没能听清你读的内容。你可以再试一次，也可以继续，由你决定！”.
+`SpeechUI.isReady()` checks the actual adaptive engine, not a stale preload status.
+Study/game word and sentence callers, including recovery, bypass speaking when
+unready while preserving existing completion, SR and reward accounting. A fault
+or timeout after recording keeps the existing friendly Retry/Continue controls.
+No recognition, model, runtime, helper or cache URLs change.
+
+
 ## Preview app integration — 1 November 2026
 
 The main preview now uses the frozen adaptive worker for both existing sentence
@@ -11,8 +24,9 @@ Completed spelling letters become one tile per spoken word in the same answer
 area. The microphone resets those tiles to purple; only recognised words turn
 green. Multiword vocabulary receives separate word decisions. There is no
 repeated target or second feedback row, letter pronunciation grading, red speech
-failure, or percentage. Students can retry or Continue; preparation and errors
-also offer Continue. Spelling SR/events are earned once before speech, and game
+failure, or percentage. New and restored speaking steps are skipped when the
+model is not ready; its background preparation continues. Problems after a
+recording still offer Retry/Continue. Spelling SR/events are earned once before speech, and game
 Continue reveals the already earned reward without repeating its accounting.
 
 `speech_adaptive_app.js` shares one worker between preload and all main-app speech
