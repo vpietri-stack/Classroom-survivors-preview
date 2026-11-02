@@ -708,9 +708,9 @@
     const wrap = document.createElement('div');
     wrap.className = 'speech-sentence-gate speech-practice mt-4 text-center';
     wrap.innerHTML = '<div class="text-lg mb-2">🎙️ 朗读练习：<b class="text-emerald-300" lang="en"></b></div>' +
-      '<p class="speech-practice-instruction">点击录音，读完后点击停止。可以再练一次，也可以继续。</p>' +
-      '<div class="speech-gate-btns flex items-center justify-center gap-3 flex-wrap"></div>' +
       '<div class="heard-feedback" role="status" aria-live="polite"></div>' +
+      '<div class="speech-gate-btns flex items-center justify-center gap-3 flex-wrap"></div>' +
+      '<p class="speech-practice-instruction">点击录音，读完后点击停止。可以再练一次，也可以继续。</p>' +
       '<div class="speech-target-words" hidden aria-label="听到的目标词"></div><p class="speech-target-note" hidden>绿色是这次听到的词；其他词不判对错。</p>' +
       '<details hidden><summary>查看识别到的内容</summary><p></p></details>';
     if (wordTiles.length) {

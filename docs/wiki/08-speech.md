@@ -1,7 +1,8 @@
 # Speech Recognition & Pronunciation Scoring
 
 Preview feedback update (2 November 2026): recognised words carry a bottom-right
-checkmark; it is a CSS badge so target text and ordered word matching stay intact.
+checkmark; reading feedback appears above the record/Continue controls and the
+recording instructions below them. The checkmark is a CSS badge so target text and ordered word matching stay intact.
 Each new recording removes both the green state and badge. Feedback distinguishes
 all/some/no green target words using the approved Simplified Chinese messages:
 “太棒了！你读得非常好！”, “读得不错！不过，有些词我们没能听清楚。你可以再试一次，也可以继续，由你决定！”

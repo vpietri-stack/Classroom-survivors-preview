@@ -1,5 +1,5 @@
 {
-  "version": "2026-11-02a",
+  "version": "2026-11-02b",
   "deployedAt": "2026-11-02",
-  "notes": "Preview only: clearer speech feedback and checkmarks; skip speaking until its model is ready."
+  "notes": "Preview only: reading feedback above speech buttons; recording instructions below."
 }
