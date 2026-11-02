@@ -1,164 +1,63 @@
-# AGENTS.md — READ THIS FIRST (any agent touching this repo)
+# Classroom Survivors
 
-You are working in **Classroom-survivors** (a vanilla-JS ESL web game + Azure
-Static Web Apps Functions backend, deployed to GitHub Pages). Before editing
-code, shipping a fix, or running a deploy, internalize the two hard rules below.
-They are enforced by tests, but the tests only catch you *after* you drift — read
-this so you don't drift in the first place.
+Vanilla-JS ESL learning game, GitHub Pages frontend, Azure Functions/Cosmos backend.
+Start at `docs/wiki/01-overview.md` and read the owning pages for the task; the wiki
+is a router, not a requirement to load every page. Update a page when its documented
+behavior, contract or workflow changes; avoid duplicate permanent handoff narratives.
 
----
+## Isolation and staging
 
-## 📚 REPO WIKI — `docs/wiki/` (load before ANY work)
+Use one feature branch/worktree. The shared main checkout may contain another
+session's work: never switch its branch, commit in it or overwrite its changes.
+Use `wt.sh new <feature> <explicit-base>` and `wt.sh where` before editing.
+`wt.sh` links installed dependencies; use `wt.sh rm` to remove a worktree safely.
+Do not recursively delete a worktree/junction. Stage explicit paths only; never
+`git add -A` or `git add .`. Private student data, recordings, dumps and secrets
+must remain untracked. Sequence integrations that touch shared files.
 
-`docs/wiki/` is the **single source of truth** for what this project is and how
-it works: architecture, subsystems, data model, API, telemetry, testing,
-deployment, and the don't-re-break-it gotchas/history page. **Start with
-`docs/wiki/01-overview.md`** (it routes you to the right page per task).
+## Checks — approved workflow policy, 2 November 2026
 
-**Update discipline:** any agent that changes code covered by a wiki page must
-update that page in the same commit. Architecture changes, new API endpoints,
-new localStorage keys, new event types, new tests, deploy-process changes, and
-post-incident lessons all belong there. Root-level `*_HANDOFF*.md` write-ups
-must be indexed in `docs/wiki/15-gotchas-and-history.md` and ideally distilled
-into the wiki (the root should not accumulate undying docs).
+During iteration use `npm run test:changed -- <base-ref>` or an explicit group:
+`node scripts/checks.mjs --group content` (also handwriting, speech, dashboard,
+notes, api, tower). Unknown/shared runtime changes broaden to the full suite.
+Inspect the selected list with `--list` when impact is uncertain. Documentation
+alone does not require application tests. Add a behavioral regression for a real
+bug; do not create tests that merely mirror an obvious low-impact edit.
 
----
+Before integration/release, run `npm test` on the final integrated code. It keeps
+all tests and the deploy-stamp guard first; see `scripts/checks.json` for the list.
+Backend mock/contract checks are portable: `npm --prefix api test`. Live backend
+integration is separate: `npm --prefix api run test:integration`, with the private
+helper, explicit loopback TEST_BASE and confirmed isolated Functions/Cosmos setup.
+Run that integration when backend/auth/persistence contracts change. Unavailable
+integration is a reported gap, never a pass and never a reason to use production.
 
-## ⛔ RULE 1 — Deploy version stamps MUST stay in sync (or ALL users get a red banner)
+Full logs/receipts are gitignored in `.checks/`. Optional `--reuse` is local and
+valid only for identical source/tests/fixtures/dependencies/runtime; no live API
+result is cached. `npm test` reruns by default. A changed merge or environment
+invalidates prior evidence. Wait on the running process rather than tail-polling.
 
-There are **THREE** stamps that must be byte-identical after every deploy:
+## Release roles and targets
 
-| File | Field | Example |
-|------|-------|---------|
-| `version.json` | `"version"` | `"2026-08-30a"` |
-| `frontend_auth.js` | `const APP_VERSION = '...'` | `'2026-08-30a'` |
-| `index.html` | `<script src="frontend_auth.js?v=...">` | `?v=2026-08-30a` |
+Feature work preserves deploy stamps. The integrator updates them once on the
+final approved release: `version.json`, `frontend_auth.js` APP_VERSION and the
+`index.html` frontend_auth query must agree; keep dashboard auth queries aligned.
+Verify the deployed stamp and changed assets after release. A mismatch previously
+put the cannot-save-progress banner on students' screens.
 
-**Why:** `startVersionWatchdog()` (frontend_auth.js) polls `version.json` every
-60s; if the live version is **greater** than the running `APP_VERSION`, it shows
-`registerUpdateBanner()` → a **red bottom banner** ("⚠️ 无法保存进度 — 点击重新输入密码")
-to **every** user (students + teacher). A mismatch = everyone sees the banner and
-can't self-heal. This was broken on 2026-08-30 (version.json bumped, the other
-two forgotten) and took a full GitHub-Pages-deploy unstick to recover.
+Preview and production are separate release lines and have isolated API/data and
+curriculum. Build on the named target's current base and preserve that isolation.
+`preview` remote main is preview; `origin` main is production. A preview request
+never authorizes production or a whole-history merge from preview to production.
+Production requires the user's explicit release instruction. Integrate in a
+separate worktree; do not switch the shared checkout or require unrelated refs to
+be equal. See `docs/wiki/13-deployment.md` for current operations and history.
 
-**Do this on every version bump:**
-1. Pick a new stamp: `YYYY-MM-DD` + optional lowercase letter.
-2. Set **all three** to the same value.
-3. `npm test` must pass (the guard `test_deploy_stamp_sync.js` runs first and
-   exits non-zero on any drift — so you literally cannot commit a mismatch via
-   the normal test gate).
-4. Deploy, then verify live: curl the served `frontend_auth.js` and confirm
-   `APP_VERSION` matches `version.json`.
+Monitor the existing Pages/Azure deployment runs through a terminal result;
+retry a failed deployment only after resolving its condition. Do not push again
+merely to poll. This policy supersedes historical full-suite-before-every-commit
+and push-both-remotes instructions in older handoffs/wiki excerpts.
 
-See `DEPLOY_VERSION_STAMP.md` for the full root-cause writeup.
-
----
-
-## ⛔ RULE 2 — Never `git add -A` / `git add .` here
-
-Stage specific paths only (`git add <file> <file>`). The repo has a large
-untracked `api/speech_events_dump_full.json` and other artifacts that must NOT
-be committed. The workspace instruction forbids blanket adds; respect it.
-
----
-
-## 🌳 RULE 3 — One feature per conversation, in its own worktree
-
-This working directory is shared by **more than one session at once**, and
-`git checkout` rewrites the files under whatever is already running here. On
-2026-10-05 another session's `branch: Reset to d3014dc` silently discarded an
-agent's ~250-line uncommitted edit to `handwriting.js`. It was never staged,
-never pushed, and had no editor local-history entry — it was unrecoverable.
-
-**The model:** the Qoder workspace folder stays `Classroom-survivors` (so this
-file, the wiki and project memory all load), but each feature gets its **own
-conversation** and its **own checkout** in `../Classroom-survivors-wt/<feature>`.
-One conversation, one feature. Do not fold a second feature into a conversation
-that is already carrying one — start a new conversation instead.
-
-**Opening a feature.** The operator names it; create it if it doesn't exist:
-
-```bash
-# works from the main checkout whatever branch it is on, even before wt.sh lands there
-git show refs/heads/preview:wt.sh > /tmp/wt.sh && bash /tmp/wt.sh new <feature>
-cd "../Classroom-survivors-wt/<feature>"
-```
-
-`wt.sh new` also junctions `node_modules/` and `api/node_modules/` (both
-gitignored, so a fresh worktree has neither and `npm test` dies with a
-misleading `Cannot find module '@azure/functions'`).
-
-**Before the first write, assert where you are:**
-
-```bash
-./wt.sh where     # exits 3 and shouts if you are standing in the MAIN checkout
-```
-
-This is not ceremony. The workspace root is the main repo while the work lives
-in a sibling folder, so every default path resolves to the **wrong** tree. An
-agent that edits `frontend_auth.js` without checking has edited the copy
-another session is running. Use absolute paths into the worktree, or `cd` there
-and stay there.
-
-**Hard rules:**
-- Never switch the main checkout to your branch, and never commit in it because
-  "it was already checked out" — it belongs to whoever is using it.
-- **Never `rm -rf` a worktree.** Use `wt.sh rm`, which deletes the junctions
-  first. A recursive delete that follows a junction deletes the real
-  `node_modules`.
-- Finish the feature in its own worktree and merge it deliberately. Leave
-  `wt.sh ls` showing only the worktrees still in flight.
-
-**Split along files, not topics.** `images/vocab/*.png` is near-conflict free
-(new filenames). `index.html`, `content_<book>.js` and the stamp trio are not —
-two features editing them will collide. If two conversations must touch the same
-file, sequence them rather than running them in parallel.
-
-**Agents never bump the deploy stamps.** `version.json`, `APP_VERSION` and the
-`index.html` `?v=` must stay byte-identical (RULE 1); if two features each bump
-them you get a conflict on precisely the three lines that may not conflict, and
-a bad resolution puts the red banner on every student. The integrator bumps,
-once, on the merged result, at ship time.
-
-**State the push target.** `origin` is production (Pages + the Azure Functions);
-`preview` and `hw` are preview sites. An agent that "just pushes its branch" to
-`origin/main` has shipped to every class. Never push to `origin/main` without an
-explicit instruction for that deploy.
-
----
-
-## Deploy pipeline (preview-first, additive)
-
-- Source branch for GitHub Pages **and** the SWA Functions is `main`.
-- `preview` is your working/local integration branch; `main` is what ships.
-- Standard cycle: work on `preview` → `git checkout main && git merge preview`
-  → push `main` to **both** `origin` (GitHub Pages + SWA via Actions) **and**
-  `preview` remote (`git push origin HEAD:refs/heads/main` and
-  `git push preview HEAD:refs/heads/main`). Keep all four refs equal before
-  finishing.
-- **GitHub Pages wedges easily**: a prior "in progress" deployment blocks the
-  next one with `Deployment request failed ... due to in progress deployment.
-  Please cancel <sha> first`. The modern Pages Settings UI has NO cancel button
-  — it self-resolves in ~30–90 min, or `gh run rerun <pages-run-id>` after the
-  lock rolls forward. Don't thrash with repeated pushes; one rerun after the
-  wedge clears is enough.
-- The SWA Functions deploy (`Azure Static Web Apps CI/CD` workflow) and the
-  Pages deploy are **separate** Actions runs triggered by the same push.
-
-## Tests (REQRED green before any commit)
-- `npm test` (root) — runs the whole suite (currently 16 files, 517 assertions).
-  `test_deploy_stamp_sync.js` is first; it fails the whole run on stamp drift.
-- `cd api && npm test` — backend Functions tests.
-
-## Key files
-- `frontend_auth.js` — auth, session tokens, **version watchdog**, flush logic.
-- `index.html` — entry; every `<script>` carries a `?v=<APP_VERSION>` cache-buster.
-- `teacher_dashboard.js/.html/.css` — admin/teacher view (archive-merge lives here).
-- `api/src/functions/` — Azure Functions (getStudents, saveAnalytics w/ auto-archive,
-  getStudentArchive, login, etc.).
-- `DEPLOY_VERSION_STAMP.md`, `HANDOFF_SESSION_REFRESH_FIX.md` — discipline + state.
-
-## Conventions
-- KISS/DRY; match surrounding style; additive changes preferred.
-- Bump the deploy stamps (all three) whenever you ship a fix clients must pick up.
-- Leave `api/speech_events_dump_full.json` (untracked) alone.
+Keep queue/ack retry discipline, account isolation, SR invariants and bounded
+payloads. New incidents need current evidence; historical causes do not establish
+the cause of a new tablet refresh.

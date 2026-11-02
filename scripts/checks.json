@@ -1,0 +1,175 @@
+{
+  "all": [
+    "test_deploy_stamp_sync.js",
+    "test_study_resume.js",
+    "test_game_resume.js",
+    "test_game_resume_browser.js",
+    "test_study_resume_state.js",
+    "test_study_resume_browser.js",
+    "test_practice_telemetry.js",
+    "test_widgets_regression.js",
+    "test_handwriting.js",
+    "test_handwriting_browser.js",
+    "test_handwriting_neural_browser.js",
+    "test_handwriting_samples.js",
+    "test_handwriting_capture_browser.js",
+    "test_sr_once_per_session.js",
+    "test_round_e_dedup.js",
+    "test_session_flush_deadline.js",
+    "test_auto_archive_analytics.js",
+    "test_archive_merge_dashboard.js",
+    "test_dashboard_non_spelling.js",
+    "test_speech_hygiene.js",
+    "test_speech_practice.js",
+    "test_speech_word_poc.js",
+    "test_speech_adaptive_app.js",
+    "test_speech_adaptive.js",
+    "test_speech_adaptive_assets.js",
+    "test_speech_adaptive_mirrors.js",
+    "test_speech_adaptive_runtime.js",
+    "test_speech_adaptive_browser.js",
+    "test_speech_adaptive_lifecycle.js",
+    "test_speech_collection.js",
+    "test_speech_target.js",
+    "test_speech_engine_cancel.js",
+    "test_speech_samples.js",
+    "test_speech_collection_runtime.js",
+    "test_speech_capture_browser.js",
+    "test_td_gate.js",
+    "test_td_core.js",
+    "test_asset_manifest.js",
+    "test_geo_events.js",
+    "test_geo_capture.js",
+    "test_geo_export.js",
+    "test_geo_map.js",
+    "test_dashboard_security.js",
+    "test_dashboard_efficiency.js",
+    "test_class_calendar.js",
+    "test_target_reports.js",
+    "test_target_reports_browser.js",
+    "test_non_spelling_content.js",
+    "test_non_spelling_startup.js",
+    "test_non_spelling_integration_browser.js",
+    "test_vocab_normalization.js",
+    "test_client_diagnostics.js",
+    "test_client_diagnostics_browser.js",
+    "test_preview_notes_state.js",
+    "test_preview_notes_api.js",
+    "test_preview_notes_browser.js",
+    "test_notes_speech_browser.js",
+    "scripts/checks.test.mjs"
+  ],
+  "groups": {
+    "content": {
+      "paths": [
+        "^content_[^/]+\\.js$",
+        "^(non_spelling_content|translations)\\.js$",
+        "^images/vocab/"
+      ],
+      "tests": [
+        "test_widgets_regression.js",
+        "test_dashboard_non_spelling.js",
+        "test_asset_manifest.js",
+        "test_non_spelling_content.js",
+        "test_non_spelling_startup.js",
+        "test_non_spelling_integration_browser.js",
+        "test_vocab_normalization.js"
+      ]
+    },
+    "handwriting": {
+      "paths": [
+        "^handwriting[^/]*\\.(js|json|html|css)$",
+        "^handwriting_model/"
+      ],
+      "tests": [
+        "test_handwriting.js",
+        "test_handwriting_browser.js",
+        "test_handwriting_neural_browser.js",
+        "test_handwriting_samples.js",
+        "test_handwriting_capture_browser.js"
+      ]
+    },
+    "speech": {
+      "paths": [
+        "^(speech[^/]*|recorder[^/]*)\\.(js|json|html|css)$",
+        "^(models|lib/wasm)/"
+      ],
+      "tests": [
+        "test_practice_telemetry.js",
+        "test_speech_hygiene.js",
+        "test_speech_practice.js",
+        "test_speech_word_poc.js",
+        "test_speech_adaptive_app.js",
+        "test_speech_adaptive.js",
+        "test_speech_adaptive_assets.js",
+        "test_speech_adaptive_mirrors.js",
+        "test_speech_adaptive_runtime.js",
+        "test_speech_adaptive_browser.js",
+        "test_speech_adaptive_lifecycle.js",
+        "test_speech_collection.js",
+        "test_speech_target.js",
+        "test_speech_engine_cancel.js",
+        "test_speech_samples.js",
+        "test_speech_collection_runtime.js",
+        "test_speech_capture_browser.js",
+        "test_notes_speech_browser.js"
+      ]
+    },
+    "dashboard": {
+      "paths": [
+        "^(teacher_dashboard|admin_dashboard|class_calendar|target_reports)[^/]*\\.(js|html|css)$"
+      ],
+      "tests": [
+        "test_archive_merge_dashboard.js",
+        "test_dashboard_non_spelling.js",
+        "test_dashboard_security.js",
+        "test_dashboard_efficiency.js",
+        "test_class_calendar.js",
+        "test_target_reports.js",
+        "test_target_reports_browser.js"
+      ]
+    },
+    "notes": {
+      "paths": [
+        "^(preview_notes|interactive_notes|notes_speech)[^/]*\\.(js|html|css)$"
+      ],
+      "tests": [
+        "test_preview_notes_state.js",
+        "test_preview_notes_api.js",
+        "test_preview_notes_browser.js",
+        "test_notes_speech_browser.js"
+      ]
+    },
+    "api": {
+      "paths": [
+        "^api/"
+      ],
+      "tests": [
+        "test_study_resume.js",
+        "test_game_resume.js",
+        "test_handwriting_samples.js",
+        "test_session_flush_deadline.js",
+        "test_auto_archive_analytics.js",
+        "test_speech_samples.js",
+        "test_speech_collection_runtime.js",
+        "test_geo_events.js",
+        "test_dashboard_security.js",
+        "test_dashboard_efficiency.js",
+        "test_class_calendar.js",
+        "test_target_reports.js",
+        "test_client_diagnostics.js",
+        "test_preview_notes_state.js",
+        "test_preview_notes_api.js"
+      ]
+    },
+    "tower": {
+      "paths": [
+        "^(tower_defense|td_)[^/]*\\.(js|html|css)$"
+      ],
+      "tests": [
+        "test_td_gate.js",
+        "test_td_core.js"
+      ]
+    }
+  }
+}

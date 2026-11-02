@@ -5,7 +5,8 @@
   "main": "src/functions/*.js",
   "scripts": {
     "start": "func start",
-    "test": "node test_auth.js"
+    "test": "node ../scripts/checks.mjs --group api",
+    "test:integration": "node ../scripts/checks.mjs --integration"
   },
   "dependencies": {
     "@azure/cosmos": "^4.9.3",

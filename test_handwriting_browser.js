@@ -29,10 +29,9 @@
 //
 // Run:  node test_handwriting_browser.js   (part of npm test)
 // ============================================================
-const { chromium } = require('playwright-core');
+const { launchBrowser, fileUrl: testFileUrl } = require('./scripts/test-browser.cjs');
 const path = require('path');
-const CHROME_PATH = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
-const fileUrl = 'file:///' + path.resolve(__dirname, 'index.html').replace(/\\/g, '/');
+const fileUrl = testFileUrl(path.join(__dirname, 'index.html'));
 
 let pass = 0, fail = 0;
 function ok(c, m) { if (c) { pass++; console.log('PASS: ' + m); } else { fail++; console.error('FAIL: ' + m); } }
@@ -41,10 +40,11 @@ const SETTLE = 1900;   // > HW_STROKE_GAP_MS: long enough for a lift to be judge
 const ADVANCE = 600;   // > the round's 420ms wait before showing the next gap
 
 (async () => {
-  const browser = await chromium.launch({
-    executablePath: CHROME_PATH, headless: true,
+  const browser = await launchBrowser({
+    headless: true,
     args: ['--no-sandbox', '--disable-gpu', '--allow-file-access-from-files', '--font-render-hinting=none']
   });
+  try {
   const page = await browser.newPage({ viewport: { width: 480, height: 900 }, deviceScaleFactor: 2 });
   const errors = [];
   page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
@@ -496,7 +496,6 @@ const ADVANCE = 600;   // > the round's 420ms wait before showing the next gap
     'privacy: with capture disabled, a full round of accepted and rejected letters uploaded nothing (' +
     uploadsWhileOff + ' payloads)');
 
-  await browser.close();
 
   const realErrors = errors.filter(t => !/net::ERR_|Failed to load resource|ERR_FILE_NOT_FOUND|favicon/i.test(t));
   ok(realErrors.length === 0, 'runtime: no JS errors (' + (realErrors.length ? realErrors.join(' | ') : 'clean') + ')');
@@ -504,5 +503,6 @@ const ADVANCE = 600;   // > the round's 420ms wait before showing the next gap
   console.log('\n--- HANDWRITING (browser) ---');
   console.log(pass + ' passed, ' + fail + ' failed');
   console.log('RESULT: ' + (fail === 0 ? 'PASS' : 'FAIL'));
-  process.exit(fail === 0 ? 0 : 1);
+  process.exitCode = fail === 0 ? 0 : 1;
+  } finally { await browser.close(); }
 })().catch(e => { console.error('CRASH:', e); process.exit(2); });

@@ -60,3 +60,6 @@ speech_samples/
 # repo is public. Delete the directory when the recognition tuning is finished.
 /handwriting_samples/
 handwriting_samples/
+
+# Quiet check logs and input-keyed local validation receipts
+/.checks/

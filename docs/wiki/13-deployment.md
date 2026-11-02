@@ -1,3 +1,20 @@
+# Current integration policy (2 November 2026)
+
+Feature agents use isolated worktrees and preserve release stamps. The integrator
+starts a dedicated worktree at the named target's current main, integrates only
+approved changes, updates synchronized stamps once and runs the full suite on the
+result. Never switch or commit in the shared main checkout.
+
+Preview (`preview` remote) and production (`origin` remote) keep separate API/data
+and curriculum. Publish only to the explicitly authorized target; preview approval
+does not authorize production or merging preview history wholesale into production.
+No requirement exists to equalize unrelated target refs. Verify the target's
+existing Pages/Azure runs and served stamps/changed assets. Continue an in-flight
+run; do not create pushes to poll it. Resolve a failed condition before retrying.
+
+This policy supersedes older checkout-main/push-both-remotes instructions below;
+the remaining sections document subsystem release requirements and history.
+
 # Deployment & Release Discipline
 
 Preview 2026-11-01f integrates adaptive speech into the main app and adds word

@@ -1,3 +1,34 @@
+# Current check workflow (2 November 2026)
+
+Use targeted checks during iteration and `npm test` on the final integrated code
+before release. `scripts/checks.json` preserves the complete former test chain,
+with the deploy-stamp guard first. `npm run test:list` gives the current list.
+
+- `npm run test:changed -- <base-ref>` includes changes since that base and new
+  untracked files. Without a base it uses HEAD for local iteration, not a release
+  comparison. Unknown runtime changes and shared auth/storage contracts select all.
+- `node scripts/checks.mjs --group <name>` selects content, handwriting, speech,
+  dashboard, notes, api or tower. Add `--list` to inspect selection. Explicit group
+  selection is the caller's impact decision; it does not prove release readiness.
+- `npm --prefix api test` runs portable mock/contract checks without the private
+  helper or live database. `npm --prefix api run test:integration` requires the
+  private helper, explicit loopback TEST_BASE and CS_INTEGRATION_ISOLATED=1, meaning
+  the operator has configured an isolated local Functions/Cosmos environment.
+  Hosted endpoints are rejected; missing prerequisites are UNAVAILABLE, not passed.
+- Logs and validation receipts live in gitignored `.checks/`. The runner preserves
+  failures, stops on the first failing suite, and prints one line per suite.
+- Optional `--reuse` reuses an identical passing local input fingerprint. The full
+  command reruns by default. Source/test/fixture/dependency/runtime changes or
+  changed merges invalidate evidence. Live integration is never cached.
+- `npm run test:tooling` covers selection broadening, preserved tests, isolated
+  integration prerequisites and prevention of real HTTP API traffic in the shared
+  browser fixture. The fixture discovers Chrome or honors CHROME_PATH, encodes file
+  URLs, blocks real /api traffic before navigation and supports scenario mocks.
+  The two handwriting browser tests use it and close the browser even on errors.
+
+This section supersedes historical per-commit gate instructions below. Keep the
+behavioral contracts in the historical inventory; do not remove tests for cost.
+
 # Testing
 
 Preview adaptive speech integration: `test_speech_adaptive_app.js` drives the real
@@ -62,7 +93,7 @@ draws the actual upper dot; its former y-cut accidentally drew another stem.
 
 **Owner files:** `package.json` (`test` script), `test_*.js` (root), `api/test_auth.js`, plus the out-of-chain `vs_*` test family.
 
-`npm test` (root) is the **required-green gate before any commit**. It chains 21 Node scripts
+`npm test` (root) is the **full integrated release gate**. The historical inventory below described 21 Node scripts
 (`package.json:7`). Verified 2026-10-12: **880 assertions, 0 failures** (counts per file below;
 the stamp guard prints no summary line).
 
@@ -90,7 +121,7 @@ test_geo_map.js                    # geo_map: GCJ points, haversine, ranking, Ga
 test_dashboard_security.js         # sanitizeAvatar allowlist + authorizeClearGeo     (7)
 ```
 
-Two extra aliases: `npm run test:td` = `test_td_gate.js && test_td_core.js`. The backend has its own suite: `cd api && npm test` → `api/test_auth.js` (requires the local Functions runtime on `:7072` + an isolated test container — see [Backend API](10-backend-api.md)).
+Historical aliases: `npm run test:td` = `test_td_gate.js && test_td_core.js`. The backend has its own suite: `cd api && npm test` → `api/test_auth.js` (requires the local Functions runtime on `:7072` + an isolated test container — see [Backend API](10-backend-api.md)).
 
 ## The stamp guard must stay first
 
