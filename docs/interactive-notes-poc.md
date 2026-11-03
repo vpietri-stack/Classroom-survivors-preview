@@ -128,3 +128,15 @@ playback, cancellation/stale results, denied permission and 320px layout. The
 existing target-model and recorder suites cover their underlying implementation.
 
 Notes recording now requires at least two lexical words (preview 2026-10-28e). Single-word selection cancels recording/checking, clears the previous recording, and disables both microphone and own-recording playback while preserving example listening. Punctuation and contractions do not create extra words. Browser coverage includes the exact two-word boundary and switching back to a multiword phrase.
+
+## Restored single-word notes practice (3 November 2026)
+
+The user revoked the two-word restriction after testing the improved model.
+All nonempty lexical targets, including single words and contractions, can now
+be recorded. The notes reader uses the current AdaptiveSpeech bridge with
+onset-preserving Recorder capture, sharing its parent's worker when embedded
+and loading the same bridge lazily when standalone. No legacy Whisper fallback
+is used. Existing feedback, own-recording playback and cancellation remain.
+Browser coverage includes single-word target identity/green feedback/playback,
+onset-preserving capture, contractions and rejection of punctuation-only targets.
+Production is unchanged.

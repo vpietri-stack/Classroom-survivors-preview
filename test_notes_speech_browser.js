@@ -17,12 +17,13 @@ const server=http.createServer((req,res)=>{
    const revoke=URL.revokeObjectURL.bind(URL);URL.revokeObjectURL=url=>{testSpeech.revoked++;revoke(url);};
    HTMLMediaElement.prototype.play=function(){return Promise.resolve();};
    window.Recorder=class{
+    constructor(options){testSpeech.recorderOptions=options;}
     static isSupported(){return true;}
     async start(){if(testSpeech.denied)throw Object.assign(new Error(),{name:'NotAllowedError'});}
     cancel(){testSpeech.cancelled++;}
     async stop(){return new Blob([new Uint8Array(16000)],{type:'audio/wav'});}
    };
-   window.LocalEngine={load:async cb=>cb(100),transcribe:async(blob,options)=>{
+   window.AdaptiveSpeech={enabled:true,load:async cb=>cb(100),transcribe:async(blob,options)=>{
     testSpeech.calls.push({target:options.target,signal:options.signal});
     const result={targetStatus:'ready',targetWords:options.target.match(/[\p{L}\p{N}]+(?:['’\-][\p{L}\p{N}]+)*/gu).map((text,i)=>({text,heardClear:i===0}))};
     if(testSpeech.delay)return new Promise(resolve=>testSpeech.resolve=()=>resolve(result));return result;
@@ -45,7 +46,11 @@ const server=http.createServer((req,res)=>{
   ok(await page.locator('.notes-heard').count()===0,'new attempt clears previous green feedback');
   await page.locator('[data-clip="word-bored"]').first().evaluate(el=>el.scrollIntoView({block:'center'}));await page.locator('[data-clip="word-bored"]').first().click();
   ok(await page.locator('#notes-mic').getAttribute('aria-pressed')==='false'&&await page.locator('#notes-recording').isDisabled(),'new target cancels recording and discards old clip');
-  ok(await page.locator('#notes-mic').isDisabled()&&await page.locator('#notes-recording').isDisabled(),'single words disable both recording controls');
+  ok(await page.locator('#notes-mic').isEnabled()&&await page.locator('#notes-recording').isDisabled(),'single words enable new recording without retaining the previous clip');
+  await page.locator('#notes-mic').click();await page.waitForFunction(()=>document.getElementById('notes-mic').getAttribute('aria-pressed')==='true');await page.locator('#notes-mic').click();
+  await page.waitForFunction(()=>!!document.querySelector('.notes-heard'));
+  ok(await page.evaluate(()=>testSpeech.calls.at(-1).target==='bored'&&testSpeech.recorderOptions.preserveOnset),'single words use the adaptive model with onset-preserving capture');
+  ok(await page.locator('.notes-heard').textContent()==='bored'&&await page.locator('#notes-recording').isEnabled(),'single-word feedback and own recording playback are available');
   ok(await page.locator('#replay').isEnabled(),'single-word example listening remains available');
   await page.evaluate(()=>window.dispatchEvent(new CustomEvent('notes-select',{detail:{id:'two-word-fixture',text:'interested in'}})));
   ok(await page.locator('#notes-mic').isEnabled(),'exactly two words enable recording');
@@ -55,7 +60,9 @@ const server=http.createServer((req,res)=>{
   await page.evaluate(()=>testSpeech.resolve());
   ok(await page.locator('.notes-heard').count()===0&&await page.evaluate(()=>testSpeech.calls.at(-1).signal.aborted),'switching targets aborts assessment and ignores stale results');
   await page.evaluate(()=>window.dispatchEvent(new CustomEvent('notes-select',{detail:{id:'contraction-fixture',text:"I'm!"}})));
-  ok(await page.locator('#notes-mic').isDisabled(),'punctuation and contractions do not count as extra words');
+  ok(await page.locator('#notes-mic').isEnabled(),'a single contraction is eligible for recording');
+  await page.evaluate(()=>window.dispatchEvent(new CustomEvent('notes-select',{detail:{id:'empty-fixture',text:'...'}})));
+  ok(await page.locator('#notes-mic').isDisabled(),'punctuation-only targets remain ineligible');
   await page.locator('[data-clip="interested-in"]').first().evaluate(el=>el.scrollIntoView({block:'center'}));await page.locator('[data-clip="interested-in"]').first().click();
   ok(await page.locator('#notes-mic').isEnabled(),'existing multiword phrase enables recording again');
   await page.evaluate(()=>{testSpeech.delay=false;testSpeech.denied=true;});await page.locator('#notes-mic').click();await page.waitForFunction(()=>document.getElementById('notes-speech-status').textContent.includes('允许'));

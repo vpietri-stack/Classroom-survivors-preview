@@ -453,3 +453,15 @@ Speech sentence gates export/import studyResumeState: attempts, feedback, transc
 ## Game speech continuation (preview, 2026-11-01)
 
 GameRuntime reconstructs the accepted sentence and imports the existing speech gate recovery state without re-running checkGrammar or crediting its answer twice. An interrupted microphone remains idle with explicit retry/Continue. Functional recovery stores feedback/attempts only, never microphone audio, and cancels abandoned recorder callbacks.
+
+## Restored single-word notes practice (3 November 2026)
+
+The user revoked the two-word restriction after testing the improved model.
+All nonempty lexical targets, including single words and contractions, can now
+be recorded. The notes reader uses the current AdaptiveSpeech bridge with
+onset-preserving Recorder capture, sharing its parent's worker when embedded
+and loading the same bridge lazily when standalone. No legacy Whisper fallback
+is used. Existing feedback, own-recording playback and cancellation remain.
+Browser coverage includes single-word target identity/green feedback/playback,
+onset-preserving capture, contractions and rejection of punctuation-only targets.
+Production is unchanged.

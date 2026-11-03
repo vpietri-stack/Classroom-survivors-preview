@@ -8,12 +8,12 @@
   mic.setAttribute('aria-label', '开始录音'); mic.setAttribute('aria-pressed', 'false');
   replay.id = 'notes-recording'; replay.textContent = '▷ 听我的录音'; replay.disabled = true;
   status.id = 'notes-speech-status'; status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
-  status.textContent = '点读单词；选择两个词以上的短语或句子可以试读。';
+  status.textContent = '先点一个单词或句子，再点麦克风试读。';
   controls.append(mic, replay, status); player.append(controls);
   if (window.ResizeObserver) new ResizeObserver(() => document.documentElement.style.setProperty("--notes-player-height", player.offsetHeight + "px")).observe(player);
   let target = null, phase = 'idle', generation = 0, recorder = null, assessment = null, timer = null, recordingURL = null, ownAudio = null, runtime = null;
   const message = text => { status.textContent = text; };
-  function canPractice() { return !!target && (target.text.match(/[\p{L}\p{N}]+(?:['’\-][\p{L}\p{N}]+)*/gu) || []).length >= 2; }
+  function canPractice() { return !!target && (target.text.match(/[\p{L}\p{N}]+(?:['’\-][\p{L}\p{N}]+)*/gu) || []).length >= 1; }
   function idle() { phase = 'idle'; mic.disabled = !canPractice(); mic.textContent = '🎤 试着读'; mic.setAttribute('aria-label', '开始录音'); mic.setAttribute('aria-pressed', 'false'); }
   function cancel() {
     generation++; clearTimeout(timer); if (assessment) assessment.abort(); assessment = null;
@@ -36,11 +36,15 @@
     return new Promise((resolve, reject) => { const el = document.createElement('script'); el.src = src; el.onload = resolve; el.onerror = () => { el.remove(); reject(new Error('load')); }; document.head.append(el); });
   }
   async function engine() {
-    try { if (parent !== window && parent.LocalEngine && parent.Recorder) return { engine: parent.LocalEngine, Recorder: parent.Recorder }; } catch (_) {}
+    try { if (parent !== window && parent.AdaptiveSpeech?.enabled && parent.Recorder) return { engine: parent.AdaptiveSpeech, Recorder: parent.Recorder }; } catch (_) {}
     if (!runtime) runtime = (async () => {
-      if (!window.Recorder) await script('speech_recorder.js?v=2');
-      if (!window.LocalEngine) await script('speech_engine.js?v=12');
-      return { engine: window.LocalEngine, Recorder: window.Recorder };
+      if (!window.Recorder) await script('speech_recorder.js?v=2026-11-01f');
+      if (!window.AdaptiveSpeech?.enabled) {
+        if (typeof SPEECH_PRACTICE_ENABLED === 'undefined') await script('config.js?v=2026-11-03a');
+        await script('speech_adaptive_app.js?v=2026-11-01f');
+      }
+      if (!window.AdaptiveSpeech?.enabled) throw new Error('Adaptive speech unavailable');
+      return { engine: window.AdaptiveSpeech, Recorder: window.Recorder };
     })().catch(error => { runtime = null; throw error; });
     return runtime;
   }
@@ -66,14 +70,14 @@
     cancel(); const ticket = generation; discard(); render();
     window.InteractiveNotesPOC.pause();
     phase = 'preparing'; mic.disabled = true; message('正在准备语音，首次使用可能需要等一会儿…');
-    timer = setTimeout(() => { cancel(); message('语音准备得有点久，可以再点麦克风重试。'); }, 120000);
+    timer = setTimeout(() => { cancel(); message('语音准备得有点久，可以再点麦克风重试。'); }, 300000);
     try {
       const api = await engine();
       if (ticket !== generation) return;
       if (!api.Recorder.isSupported()) throw new Error('unsupported');
       await api.engine.load(percent => { if (ticket === generation) message('正在准备语音：' + percent + '%，请稍候…'); });
       if (ticket !== generation) return;
-      recorder = new api.Recorder(); await recorder.start();
+      recorder = new api.Recorder({ preserveOnset: true }); await recorder.start();
       if (ticket !== generation) return;
       clearTimeout(timer); phase = 'recording'; mic.disabled = false; mic.textContent = '■ 停止录音'; mic.setAttribute('aria-label', '停止录音'); mic.setAttribute('aria-pressed', 'true');
       message('正在录音，读完再点一次麦克风。');
@@ -91,7 +95,7 @@
   window.addEventListener('notes-select', event => {
     const changed = !target || target.id !== event.detail.id;
     cancel(); target = event.detail; idle();
-    if (changed) { discard(); message(canPractice() ? '点麦克风试读，读完再点一次停止。' : '单词可以点读。选择两个词以上的短语或句子可以试读。'); }
+    if (changed) { discard(); message(canPractice() ? '点麦克风试读，读完再点一次停止。' : '先点一个单词或句子，再点麦克风试读。'); }
   });
   document.getElementById('stop').addEventListener('click', () => { cancel(); message('已停止。可以继续点读或试读。'); });
   document.addEventListener('visibilitychange', () => { if (document.hidden) { cancel(); discard(); message('已停止录音。'); } });
