@@ -7,7 +7,7 @@ window.InteractiveNotesData = {
   "pages": [
     {
       "title": "什么时候用最高级？",
-      "file": "01-when-to-use.png",
+      "file": "01-when-to-use.webp",
       "width": 1055,
       "height": 1491,
       "hotspots": [
@@ -65,7 +65,7 @@ window.InteractiveNotesData = {
     },
     {
       "title": "最高级怎么变？",
-      "file": "02-how-to-form.png",
+      "file": "02-how-to-form.webp",
       "width": 1055,
       "height": 1491,
       "hotspots": [
@@ -193,7 +193,7 @@ window.InteractiveNotesData = {
     },
     {
       "title": "不规则变化",
-      "file": "03-best-and-worst.png",
+      "file": "03-best-and-worst.webp",
       "width": 1055,
       "height": 1491,
       "hotspots": [

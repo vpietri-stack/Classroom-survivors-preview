@@ -31,14 +31,14 @@
     ['swim','游泳'],['swimming','正在游泳'],['sit','坐'],['sitting','正坐着']].forEach(([word, meaning]) => clip(word, word, meaning, 'word'));
   const spot = (clip, rect, kind = 'text') => ({ clip, rect, kind });
   const pages = [
-    { title: '什么时候用？怎样组成？', file: '01-when-and-how.png', width: 1055, height: 1491, hotspots: [
+    { title: '什么时候用？怎样组成？', file: '01-when-and-how.webp', width: 1055, height: 1491, hotspots: [
       spot('now',[242,342,70,39],'word'), spot('look',[397,342,68,39],'word'), spot('listen',[546,342,85,39],'word'),
       spot('i-am-riding',[16,741,328,303],'picture'), spot('i-am-riding',[52,1050,265,101]),
       spot('she-is-swimming',[370,741,316,303],'picture'), spot('she-is-swimming',[396,1050,263,101]),
       spot('they-are-cleaning',[706,741,326,303],'picture'), spot('they-are-cleaning',[716,1050,315,101]),
       spot('im',[210,1234,76,53],'word'), spot('shes',[557,1234,104,53],'word'), spot('theyre',[905,1234,124,53],'word')
     ] },
-    { title: '怎样提问和回答？', file: '02-questions-and-negatives-speakers.png', width: 1055, height: 1491, hotspots: [
+    { title: '怎样提问和回答？', file: '02-questions-and-negatives-speakers.webp', width: 1055, height: 1491, hotspots: [
       spot('what-are-you-doing',[45,292,255,39]), spot('im-riding',[351,282,143,58]),
       spot('whats-she-doing',[537,294,188,39]), spot('shes-swimming',[749,284,145,66]),
       spot('im-riding',[188,365,311,191],'picture'), spot('shes-swimming',[741,420,286,139],'picture'),
@@ -49,7 +49,7 @@
       spot('theyre-watering',[534,982,317,85],'picture'), spot('she-isnt-sleeping',[481,1227,283,42]), spot('shes-reading',[778,1227,236,42]),
       spot('shes-reading',[96,1186,340,178],'picture'), spot('isnt',[264,1375,80,43],'word'), spot('arent',[574,1375,98,43],'word'), spot('im-not',[863,1375,111,43])
     ] },
-    { title: '-ing 拼写与 now / every day', file: '03-ing-and-now-vs-every-day.png', width: 1054, height: 1492, hotspots: [
+    { title: '-ing 拼写与 now / every day', file: '03-ing-and-now-vs-every-day.webp', width: 1054, height: 1492, hotspots: [
       spot('play',[61,302,75,39],'word'), spot('playing',[191,302,148,39],'word'), spot('clean',[61,346,87,38],'word'), spot('cleaning',[191,346,155,38],'word'),
       spot('read',[61,389,80,38],'word'), spot('reading',[191,389,151,38],'word'), spot('ride',[391,302,70,39],'word'), spot('riding',[518,302,137,39],'word'),
       spot('make',[388,346,91,38],'word'), spot('making',[518,346,149,38],'word'), spot('run',[728,302,64,39],'word'), spot('running',[840,302,169,39],'word'),

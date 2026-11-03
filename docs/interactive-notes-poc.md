@@ -140,3 +140,9 @@ is used. Existing feedback, own-recording playback and cancellation remain.
 Browser coverage includes single-word target identity/green feedback/playback,
 onset-preserving capture, contractions and rejection of punctuation-only targets.
 Production is unchanged.
+
+## Image publishing workflow
+
+Keep the approved PNG masters. Run `python scripts/export-notes-images.py <master.png> ...` with Pillow installed to export full-resolution WebP at quality 90. Update the lesson's `notes_data.js` manifest to reference the WebP while preserving its dimensions and hotspot coordinates. A registered reader must load that manifest by script tag.
+
+`node scripts/check-notes-images.cjs` checks every registered lesson. It requires WebP, matching image and manifest dimensions, at most 450 KB per image, and at most 1.5 MB of distinct images per lesson. The release suite runs this check automatically. Review the smallest English and Chinese text at phone width and zoom, then tap representative hotspots before publishing. The reader loads the first image eagerly and lazy-loads later images.

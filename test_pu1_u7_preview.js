@@ -35,7 +35,7 @@ assert.equal(lesson.pages.length,3);
 const reachable=new Set();
 for(const page of lesson.pages) {
   const bytes=fs.readFileSync(path.join(__dirname,lesson.assetBase,page.file));
-  assert.equal(bytes.readUInt32BE(16),page.width); assert.equal(bytes.readUInt32BE(20),page.height);
+  assert.deepEqual(require('./scripts/check-notes-images.cjs').webpDimensions(bytes),[page.width,page.height]);
   for(const spot of page.hotspots) {
     const [x,y,w,h]=spot.rect; assert.ok(lesson.clips[spot.clip]);
     assert.ok(x>=0&&y>=0&&w>0&&h>0&&x+w<=page.width&&y+h<=page.height); reachable.add(spot.clip);

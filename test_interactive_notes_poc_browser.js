@@ -37,7 +37,7 @@ const ok = (value, label) => { assert.ok(value, label); checks++; console.log('P
     });
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 90000 }); await page.waitForFunction(() => window.InteractiveNotesPOC);
     ok(await page.locator('.note-page').count() === 4, 'all four original infographic pages displayed');
-    ok((await page.locator('.page-image').first().getAttribute('src')).endsWith('01-grammar-guide.png'), 'intro page is the first full page');
+    ok((await page.locator('.page-image').first().getAttribute('src')).endsWith('01-grammar-guide.webp'), 'intro page is the first full page');
     ok(await page.locator('.hotspot.word').count() === 12, 'twelve separately clickable vocabulary headings');
     ok(await page.locator('script[src*="speech_"]').count() === 0 && await page.locator('#recordButton').count() === 0, 'no eager speech engine or legacy record control');
     await page.screenshot({ path: path.join(qa, 'intro-desktop.png') });

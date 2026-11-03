@@ -396,3 +396,5 @@ is used. Existing feedback, own-recording playback and cancellation remain.
 Browser coverage includes single-word target identity/green feedback/playback,
 onset-preserving capture, contractions and rejection of punctuation-only targets.
 Production is unchanged.
+
+The notes image budget gate runs in the full and notes checks. It discovers manifests from the registered readers and enforces WebP, matching dimensions, 450 KB per image and 1.5 MB per lesson. See [image export and visual review](../interactive-notes-poc.md#image-publishing-workflow).
