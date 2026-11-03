@@ -1,6 +1,6 @@
 ## Think Starter Unit 4 page 44 preview
 
-The preview site links to `think_parks.html` from the selection wizard. It has 25 illustrated vocabulary targets, the page 44 scan with sentence hotspots, and 18 original Track 4.12 sentence clips with Simplified Chinese translations. Its account-free practice runs five sets of five recognition questions followed by six paragraph gap-fills. The page keeps practice state in memory and does not use the regular Study credit or SR pipeline.
+The preview site links to `think_parks.html` from the selection wizard. It has 25 illustrated vocabulary targets, the page 44 scan with sentence hotspots, and 18 original Track 4.12 sentence clips with Simplified Chinese translations. The preview prefetches separate vocabulary and article audio packs while retaining the individual clips as a first-tap fallback. Its Study link opens the standard authenticated Study overlay. Five sets of five recognition questions lead into six paragraph gap-fills with the page 44 scan available inside each exercise. Check grades all placements together and resets the entire dock after an error. The lesson uses normal Study completion, analytics and recovery, and excludes its results from SR.
 
 ## PU1 Unit 7 page 85 preview (3 November 2026)
 

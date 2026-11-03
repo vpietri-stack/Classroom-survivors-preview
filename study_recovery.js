@@ -112,7 +112,7 @@
         if (!own() || !snapshot || !active || event.mode !== 'study' && event.sessionType !== 'study') return;
         if (event.type === 'session') {
             event.eventId = 'se_study_' + snapshot.runId;
-            event.data = { ...event.data, studyRunId: snapshot.runId, studyContent: snapshot.content };
+            event.data = { ...event.data, studyRunId: snapshot.runId, studyContent: event.data.studyContent || snapshot.content };
         } else if (event.type === 'exercise' && !/^speech_/.test(event.exerciseType)) {
             const s = STUDY_STATE;
             const identity = JSON.stringify([s.round,s.currentWordIndex,s.currentSentenceIndex,s.currentNonSpellingIndex,s.subRound,event.exerciseType,event.itemDetails]);

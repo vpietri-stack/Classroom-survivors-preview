@@ -4,7 +4,7 @@
     const clone = value => JSON.parse(JSON.stringify(value));
     const ids = ['words','sentences','remainingWordsRoundA','currentWordIndex','currentSentenceIndex','round',
         'subRound','sentencePairs','pairAttempts','pairQueued','nonSpellingExercises','currentNonSpellingIndex',
-        'previewNote','_mixedActive','_typedRecorded','isTransitioning','_roundCFrozen','_roundEFrozen','srFinalized'];
+        'previewNote','parks','_mixedActive','_typedRecorded','isTransitioning','_roundCFrozen','_roundEFrozen','srFinalized'];
     const $ = id => document.getElementById(id);
     const nodes = selector => Array.from(document.querySelectorAll(selector));
     function capture() {
@@ -40,6 +40,7 @@
     }
     function cancel() {
         studyRuntimeEpoch++; studyCancelPending(); clearTimeout(roundDTimer);
+        if (w.ThinkParksStudy) ThinkParksStudy.pause();
         nodes('#study-game-area .speech-rec-btn').forEach(e => { if(e.disposeSpeech)e.disposeSpeech(); });
         clearTimeout(STUDY_STATE._roundEResetTimer); STUDY_STATE._roundEResetTimer = null;
         nodes('#scramble-slots .study-slot').forEach(e => { clearTimeout(e._resetTimer); e._resetTimer = null; });
@@ -52,6 +53,8 @@
     }
     function pendingAction(name) {
         if (name === 'recognition_next') return () => { STUDY_STATE.isTransitioning = false; playRoundAPrompt(); };
+        if (name === 'parks_next') return ThinkParksStudy.next;
+        if (name === 'parks_reset') return ThinkParksStudy.reset;
         if (name === 'scramble_next') return () => { STUDY_STATE.currentWordIndex++; STUDY_STATE.isTransitioning = false; STUDY_STATE._roundCFrozen = false; startExerciseTracking(); nextRoundCWord(); };
         if (name === 'scramble_reset') return clearRoundC;
         if (name === 'handwriting_letter') return roundDShowTarget;
@@ -75,6 +78,7 @@
         showStudyModeScreen();
         const s = saved.state, ui = saved.ui;
         if (s.round === 'A') startRoundA(true);
+        else if (s.parks) ThinkParksStudy.renderCloze();
         else if (s.round === 'C') nextRoundCWord();
         else if (s.round === 'D') nextRoundDWord(saved.handwriting);
         else if (s._mixedActive) NonSpellingFlow.restoreStudy(ui.typed);
@@ -88,7 +92,7 @@
         if (s.round === 'A') {
             const map = new Map(nodes('#roundA-container button').map(e => [e.textContent,e]));
             ui.aOrder.forEach(text => { if (map.has(text)) $('roundA-container').appendChild(map.get(text)); });
-            showTranslation('roundA-translation', ui.tts); showVocabImage('roundA-image', ui.tts);
+            showStudyRecognitionClue(ui.tts);
         }
         if (s.round === 'C') {
             nodes('#scramble-slots .study-slot').forEach((e,i) => { const v=ui.cSlots[i]; if(v){e.innerText=v.text;e.className=v.cls;} });
@@ -96,7 +100,7 @@
             ui.cBank.forEach(char => { const b=document.createElement('button');b.className='study-letter-btn';b.innerText=char;b.dataset.char=char;b.onclick=()=>addLetterToSlot(char,b,currentTTSWord);$('scramble-bank').appendChild(b); });
             if (saved.speech) mountStudyWordSpeechGate(saved.speech);
         }
-        if (s.round === 'E' && !ui.typed) {
+        if (s.round === 'E' && !s.parks && !ui.typed) {
             nodes('#sentence-drop-zone .sentence-slot').forEach((e,i) => { const v=ui.eSlots[i];if(v){const b=createWordTile(v.text,i);b.className=v.cls;b.dataset.word=v.text;e.appendChild(b);} });
             $('sentence-word-bank').replaceChildren();
             ui.eBank.forEach((v,i) => { const b=createWordTile(v.text,i);b.className=v.cls;$('sentence-word-bank').appendChild(b); });
@@ -114,7 +118,7 @@
         if (!pending && !saved.speech && !ui.typed) {
             if (s.round === 'C' && s.isTransitioning) pending={action:'scramble_next',remainingMs:100};
             else if (s.round === 'C' && s._roundCFrozen) pending={action:'scramble_reset',remainingMs:5000};
-            else if (s.round === 'E' && s.isTransitioning) { mountStudySpeechGate(null); }
+            else if (s.round === 'E' && !s.parks && s.isTransitioning) { mountStudySpeechGate(null); }
             else if (s.round === 'E' && s._roundEFrozen) pending={action:'sentence_reset',remainingMs:5000};
             else if (s.round === 'D' && s.isTransitioning) pending={action:'handwriting_word',remainingMs:300};
             else if (s.round === 'D' && saved.handwriting.trace && saved.handwriting.trace.frozen) pending={action:'handwriting_letter',remainingMs:140};

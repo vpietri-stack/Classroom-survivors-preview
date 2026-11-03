@@ -9,11 +9,11 @@ nav { display: flex; flex-wrap: wrap; gap: 1rem; }
 main { max-width: 1112px; margin: auto; padding: 1rem 1rem 6rem; }
 section { margin-bottom: 2.5rem; }
 .cards { display: grid; grid-template-columns: repeat(auto-fit,minmax(135px,1fr)); gap: .65rem; }
-.card, #activity { background: white; border: 1px solid #c6dfce; border-radius: .8rem; padding: .8rem; }
+.card { background: white; border: 1px solid #c6dfce; border-radius: .8rem; padding: .8rem; }
 .card { position: relative; text-align: left; align-content: start; }
 .card:hover { background: #e5f5e9; }
 .card .listen-icon { position: absolute; top: .45rem; right: .45rem; border-radius: 50%; background: #173d36; color: white; width: 1.45rem; text-align: center; }
-.card img, .clue { width: 100%; aspect-ratio: 1; object-fit: contain; border-radius: .45rem; }
+.card img { width: 100%; aspect-ratio: 1; object-fit: contain; border-radius: .45rem; }
 .card strong, .card span { display: block; }
 #scan { position: relative; max-width: 816px; margin-inline: auto; }
 #scan img { display: block; width: 100%; height: auto; }
@@ -24,12 +24,4 @@ button.hotspot:hover, button.hotspot:focus-visible { background: #fff88a70; }
 #player { position: fixed; z-index: 2; bottom: .5rem; left: 50%; transform: translateX(-50%); width: min(calc(100% - 1rem), 680px); background: #173d36; color: white; border-radius: .7rem; padding: .75rem 2.6rem .75rem .85rem; box-shadow: 0 0 25px #0004; }
 #dismiss { position: absolute; right: .4rem; top: .4rem; padding: 0 .45rem; }
 #audio { display: block; width: 100%; height: 40px; margin-top: .3rem; }
-.clue { display: block; width: min(45vw, 180px); margin-bottom: .4rem; }
-.choices, .bank { display: flex; gap: .55rem; flex-wrap: wrap; margin: .75rem 0; }
-.cloze { display: grid; gap: 1rem; grid-template-columns: 1fr minmax(135px, 26%); align-items: start; }
-.bank { flex-direction: column; align-items: stretch; }
-.gap { padding: 0 .35rem; min-width: 3.3em; margin: .12em; }
-.gap[aria-pressed="true"] { outline: 2px solid #dd7b16; background: #fff6db; }
-button:disabled { cursor: default; opacity: .6; }
-.correct { color: #146332; font-weight: bold; }
-@media (max-width: 640px) { .cloze { grid-template-columns: 1fr; } .bank { flex-direction: row; } }
+.study-link { font-weight: bold; }

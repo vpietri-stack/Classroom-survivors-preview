@@ -83,6 +83,8 @@ function showStudyNotice(msg) {
 // Entry point
 function initStudyMode(options = {}) {
     if(window.GameRecovery)GameRecovery.pause();
+    const parks = options.parks === true && window.ThinkParksStudy && authActiveUser && !isTestMode && (!authActiveUser.role || authActiveUser.role === "student");
+    if (options.parks && !parks) return false;
     const notePlan = window.PreviewNotes && options.previewNoteId ? PreviewNotes.prepareStudy(options.previewNoteId) : null;
     if (options.previewNoteId && !notePlan) return false;
     if (window.ClientDiagnostics) ClientDiagnostics.checkpoint('study-start', { mode: 'study', active: true, word: '', letter: '' });
@@ -96,12 +98,12 @@ function initStudyMode(options = {}) {
     }
 
     // Get Spaced Repetition Content (SR-aware)
-    const SR_WORDS = notePlan ? notePlan.words : getStudyContentSR(book, unit, page, 'vocab', 5);
-    const mixed = notePlan ? notePlan.exercises : window.NonSpellingFlow ? NonSpellingFlow.prepareStudy(book, unit, page) : null;
-    const SR_SENTENCES = mixed ? [] : getStudyContentSR(book, unit, page, 'sentences', 5);
+    const SR_WORDS = parks ? ThinkParks.words.slice(0, 5).map(word => word[0]) : notePlan ? notePlan.words : getStudyContentSR(book, unit, page, 'vocab', 5);
+    const mixed = parks ? null : notePlan ? notePlan.exercises : window.NonSpellingFlow ? NonSpellingFlow.prepareStudy(book, unit, page) : null;
+    const SR_SENTENCES = parks || mixed ? [] : getStudyContentSR(book, unit, page, 'sentences', 5);
     const sentenceCount = mixed ? mixed.length : SR_SENTENCES.length;
 
-    if (SR_WORDS.length < 5 || sentenceCount < 5) {
+    if (!parks && (SR_WORDS.length < 5 || sentenceCount < 5)) {
         if (SR_WORDS.length === 0 || sentenceCount === 0) {
             showStudyNotice("Not enough content for Study Mode on this page yet.");
             return;
@@ -128,6 +130,7 @@ function initStudyMode(options = {}) {
     STUDY_STATE.words = SR_WORDS.slice(0, 5);
     STUDY_STATE.sentences = SR_SENTENCES.slice(0, 5);
     STUDY_STATE.nonSpellingExercises = mixed;
+    STUDY_STATE.parks = parks ? { set: 0 } : null;
     STUDY_STATE.previewNote = notePlan ? notePlan.context : null;
     STUDY_STATE._mixedActive = false;
 
@@ -177,12 +180,14 @@ function startRoundA(resuming) {
     STUDY_STATE.round = 'A';
     if (!resuming) STUDY_STATE.remainingWordsRoundA = [...STUDY_STATE.words];
 
-    updateStudyUI("Round A: Word Recognition", "Listen and click the correct word.");
+    const parks = STUDY_STATE.parks;
+    updateStudyUI(parks ? "Round A · " + (parks.set + 1) + " / 5" : "Round A: Word Recognition",
+        parks ? "听一听，点击正确的单词或短语。" : "Listen and click the correct word.");
 
     const container = document.getElementById('study-game-area');
     container.innerHTML = `
         <div class="flex flex-col items-center gap-3 w-full">
-            <button onclick="playTTS()" aria-label="Play Audio" class="audio-play-btn"><i class="fas fa-volume-up"></i></button>
+            <button onclick="playStudyRecognitionAudio()" aria-label="Play Audio" class="audio-play-btn"><i class="fas fa-volume-up"></i></button>
             <div id="roundA-translation" class="translation-hint hidden"></div>
             <img id="roundA-image" class="vocab-image hidden" alt="Vocabulary Image">
             <div id="roundA-container" class="flex flex-wrap justify-center gap-3 w-full px-2">
@@ -228,9 +233,22 @@ function playRoundAPrompt() {
     // "sound of one of the word is played" -> Pick random from remaining
     const target = STUDY_STATE.remainingWordsRoundA[Math.floor(Math.random() * STUDY_STATE.remainingWordsRoundA.length)];
     currentTTSWord = target; // Global from game.js for playTTS()
-    showTranslation('roundA-translation', target);
-    showVocabImage('roundA-image', target);
-    setTimeout(playTTS, 500); // Small delay
+    showStudyRecognitionClue(target);
+    if (STUDY_STATE.parks) playStudyRecognitionAudio();
+    else setTimeout(playTTS, 500); // Small delay
+}
+
+function playStudyRecognitionAudio() {
+    if (STUDY_STATE.parks) ThinkParksStudy.playWord();
+    else playTTS();
+}
+
+function showStudyRecognitionClue(target) {
+    if (STUDY_STATE.parks) ThinkParksStudy.showWord(target);
+    else {
+        showTranslation('roundA-translation', target);
+        showVocabImage('roundA-image', target);
+    }
 }
 
 function checkRoundA(word, btnElement) {
@@ -240,6 +258,11 @@ function checkRoundA(word, btnElement) {
         // Correct
         playHappySound(); // Need to implement or reuse
         btnElement.classList.add('scale-0', 'transition-transform', 'duration-300'); // Animate out
+
+        if (STUDY_STATE.parks) {
+            queueExerciseEvent('wordRecognition', 'study', word);
+            startExerciseTracking();
+        }
 
         // Remove from list
         STUDY_STATE.remainingWordsRoundA = STUDY_STATE.remainingWordsRoundA.filter(w => w !== word);
@@ -254,11 +277,18 @@ function checkRoundA(word, btnElement) {
         synthError(); // Reuse game.js
         btnElement.classList.add('bg-red-500', 'shake');
         setTimeout(() => btnElement.classList.remove('bg-red-500', 'shake'), 500);
-        setTimeout(playTTS, 600); // Replay correct sound
+        if (STUDY_STATE.parks) {
+            incrementExerciseAttempts();
+            playStudyRecognitionAudio();
+        } else setTimeout(playTTS, 600); // Replay correct sound
     }
 }
 
 function finishRoundA() {
+    if (STUDY_STATE.parks) {
+        ThinkParksStudy.recognitionComplete();
+        return;
+    }
     // Round A (word recognition) completed → straight into Word Scramble.
     // (Word-level pronunciation was removed; speech now happens on sentences.)
     startRoundC();
@@ -1323,16 +1353,19 @@ async function finishStudySession() {
 
     // Track session completion
     // Finalize SR state for this session before flushing
-    const previewNote = window.PreviewNotes ? PreviewNotes.completeStudy() : null;
+    const parks = STUDY_STATE.parks;
+    const parksOwner = parks && authActiveUser && authActiveUser.id;
+    const previewNote = !parks && window.PreviewNotes ? PreviewNotes.completeStudy() : null;
     const previewOwner = previewNote && STUDY_STATE.previewNote.owner;
     const completedStudyStart = STUDY_STATE.startTime;
     STUDY_STATE.srFinalized = true;
-    finalizeSession(srStudyResults, true, window.StudyRecovery && StudyRecovery.runId());
+    if (!parks) finalizeSession(srStudyResults, true, window.StudyRecovery && StudyRecovery.runId());
 
     queueSessionEvent('study', {
         durationMs: durationMs,
         durationFormatted: timeStr,
-        ...(previewNote ? { previewNote } : {})
+        ...(previewNote ? { previewNote } : {}),
+        ...(parks ? { studyContent: ThinkParksStudy.context } : {})
     });
     if (previewNote && window.PreviewNotes) PreviewNotes.markComplete(previewNote);
     // FIX (2026-08-25, "Doris refresh"): AWAIT the delivery of the session
@@ -1346,6 +1379,7 @@ async function finishStudySession() {
     else flushAnalyticsOnGameOver(); // Reliable flush with retry on session end
     if (previewNote && (!STUDY_STATE.active || STUDY_STATE.startTime !== completedStudyStart || !authActiveUser || authActiveUser.id !== previewOwner)) return;
 
+    if (parks && (!STUDY_STATE.active || STUDY_STATE.startTime !== completedStudyStart || !authActiveUser || authActiveUser.id !== parksOwner)) return;
     const targetText = typeof getActiveTargetText === 'function' ? getActiveTargetText() : null;
     const messageHtml = targetText 
         ? `<div class="mb-8 py-3 px-6 bg-indigo-900/50 border border-indigo-400/50 rounded-xl inline-block"><p class="study-text-xl text-indigo-200 font-bold tracking-wide">${targetText}</p></div>`
@@ -1360,7 +1394,7 @@ async function finishStudySession() {
             ${messageHtml}
             
             <div class="flex flex-col gap-3 items-center w-full">
-                <button onclick="initStudyMode()" class="game-btn bg-blue-600 text-lg sm:text-xl w-full">再学习一下</button>
+                <button onclick="${parks ? "ThinkParksStudy.start()" : "initStudyMode()"}" class="game-btn bg-blue-600 text-lg sm:text-xl w-full">再学习一下</button>
                 <button onclick="showGameSelection()" class="game-btn bg-orange-500 text-lg sm:text-xl w-full">边玩边学</button>
             </div>
         </div>
@@ -1383,6 +1417,7 @@ function exitStudyMode() {
     }
     STUDY_STATE.active = false; // so the game-mode keydown listener resumes
     STUDY_STATE.previewNote = null;
+    STUDY_STATE.parks = null;
     clearTimeout(roundDTimer);
     // A word abandoned halfway is still worth keeping: the letters a child gave
     // up on are the ones the recognition needs to learn from.
@@ -1412,9 +1447,12 @@ function updateStudyUI(title, subtitle) {
 
 function updateStudyProgress() {
     const mixed = !!STUDY_STATE.nonSpellingExercises;
-    const rounds = mixed ? STUDY_ROUNDS.slice(0, 4) : STUDY_ROUNDS;
+    const parks = STUDY_STATE.parks;
+    const rounds = parks ? [...Array(5).fill('A'), ...Array(6).fill('E')] : mixed ? STUDY_ROUNDS.slice(0, 4) : STUDY_ROUNDS;
     const currentRound = mixed && STUDY_STATE.round === 'F' ? 'E' : STUDY_STATE.round;
-    const currentIdx = rounds.indexOf(currentRound);
+    const currentIdx = parks
+        ? STUDY_STATE.srFinalized ? rounds.length : currentRound === 'A' ? parks.set : 5 + STUDY_STATE.currentSentenceIndex
+        : rounds.indexOf(currentRound);
     let bar = document.getElementById('study-progress-indicator');
     if (!bar) {
         bar = document.createElement('div');
