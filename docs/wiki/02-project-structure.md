@@ -257,3 +257,7 @@ game_recovery.js owns the independent game checkpoint, Chinese login choice and 
 The PU2 Unit 5 page 59 superlatives reader is `pu2_u5_p59_notes.html`.
 Its registered preview starts a page 59 Study session. Typed exercises moved
 from page 60 retain their original SR keys through `srPage: "60"`.
+
+The page 59 reader bundles its saved Sound of Text and Youdao MP3s so a tap
+can start audio without a separate media request. Source details live in the
+lesson audio manifest.

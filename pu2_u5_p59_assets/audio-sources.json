@@ -2,109 +2,130 @@
   {
     "id": "biggest",
     "text": "the biggest",
-    "voice": "Microsoft Hazel Desktop (en-GB)",
-    "source": "Windows SAPI"
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=the+biggest",
+    "bytes": 18720
   },
   {
     "id": "milo",
     "text": "Milo is the biggest bear in the park.",
-    "voice": "Microsoft Hazel Desktop (en-GB)",
-    "source": "Windows SAPI"
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/a778b970-d76d-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 23424
   },
   {
     "id": "ben",
     "text": "Ben is bigger than Pip.",
-    "voice": "Microsoft Hazel Desktop (en-GB)",
-    "source": "Windows SAPI"
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/a777cf10-d76d-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 14976
   },
   {
     "id": "tall",
     "text": "tall",
-    "voice": "Microsoft Hazel Desktop (en-GB)",
-    "source": "Windows SAPI"
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=tall",
+    "bytes": 11757
   },
   {
     "id": "tallest",
     "text": "the tallest",
-    "voice": "Microsoft Hazel Desktop (en-GB)",
-    "source": "Windows SAPI"
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=the+tallest",
+    "bytes": 23520
   },
   {
     "id": "giraffe",
     "text": "The giraffe is the tallest.",
-    "voice": "Microsoft Hazel Desktop (en-GB)",
-    "source": "Windows SAPI"
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/a8f1c4e0-d76d-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 19584
   },
   {
     "id": "happy",
     "text": "happy",
-    "voice": "Microsoft Hazel Desktop (en-GB)",
-    "source": "Windows SAPI"
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=happy",
+    "bytes": 10029
   },
   {
     "id": "happiest",
     "text": "the happiest",
-    "voice": "Microsoft Hazel Desktop (en-GB)",
-    "source": "Windows SAPI"
+    "source": "Youdao British English (type=1), joined word clips",
+    "sourceUrl": [
+      "https://dict.youdao.com/dictvoice?type=1&audio=the",
+      "https://dict.youdao.com/dictvoice?type=1&audio=happiest"
+    ],
+    "bytes": 15509
   },
   {
     "id": "girl",
     "text": "The girl in yellow is the happiest.",
-    "voice": "Microsoft Hazel Desktop (en-GB)",
-    "source": "Windows SAPI"
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/aad9e5d0-d76d-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 23040
   },
   {
     "id": "big",
     "text": "big",
-    "voice": "Microsoft Hazel Desktop (en-GB)",
-    "source": "Windows SAPI"
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=big",
+    "bytes": 8493
   },
   {
     "id": "ball-biggest",
     "text": "the biggest",
-    "voice": "Microsoft Hazel Desktop (en-GB)",
-    "source": "Windows SAPI"
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=the+biggest",
+    "bytes": 18720
   },
   {
     "id": "ball",
     "text": "The yellow ball is the biggest.",
-    "voice": "Microsoft Hazel Desktop (en-GB)",
-    "source": "Windows SAPI"
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/ab2cc0c0-d76d-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 19200
   },
   {
     "id": "good",
     "text": "good",
-    "voice": "Microsoft Hazel Desktop (en-GB)",
-    "source": "Windows SAPI"
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=good",
+    "bytes": 8685
   },
   {
     "id": "best",
     "text": "the best",
-    "voice": "Microsoft Hazel Desktop (en-GB)",
-    "source": "Windows SAPI"
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=the+best",
+    "bytes": 22701
   },
   {
     "id": "runner",
     "text": "She is the best runner in the class.",
-    "voice": "Microsoft Hazel Desktop (en-GB)",
-    "source": "Windows SAPI"
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/acac5be0-d76d-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 21504
   },
   {
     "id": "bad",
     "text": "bad",
-    "voice": "Microsoft Hazel Desktop (en-GB)",
-    "source": "Windows SAPI"
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=bad",
+    "bytes": 8877
   },
   {
     "id": "worst",
     "text": "the worst",
-    "voice": "Microsoft Hazel Desktop (en-GB)",
-    "source": "Windows SAPI"
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=the+worst",
+    "bytes": 28348
   },
   {
     "id": "apple",
     "text": "This is the worst apple.",
-    "voice": "Microsoft Hazel Desktop (en-GB)",
-    "source": "Windows SAPI"
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/f3e89870-d76d-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 17280
   }
 ]
