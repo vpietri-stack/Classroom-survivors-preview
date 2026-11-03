@@ -253,3 +253,7 @@ Study recovery is separate from diagnostic collection: study_recovery.js owns lo
 ## Gomoku and UNO continuation (preview, 2026-11-01)
 
 game_recovery.js owns the independent game checkpoint, Chinese login choice and menu buttons. game_runtime.js serializes logical board/card/quiz state and reconstructs controls using existing renderers. Shared gameResumeCore.js validates the bounded payload; gameResume.js provides signed self-only writes. No Phaser objects, saved HTML or media are persisted.
+
+The PU2 Unit 5 page 59 superlatives reader is `pu2_u5_p59_notes.html`.
+Its registered preview starts a page 59 Study session. Typed exercises moved
+from page 60 retain their original SR keys through `srPage: "60"`.

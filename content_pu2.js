@@ -888,7 +888,8 @@ TEACHING_CONTENT["PU2"] = {
                 { a: "These animals live in the sea. They're bigger than dolphins.", b: "They're whales." }
             ]
         },
-        "60": {
+        "59": {
+            srPage: "60",
             vocab: [
                 'clean - the cleanest', 'clever - the cleverest', 'long - the longest', 'new - the newest', 'nice - the nicest',
                 'old - the oldest', 'quiet - the quietest', 'short - the shortest', 'straight - the straightest', 'tall - the tallest', 'young - the youngest',
@@ -896,31 +897,39 @@ TEACHING_CONTENT["PU2"] = {
                 'naughty - the naughtiest', 'pretty - the prettiest', 'silly - the silliest', 'ugly - the ugliest',
                 'big - the biggest', 'fat - the fattest', 'sad - the saddest', 'thin - the thinnest',
                 'bad - the worst', 'good - the best', 'fast - the fastest', 'quick - the quickest', 'slow - the slowest',
-                'brave - the bravest',
-                'climb - climbing', 'fall - falling', 'fly - flying', 'get - getting', 'hide - hiding',
-                'jump - jumping', 'lose - losing', 'move - moving', 'run - running', 'walk - walking'
+                'brave - the bravest'
             ],
             sentences: [
                 "Blue whales are the biggest animals.",
-                "Snails can't move fast.",
-                "Kangaroos can jump but they can't run.",
                 "Dolphins are the cleverest sea animals.",
-                "Penguins walk slowly but they can swim fast.",
                 "Gracie is the oldest animal in the barn.",
                 "Rocky is the youngest animal in the barn.",
                 "Giraffes are the tallest animals.",
-                "I think parrots are the prettiest birds.",
-                "You musn't lose your books.",
                 "Pandas are the fattest bears."
             ],
             sentencePairs: [
                 { a: "Which animal is the biggest?", b: "The blue whale is." },
                 { a: "Is Gracie the youngest in the barn?", b: "No, she isn't. Rocky is." },
                 { a: "Is Rocky the youngest in the barn?", b: "Yes, he is." },
-                { a: "Penguins walk slowly,", b: "but they can swim fast." },
                 { a: "Dolphins are", b: "the cleverest sea animals." },
                 { a: "Which birds are the prettiest?", b: "I think the parrots are." },
                 { a: "Are elephants the biggest animals?", b: "No, they aren't. Blue whales are bigger." }
+            ]
+        },
+        "60": {
+            vocab: [
+                'climb - climbing', 'fall - falling', 'fly - flying', 'get - getting', 'hide - hiding',
+                'jump - jumping', 'lose - losing', 'move - moving', 'run - running', 'walk - walking'
+            ],
+            sentences: [
+                "Snails can't move fast.",
+                "Kangaroos can jump but they can't run.",
+                "Penguins walk slowly but they can swim fast.",
+                "I think parrots are the prettiest birds.",
+                "You musn't lose your books."
+            ],
+            sentencePairs: [
+                { a: "Penguins walk slowly,", b: "but they can swim fast." }
             ]
         },
         "62": {
@@ -1466,7 +1475,7 @@ AVAILABLE_CONTENT["PU2"] = {
     "2": [19, 21, 22, 25],
     "3": [31, 33, 40, 43],
     "4": [45, 46, 47, 54],
-    "5": [57, 60, 62],
+    "5": [57, 59, 60, 62],
     "6": [78, 81],
     "7": [83, 85, 87, 93],
     "8": [95, 96, 97, 98, 104],

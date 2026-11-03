@@ -275,7 +275,7 @@ const pu2Unit5 = content.buildPool('PU2', 5, 62).entries.filter(e => e.item.id &
 assert.equal(pu2Unit5.filter(e => e.answers).length, 28);
 assert.equal(pu2Unit5.filter(e => e.answer).length, 34);
 assert.equal(new Set([...pu2Unit1, ...pu2Unit2, ...pu2Unit3, ...pu2Unit4, ...pu2Unit5].map(e => e.key)).size, 281);
-for (const [page, missing, fix] of [[57,6,8],[60,16,18],[62,6,8]]) {
+for (const [page, missing, fix] of [[57,6,8],[59,10,14],[60,6,4],[62,6,8]]) {
     const items = pu2Unit5.filter(e => e.page === String(page));
     assert.equal(items.filter(e => e.answers).length, missing);
     assert.equal(items.filter(e => e.answer).length, fix);
@@ -286,6 +286,7 @@ for (const [page, missing, fix] of [[57,6,8],[60,16,18],[62,6,8]]) {
         assert.ok(new Set(picked.map(e => e.type)).size >= 3);
     }
 }
+assert.ok(pu2Unit5.filter(e => e.page === '59').every(e => e.key === 'non-spelling:' + e.type + ':pu2:5:60:' + e.id.toLowerCase()));
 assert.ok(!content.buildPool('PU2', 4, 54).entries.some(e => e.item.unit === '5'));
 for (const [id, answers] of [['M25',['meat','fish','carnivores']], ['M26',['meat','plants','omnivores']], ['M27',['plants','herbivores']], ['M28',['bears','polar','bears']]]) {
     assert.deepEqual(Array.from(pu2Unit5.find(e => e.id === id).answers), answers);

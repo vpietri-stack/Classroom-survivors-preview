@@ -1,0 +1,110 @@
+[
+  {
+    "id": "biggest",
+    "text": "the biggest",
+    "voice": "Microsoft Hazel Desktop (en-GB)",
+    "source": "Windows SAPI"
+  },
+  {
+    "id": "milo",
+    "text": "Milo is the biggest bear in the park.",
+    "voice": "Microsoft Hazel Desktop (en-GB)",
+    "source": "Windows SAPI"
+  },
+  {
+    "id": "ben",
+    "text": "Ben is bigger than Pip.",
+    "voice": "Microsoft Hazel Desktop (en-GB)",
+    "source": "Windows SAPI"
+  },
+  {
+    "id": "tall",
+    "text": "tall",
+    "voice": "Microsoft Hazel Desktop (en-GB)",
+    "source": "Windows SAPI"
+  },
+  {
+    "id": "tallest",
+    "text": "the tallest",
+    "voice": "Microsoft Hazel Desktop (en-GB)",
+    "source": "Windows SAPI"
+  },
+  {
+    "id": "giraffe",
+    "text": "The giraffe is the tallest.",
+    "voice": "Microsoft Hazel Desktop (en-GB)",
+    "source": "Windows SAPI"
+  },
+  {
+    "id": "happy",
+    "text": "happy",
+    "voice": "Microsoft Hazel Desktop (en-GB)",
+    "source": "Windows SAPI"
+  },
+  {
+    "id": "happiest",
+    "text": "the happiest",
+    "voice": "Microsoft Hazel Desktop (en-GB)",
+    "source": "Windows SAPI"
+  },
+  {
+    "id": "girl",
+    "text": "The girl in yellow is the happiest.",
+    "voice": "Microsoft Hazel Desktop (en-GB)",
+    "source": "Windows SAPI"
+  },
+  {
+    "id": "big",
+    "text": "big",
+    "voice": "Microsoft Hazel Desktop (en-GB)",
+    "source": "Windows SAPI"
+  },
+  {
+    "id": "ball-biggest",
+    "text": "the biggest",
+    "voice": "Microsoft Hazel Desktop (en-GB)",
+    "source": "Windows SAPI"
+  },
+  {
+    "id": "ball",
+    "text": "The yellow ball is the biggest.",
+    "voice": "Microsoft Hazel Desktop (en-GB)",
+    "source": "Windows SAPI"
+  },
+  {
+    "id": "good",
+    "text": "good",
+    "voice": "Microsoft Hazel Desktop (en-GB)",
+    "source": "Windows SAPI"
+  },
+  {
+    "id": "best",
+    "text": "the best",
+    "voice": "Microsoft Hazel Desktop (en-GB)",
+    "source": "Windows SAPI"
+  },
+  {
+    "id": "runner",
+    "text": "She is the best runner in the class.",
+    "voice": "Microsoft Hazel Desktop (en-GB)",
+    "source": "Windows SAPI"
+  },
+  {
+    "id": "bad",
+    "text": "bad",
+    "voice": "Microsoft Hazel Desktop (en-GB)",
+    "source": "Windows SAPI"
+  },
+  {
+    "id": "worst",
+    "text": "the worst",
+    "voice": "Microsoft Hazel Desktop (en-GB)",
+    "source": "Windows SAPI"
+  },
+  {
+    "id": "apple",
+    "text": "This is the worst apple.",
+    "voice": "Microsoft Hazel Desktop (en-GB)",
+    "source": "Windows SAPI"
+  }
+]
