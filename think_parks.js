@@ -2,7 +2,6 @@
 
 const $ = (id) => document.getElementById(id);
 const assets = "think_parks_assets/";
-const audioVersion = "?v=2";
 const newPictures = new Set([
     "public-park", "call-it", "almost", "wide", "at-one-end", "green-space",
     "lovely", "rose-garden", "glass-palace", "iguana", "real-name", "full-of", "get-there",
@@ -53,9 +52,14 @@ function shuffle(values) {
     return result;
 }
 
+function clipUrl(filename) {
+    const version = filename.startsWith("word-") ? "3" : "2";
+    return assets + filename + "?v=" + version;
+}
+
 function playClip(english, chinese, filename) {
     const audio = $("audio");
-    const source = assets + filename + audioVersion;
+    const source = clipUrl(filename);
     $("english").textContent = english;
     $("chinese").textContent = chinese;
     $("player").hidden = false;
@@ -97,7 +101,7 @@ function startPractice(words, parks) {
     const sets = Array.from({ length: 5 }, (_, i) => words.slice(i * 5, i * 5 + 5));
     function recognition(round, targets = shuffle(sets[round]), index = 0) {
         const [answer, chinese, key] = targets[index];
-        promptAudio.src = assets + "word-" + key + ".mp3" + audioVersion;
+        promptAudio.src = clipUrl("word-" + key + ".mp3");
         const listen = () => {
             promptAudio.currentTime = 0;
             promptAudio.play().catch(() => {});
