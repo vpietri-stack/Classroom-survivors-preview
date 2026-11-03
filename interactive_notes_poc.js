@@ -28,6 +28,13 @@
     delete $('playerStatus').dataset.audioError;
     $('replay').disabled = false; $('stop').disabled = false;
     playing = true; updateActive(id);
+    // The PU1 reader can start the saved MP3 within the tap even if the
+    // browser's media requests to the static host are stalling.
+    const bundled = lesson.id === 'pu1-u7-p85' && window.PU1Page85Audio?.[id];
+    if (bundled && !audioCache.has(clip.audio)) {
+      const bytes = Uint8Array.from(atob(bundled), char => char.charCodeAt(0));
+      audioCache.set(clip.audio, URL.createObjectURL(new Blob([bytes], { type: 'audio/mpeg' })));
+    }
     let usedBlob = audioCache.has(clip.audio);
     function failed(error) {
       if (token !== generation) return;
