@@ -1,3 +1,7 @@
+## PU1 Unit 7 page correction (3 November 2026)
+
+The preview curriculum now groups the former page 84 vocabulary, nine sentences, five sentence pairs and twenty authored non-spelling boards under page 85. Available Unit 7 pages are 83, 85 and 92. The moved content retains `srPage: 84`; normalization carries it to the typed boards so their existing SR keys stay stable while their displayed/selected page is 85. Legacy sentence and pair keys are unchanged. Production curriculum is a separate release.
+
 # Frontend Core: Boot, Config, Content & Assets
 
 > **Last verified:** 2026-09-25 · **Part of:** [Classroom-survivors Repo Wiki](README.md)

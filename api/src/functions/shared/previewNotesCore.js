@@ -1,7 +1,9 @@
 (function (root) {
     'use strict';
     const catalog = [{ id: 'pu3-u9-p111', book: 'PU3', unit: '9', page: '111', version: 1,
-        title: 'Power Up 3 · Unit 9 · 第111页', reader: 'interactive_notes_poc.html' }];
+        title: 'Power Up 3 · Unit 9 · 第111页', reader: 'interactive_notes_poc.html' },
+        { id: 'pu1-u7-p85', book: 'PU1', unit: '7', page: '85', version: 1,
+        title: 'Power Up 1 · Unit 7 · 第85页', reader: 'pu1_u7_p85_notes.html' }];
     const find = id => catalog.find(note => note.id === id);
     const atPage = page => page && catalog.find(note => note.book === page.book && note.unit === String(page.unit) && note.page === String(page.page));
     function normalize(value) {

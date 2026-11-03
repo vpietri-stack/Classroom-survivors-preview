@@ -1,3 +1,7 @@
+## PU1 page-85 preview release (3 November 2026)
+
+Publish this lesson to preview/main only. Register the same new note ID in the existing isolated PR-1 preview API by updating its API branch, preserving that branch's other changes and the production main. Keep preview API/data isolation, source images and adaptive model URLs intact. Synchronize the release stamps and changed content/reader/auth/game/dashboard queries. Verify both hosted deployments and changed bytes before handing off. Production promotion requires later user approval.
+
 # Current integration policy (2 November 2026)
 
 Feature agents use isolated worktrees and preserve release stamps. The integrator

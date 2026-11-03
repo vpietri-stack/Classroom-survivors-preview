@@ -1,0 +1,146 @@
+[
+  {
+    "id": "present-continuous",
+    "text": "present continuous",
+    "audio": "pu1_u7_p85_assets/audio/present-continuous.mp3",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/b246a470-d722-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 15360
+  },
+  {
+    "id": "i-am-riding",
+    "text": "I am riding a horse.",
+    "audio": "pu1_u7_p85_assets/audio/i-am-riding.mp3",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/b4aa8510-d722-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 16704
+  },
+  {
+    "id": "she-is-swimming",
+    "text": "She is swimming.",
+    "audio": "pu1_u7_p85_assets/audio/she-is-swimming.mp3",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/b6a28480-d722-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 12864
+  },
+  {
+    "id": "they-are-cleaning",
+    "text": "They are cleaning the car.",
+    "audio": "pu1_u7_p85_assets/audio/they-are-cleaning.mp3",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/b897ebe0-d722-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 15360
+  },
+  {
+    "id": "what-are-you-doing",
+    "text": "What are you doing?",
+    "audio": "pu1_u7_p85_assets/audio/what-are-you-doing.mp3",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/f09463a0-caa4-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 11520
+  },
+  {
+    "id": "im-riding",
+    "text": "I'm riding a horse.",
+    "audio": "pu1_u7_p85_assets/audio/im-riding.mp3",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/bc824570-d722-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 15360
+  },
+  {
+    "id": "whats-she-doing",
+    "text": "What's she doing?",
+    "audio": "pu1_u7_p85_assets/audio/whats-she-doing.mp3",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/39a9d440-ce9b-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 12864
+  },
+  {
+    "id": "what-is-she-doing",
+    "text": "What is she doing?",
+    "audio": "pu1_u7_p85_assets/audio/what-is-she-doing.mp3",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/46801fc0-ce0b-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 13056
+  },
+  {
+    "id": "shes-swimming",
+    "text": "She's swimming.",
+    "audio": "pu1_u7_p85_assets/audio/shes-swimming.mp3",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/c2dc6680-d722-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 12096
+  },
+  {
+    "id": "are-they-cleaning",
+    "text": "Are they cleaning the car?",
+    "audio": "pu1_u7_p85_assets/audio/are-they-cleaning.mp3",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/c4cff920-d722-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 14976
+  },
+  {
+    "id": "yes-they-are",
+    "text": "Yes, they are.",
+    "audio": "pu1_u7_p85_assets/audio/yes-they-are.mp3",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/c6c56080-d722-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 13440
+  },
+  {
+    "id": "no-they-arent",
+    "text": "No, they aren't.",
+    "audio": "pu1_u7_p85_assets/audio/no-they-arent.mp3",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/c8bc9ca0-d722-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 14016
+  },
+  {
+    "id": "theyre-watering",
+    "text": "They're watering the flowers.",
+    "audio": "pu1_u7_p85_assets/audio/theyre-watering.mp3",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/cab25220-d722-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 16704
+  },
+  {
+    "id": "she-isnt-sleeping",
+    "text": "She isn't sleeping.",
+    "audio": "pu1_u7_p85_assets/audio/she-isnt-sleeping.mp3",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/ccd33650-d722-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 13824
+  },
+  {
+    "id": "shes-reading",
+    "text": "She's reading.",
+    "audio": "pu1_u7_p85_assets/audio/shes-reading.mp3",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/cec9af20-d722-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 11904
+  },
+  {
+    "id": "im-not",
+    "text": "I'm not",
+    "audio": "pu1_u7_p85_assets/audio/im-not.mp3",
+    "source": "existing exact-text app MP3",
+    "sourceFile": "audio_mp3\\I'm not.mp3",
+    "bytes": 8640
+  },
+  {
+    "id": "shes-swimming-now",
+    "text": "She's swimming now.",
+    "audio": "pu1_u7_p85_assets/audio/shes-swimming-now.mp3",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/d0c11250-d722-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 14784
+  },
+  {
+    "id": "she-swims-every-day",
+    "text": "She swims every day.",
+    "audio": "pu1_u7_p85_assets/audio/she-swims-every-day.mp3",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/d3426600-d722-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 15360
+  }
+]

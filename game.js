@@ -1171,6 +1171,10 @@ function claimReward(success) {
 // --- PLACEHOLDERS FOR LARGE CHUNKS ---
 function loadContent(recoveryContent) {
     let book, unit, page;
+    if (window.PreviewNotes && PreviewNotes.remapPlacement) {
+        PreviewNotes.remapPlacement(recoveryContent);
+        PreviewNotes.remapPlacement(authActiveUser);
+    }
 
     if(recoveryContent&&recoveryContent.book){book=recoveryContent.book;unit=String(recoveryContent.unit);page=String(recoveryContent.page);selectedClassContent={book,unit,page};}
     else if (typeof authActiveUser !== 'undefined' && authActiveUser && authActiveUser.book && authActiveUser.unit && authActiveUser.page) {

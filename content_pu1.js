@@ -1374,7 +1374,9 @@ TEACHING_CONTENT["PU1"] = {
                 { a: "What's your favourite sport?", b: "Basketball is." }
             ]
         },
-        "84": {
+        "85": {
+            // Keep the existing typed-board SR identities after the page correction.
+            srPage: '84',
             vocab: [
                 "ride - riding", "swim - swimming", "watch - watching", "clean - cleaning", "play - playing", "paint - painting", "do - doing", "eat - eating", 'feet', 'Tom',
                 'what',  'is', 'she', 'are', 'you', "I'm", "they're", "isn't", "not"
@@ -1683,7 +1685,7 @@ AVAILABLE_CONTENT["PU1"] = {
     "4": [45, 47, 48, 54],
     "5": [57, 59, 60, 61, 63],
     "6": [78, 81],
-    "7": [83, 84, 92],
+    "7": [83, 85, 92],
     "8": [95, 97, 99],
     "9": [107, 108, 110, 111]
 };

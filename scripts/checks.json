@@ -54,6 +54,8 @@
     "test_client_diagnostics.js",
     "test_client_diagnostics_browser.js",
     "test_preview_notes_state.js",
+    "test_pu1_u7_preview.js",
+    "test_pu1_u7_preview_browser.js",
     "test_preview_notes_api.js",
     "test_preview_notes_browser.js",
     "test_notes_speech_browser.js",
@@ -71,6 +73,8 @@
         "test_dashboard_non_spelling.js",
         "test_asset_manifest.js",
         "test_non_spelling_content.js",
+        "test_pu1_u7_preview.js",
+        "test_pu1_u7_preview_browser.js",
         "test_non_spelling_startup.js",
         "test_non_spelling_integration_browser.js",
         "test_vocab_normalization.js"
@@ -135,6 +139,8 @@
       ],
       "tests": [
         "test_preview_notes_state.js",
+        "test_pu1_u7_preview.js",
+        "test_pu1_u7_preview_browser.js",
         "test_preview_notes_api.js",
         "test_preview_notes_browser.js",
         "test_notes_speech_browser.js"

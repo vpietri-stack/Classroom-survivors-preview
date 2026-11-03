@@ -1,3 +1,9 @@
+## PU1 Unit 7 page 85 preview (3 November 2026)
+
+`pu1-u7-p85` opens `pu1_u7_p85_notes.html` on first page-85 login or SR advancement. It preserves all three approved present-continuous infographics, with 42 locally saved word/phrase/sentence clips, replay, slow playback, zoom and optional existing adaptive pronunciation practice. The shared reader now derives image paths, accessible labels and page totals from lesson data; PU3 defaults remain compatible. Start studying has no listening or speaking gate.
+
+The following regular Study chooses five distinct vocabulary entries and five distinct non-spelling boards strictly from page 85, using the unchanged content moved from page 84 (including eight missing-word and twelve find/fix boards). Full completion earns one normal Study credit and unlocks the review library; interruption, first-attempt SR, account isolation and acknowledged saving retain the existing contracts. The shared browser/server note catalog includes this new ID at version 1.
+
 # Study Mode (UI Rounds A–D + Match; internal functions A/C/D/E/F)
 
 ## Preview app integration — 1 November 2026

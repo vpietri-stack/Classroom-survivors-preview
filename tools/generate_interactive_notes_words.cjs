@@ -4,7 +4,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const root = path.join(__dirname, '..');
-const data = require('../interactive_notes_data.js');
+const data = require(process.argv[2] ? path.resolve(process.argv[2]) : '../interactive_notes_data.js');
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 const valid = bytes => bytes.length >= 1000 && (bytes.subarray(0, 3).toString() === 'ID3' || (bytes[0] === 255 && (bytes[1] & 224) === 224));
 async function soundOfText(text) {
@@ -46,5 +46,5 @@ async function soundOfText(text) {
     console.log(clip.text + ': ' + source + ', ' + bytes.length + ' bytes');
     await wait(250);
   }
-  if (report.length) fs.writeFileSync(path.join(root, 'interactive_notes_assets', 'word-audio-sources.json'), JSON.stringify(report, null, 2) + '\n');
+  if (report.length) fs.writeFileSync(path.join(root, data.assetBase || 'interactive_notes_assets/', 'word-audio-sources.json'), JSON.stringify(report, null, 2) + '\n');
 })().catch(error => { console.error(error.message); process.exitCode = 1; });

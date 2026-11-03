@@ -1,7 +1,10 @@
 'use strict';
 const assert=require('node:assert/strict'),http=require('node:http'),fs=require('node:fs'),path=require('node:path'),os=require('node:os');
 const {chromium}=require('playwright-core');
-const root=__dirname,qa=path.join(os.tmpdir(),'classroom-preview-notes-integration');fs.mkdirSync(qa,{recursive:true});
+const pu1=process.argv.includes('--pu1');
+const lesson=pu1?{book:'PU1',unit:'7',page:'85',previous:'83',id:'pu1-u7-p85',pageCount:3,missing:'M9',secondMissing:'M16',fix:'F20',srKey:'non-spelling:find-fix:pu1:7:84:f20'}:{book:'PU3',unit:'9',page:'111',previous:'110',id:'pu3-u9-p111',pageCount:4,missing:'M1',secondMissing:'M8',fix:'F14',srKey:'non-spelling:find-fix:pu3:9:111:f14'};
+lesson.placement={book:lesson.book,unit:lesson.unit,page:lesson.page};
+const root=__dirname,qa=path.join(os.tmpdir(),'classroom-preview-notes-integration',lesson.id);fs.mkdirSync(qa,{recursive:true});
 let count=0;function ok(value,label){assert.ok(value,label);count++;console.log('PASS '+label);}
 const server=http.createServer((req,res)=>{
   const file=path.resolve(root,'.'+decodeURIComponent(new URL(req.url,'http://localhost').pathname));
@@ -9,7 +12,7 @@ const server=http.createServer((req,res)=>{
   const p=file.endsWith(path.sep)?path.join(file,'index.html'):file;
   fs.readFile(p,(error,bytes)=>{if(error){res.writeHead(404);res.end();return;}res.setHeader('Content-Type',({'js':'text/javascript','css':'text/css','html':'text/html','png':'image/png','woff2':'font/woff2','mp3':'audio/mpeg'})[path.extname(p).slice(1)]||'application/octet-stream');res.end(bytes);});
 });
-async function fixture(page,id='notes-a',placement={book:'PU3',unit:'9',page:'111'},notes={}){
+async function fixture(page,id='notes-a',placement=lesson.placement,notes={}){
  await page.evaluate(({id,placement,notes})=>{
   window.playTTS=()=>{};window.synthGem=()=>{};window.synthError=()=>{};window.playHappySound=()=>{};window.SpeechStatus={isReady:()=>false};if(window.AdaptiveSpeech)AdaptiveSpeech.enabled=false;
   if(window.HWRecognition) HWRecognition.load=()=>Promise.resolve();
@@ -29,37 +32,39 @@ async function fixture(page,id='notes-a',placement={book:'PU3',unit:'9',page:'11
  const browser=await chromium.launch({executablePath:'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',headless:true});
  try{
   const context=await browser.newContext({viewport:{width:1102,height:900}}),page=await context.newPage(),errors=[];
+  await context.addInitScript(value=>{window.testNote=value;},lesson);
   page.on('pageerror',e=>errors.push(e.message));
   await page.route('**/*',route=>{const u=route.request().url();return u.startsWith(base)&&!u.includes('/models/')&&!u.includes('/lib/wasm/')?route.continue():route.abort();});
-  await page.goto(base+'/index.html?resume=0&testMode=true&studentBook=PU3&studentUnit=9&studentPage=111');
+  await page.goto(base+'/index.html?resume=0&testMode=true&studentBook='+lesson.book+'&studentUnit='+lesson.unit+'&studentPage='+lesson.page);
   await page.waitForFunction(()=>window.PreviewNotes&&window.NonSpellingFlow);
+  if(pu1){await fixture(page,'notes-legacy',{book:'PU1',unit:'7',page:'84'});ok(await page.evaluate(()=>authActiveUser.page==='85'&&selectedClassContent.page==='85'),'legacy page 84 assignment resolves to page 85 before loading content');}
   await fixture(page);
   await page.locator('#preview-notes-overlay iframe').waitFor();
-  ok(true,'manual p111 assignment automatically opens notes after real finishLogin');
+  ok(true,'manual preview-page assignment automatically opens notes after real finishLogin');
   ok((await page.locator('#preview-notes-overlay iframe').getAttribute('allow')).includes('microphone'),'embedded notes allow explicit student microphone use');
   ok(await page.locator('#preview-notes-button').isHidden(),'library button stays hidden until a preview Study is completed');
   const reader=page.frameLocator('#preview-notes-overlay iframe');
   await reader.locator('.note-page').first().waitFor();
-  ok(await reader.locator('.note-page').count()===4,'integrated reader includes all four original pages');
+  ok(await reader.locator('.note-page').count()===lesson.pageCount,'integrated reader includes all approved original pages');
   ok(!(await reader.locator('#reader-study-start').isDisabled()),'Chinese Start studying has no listening gate');
   await page.screenshot({path:path.join(qa,'automatic-intro.png')});
   await reader.locator('#reader-study-start').click();
   await page.waitForFunction(()=>STUDY_STATE.active&&STUDY_STATE.round==='A'&&!document.getElementById('preview-notes-overlay'));
-  ok(await page.evaluate(()=>STUDY_STATE.words.length===5&&new Set(STUDY_STATE.words).size===5&&STUDY_STATE.words.every(w=>TEACHING_CONTENT.PU3[9][111].vocab.includes(w))),'five random vocabulary items come from existing p111 array');
-  ok(await page.evaluate(()=>STUDY_STATE.nonSpellingExercises.length===5&&STUDY_STATE.nonSpellingExercises.every(e=>e.book==='PU3'&&e.unit==='9'&&e.page==='111')),'five non-spelling boards are strictly page-scoped');
+  ok(await page.evaluate(()=>STUDY_STATE.words.length===5&&new Set(STUDY_STATE.words).size===5&&STUDY_STATE.words.every(w=>TEACHING_CONTENT[testNote.book][testNote.unit][testNote.page].vocab.includes(w))),'five random vocabulary items come from assigned page vocabulary array');
+  ok(await page.evaluate(()=>STUDY_STATE.nonSpellingExercises.length===5&&STUDY_STATE.nonSpellingExercises.every(e=>e.book===testNote.book&&e.unit===testNote.unit&&e.page===testNote.page)),'five non-spelling boards are strictly page-scoped');
   await page.evaluate(()=>exitStudyMode());await fixture(page);
   ok(await page.locator('#preview-notes-overlay').isVisible(),'abandoned session does not complete preview');
   await page.evaluate(()=>PreviewNotes.close());
-  await page.evaluate(()=>{localStorage.setItem('csPendingPageAdvance',JSON.stringify({book:'PU3',unit:'9',page:'110'}));finishLogin();});
-  ok(await page.locator('#preview-notes-overlay').isVisible()&&await page.evaluate(()=>authActiveUser.page==='111'),'stale pending placement cannot bypass newly assigned notes');
+  await page.evaluate(()=>{localStorage.setItem('csPendingPageAdvance',JSON.stringify({book:testNote.book,unit:testNote.unit,page:testNote.previous}));finishLogin();});
+  ok(await page.locator('#preview-notes-overlay').isVisible()&&await page.evaluate(()=>authActiveUser.page===testNote.page),'stale pending placement cannot bypass newly assigned notes');
   await page.evaluate(()=>localStorage.removeItem('csPendingPageAdvance'));
   await page.frameLocator('#preview-notes-overlay iframe').locator('#reader-study-start').click();
   await page.waitForFunction(()=>STUDY_STATE.active&&STUDY_STATE.round==='A');
   // Exercise all four existing widget types deterministically; selection itself
   // remains random and is separately sampled over 200 complete plans.
   await page.evaluate(()=>{
-   const pool=NonSpellingContent.buildPool('PU3','9','111',{pageOnly:true}).entries.map(e=>e.item);
-   STUDY_STATE.nonSpellingExercises=[pool.find(e=>e.id==='M1'&&e.type==='missing-word'),pool.find(e=>e.id==='F14'&&e.type==='find-fix'),pool.find(e=>e.type==='sentence-scramble'),pool.find(e=>e.type==='sentence-match'),pool.find(e=>e.id==='M8'&&e.type==='missing-word')];
+   const pool=NonSpellingContent.buildPool(testNote.book,testNote.unit,testNote.page,{pageOnly:true}).entries.map(e=>e.item);
+   STUDY_STATE.nonSpellingExercises=[pool.find(e=>e.id===testNote.missing&&e.type==='missing-word'),pool.find(e=>e.id===testNote.fix&&e.type==='find-fix'),pool.find(e=>e.type==='sentence-scramble'),pool.find(e=>e.type==='sentence-match'),pool.find(e=>e.id===testNote.secondMissing&&e.type==='missing-word')];
   });
   for(let i=0;i<5;i++){
    await page.waitForFunction(()=>STUDY_STATE.round==='A'&&!STUDY_STATE.isTransitioning);
@@ -70,7 +75,7 @@ async function fixture(page,id='notes-a',placement={book:'PU3',unit:'9',page:'11
   ok(true,'Round A progresses into regular word scramble');
   for(let i=0;i<5;i++){
    const word=await page.evaluate(()=>STUDY_STATE.words[STUDY_STATE.currentWordIndex]);
-   for(const letter of word)await page.locator('#scramble-bank button').filter({hasText:new RegExp('^'+letter+'$')}).first().click();
+   for(const letter of word.replace(/[ .?!-]/g,''))await page.locator('#scramble-bank button').filter({hasText:new RegExp('^'+letter+'$')}).first().click();
    await page.evaluate(()=>checkRoundC());
    await page.waitForFunction(i=>STUDY_STATE.round!=='C'||STUDY_STATE.currentWordIndex>i,i);
   }
@@ -108,34 +113,34 @@ async function fixture(page,id='notes-a',placement={book:'PU3',unit:'9',page:'11
    await page.waitForFunction(i=>STUDY_STATE.currentNonSpellingIndex>i,index);
   }
   await page.waitForFunction(()=>document.getElementById('study-title').textContent==='Session Complete');
-  ok(await page.evaluate(()=>!!authActiveUser.previewNotes['pu3-u9-p111']),'only completed follow-up Study unlocks permanent notes');
+  ok(await page.evaluate(()=>!!authActiveUser.previewNotes[testNote.id]),'only completed follow-up Study unlocks permanent notes');
   ok(await page.evaluate(()=>!document.getElementById('preview-notes-button').classList.contains('hidden')),'first completed preview Study immediately unlocks the library button for the main menu');
   ok(await page.evaluate(()=>authActiveUser.analytics.filter(e=>e.type==='session'&&e.sessionType==='study').length===1),'one regular completed study session recorded');
   ok(await page.evaluate(()=>countCompletedSessionsForTarget(authActiveUser,authActiveUser.targets[0].startTime,authActiveUser.targets[0].endTime)===1),'weekly target receives exactly one session credit');
-  ok(await page.evaluate(()=>Object.keys(authActiveUser.srState.vocab).length===5&&Object.keys(authActiveUser.srState.sentences).some(k=>k.includes('non-spelling:find-fix:pu3:9:111:f14'))),'normal vocabulary and typed-exercise SR outcomes persisted');
-  ok(await page.evaluate(()=>__saved.some(r=>r.body.events?.some(e=>e.data?.previewNote?.id==='pu3-u9-p111'))&&__saved.some(r=>r.body.srDelta)),'completion marker and normal SR delta use the real acknowledged flush');
+  ok(await page.evaluate(()=>Object.keys(authActiveUser.srState.vocab).length===5&&Object.keys(authActiveUser.srState.sentences).some(k=>k===testNote.srKey)),'normal vocabulary and typed-exercise SR outcomes persisted');
+  ok(await page.evaluate(()=>__saved.some(r=>r.body.events?.some(e=>e.data?.previewNote?.id===testNote.id))&&__saved.some(r=>r.body.srDelta)),'completion marker and normal SR delta use the real acknowledged flush');
   await page.evaluate(()=>finishStudySession());
   ok(await page.evaluate(()=>authActiveUser.analytics.filter(e=>e.type==='session').length===1),'duplicate completion cannot double credit');
   const notes=await page.evaluate(()=>authActiveUser.previewNotes);
-  await fixture(page,'notes-a',{book:'PU3',unit:'9',page:'111'},notes);
+  await fixture(page,'notes-a',lesson.placement,notes);
   ok(await page.locator('#preview-notes-overlay').count()===0,'completed page uses normal login');
   await page.locator('#preview-notes-button').click();await page.locator('.preview-notes-library button').click();
   ok((await page.frameLocator('#preview-notes-overlay iframe').locator('#reader-study-start').textContent())==='返回主界面','studied notes reopen in listening-only review mode');
   await page.evaluate(()=>PreviewNotes.close());
   await fixture(page,'notes-b');ok(await page.locator('#preview-notes-overlay').isVisible(),'another student does not inherit completion');
   await page.evaluate(()=>PreviewNotes.close());
-  await fixture(page,'notes-server-only',{book:'PU3',unit:'9',page:'111'},notes);
+  await fixture(page,'notes-server-only',lesson.placement,notes);
   ok(await page.locator('#preview-notes-overlay').count()===0,'server completion works on a fresh account cache');
-  await fixture(page,'notes-advance',{book:'PU3',unit:'9',page:'110'});
+  await fixture(page,'notes-advance',{book:lesson.book,unit:lesson.unit,page:lesson.previous});
   ok(await page.locator('#preview-notes-button').isHidden(),'students on other pages with no completed preview have no empty library button');
   await page.evaluate(()=>{
    PreviewNotes.close();
    const current=getCurrentSession();
-   const sorted=getSortedPagesForBook('PU3'),end=sorted.findIndex(p=>p.unit==='9'&&p.page==='110');
+   const sorted=getSortedPagesForBook(testNote.book),end=sorted.findIndex(p=>p.unit===testNote.unit&&p.page===testNote.previous);
    for(const type of ['vocab','sentences','sentencePairs'])for(const e of buildItemPool(sorted.slice(0,end+1),type).flatPool)authActiveUser.srState[type][e.key]={lastResult:'success',dueAfterSession:current+999,interval:999};
    finishLogin();
   });
-  ok(await page.evaluate(()=>authActiveUser.page==='111')&&await page.locator('#preview-notes-overlay').isVisible(),'automatic SR advancement stops at p111 and opens its preview');
+  ok(await page.evaluate(()=>authActiveUser.page===testNote.page)&&await page.locator('#preview-notes-overlay').isVisible(),'automatic SR advancement stops at the registered page and opens its preview');
   await page.setViewportSize({width:390,height:844});await page.screenshot({path:path.join(qa,'automatic-intro-phone.png')});
   ok(errors.length===0,'no browser runtime errors: '+errors.join(','));
   console.log(count+' preview-note integration checks passed; '+qa);

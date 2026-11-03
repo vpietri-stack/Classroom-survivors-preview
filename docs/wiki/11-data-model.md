@@ -1,3 +1,7 @@
+## PU1 preview-note registration (3 November 2026)
+
+The isolated preview API also accepts `pu1-u7-p85` version 1 with book PU1, unit 7 and page 85. Completion still requires a completed regular Study marker with five words and five exercises. A page-84 marker cannot complete this note. It coexists with the existing PU3 completion map and remains idempotent across retries/archive. Historical typed-board SR keys retain their page-84 identity although current selection/logged placement is page 85.
+
 # Data Model: Cosmos DB & Client Persistence
 
 > **Last verified:** 2026-09-27 · **Part of:** [Classroom-survivors Repo Wiki](README.md)

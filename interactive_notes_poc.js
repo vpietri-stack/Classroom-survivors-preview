@@ -81,12 +81,12 @@
   lesson.pages.forEach((page, index) => {
     const article = document.createElement('article'); article.className = 'note-page'; article.id = 'page-' + (index + 1);
     const label = document.createElement('div'); label.className = 'page-label';
-    const number = document.createElement('b'); number.textContent = String(index + 1).padStart(2, '0') + ' / 04';
+    const number = document.createElement('b'); number.textContent = String(index + 1).padStart(2, '0') + ' / ' + String(lesson.pages.length).padStart(2, '0');
     const title = document.createElement('span'); title.textContent = page.title; label.append(number, title);
     const viewport = document.createElement('div'); viewport.className = 'paper-viewport';
     const paper = document.createElement('div'); paper.className = 'paper'; paper.style.aspectRatio = page.width + ' / ' + page.height;
-    const image = document.createElement('img'); image.className = 'page-image'; image.src = 'interactive_notes_assets/' + page.file;
-    image.alt = 'PU3 Unit 9 p.111 预习图，第 ' + (index + 1) + ' 页：' + page.title;
+    const image = document.createElement('img'); image.className = 'page-image'; image.src = (lesson.assetBase || 'interactive_notes_assets/') + page.file;
+    image.alt = (lesson.label || 'PU3 Unit 9 p.111') + ' 预习图，第 ' + (index + 1) + ' 页：' + page.title;
     image.width = page.width; image.height = page.height; image.draggable = false;
     if (index > 0) image.loading = 'lazy';
     paper.append(image);

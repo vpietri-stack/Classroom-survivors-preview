@@ -1,3 +1,7 @@
+## Corrected preview placement (3 November 2026)
+
+On preview/local only, `PreviewNotes.remapPlacement` maps PU1 Unit 7 page 84 to 85 before login content resolution and before pending placement replay. `loadContent` also resolves saved recovery placements. This adjusts the active placement without rewriting historical analytics, completion or mastery. No other book, unit or environment is remapped.
+
 # Authentication, Sessions & Version Watchdog
 
 > **Last verified:** 2026-09-25 · **Part of:** [Classroom-survivors Repo Wiki](README.md)

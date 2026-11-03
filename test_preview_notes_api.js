@@ -46,5 +46,11 @@ async function save(events,extra={}) {
   stored.analytics=[];
   await save([{type:'device',eventId:'later',timestamp:new Date().toISOString()}]);
   ok(stored.previewNotes['pu3-u9-p111'].completedAt===timestamp,'archived analytics do not remove persistent note completion');
+  const pu1Event={...event,eventId:'pu1-note-study',data:{...event.data,previewNote:{...marker,id:'pu1-u7-p85',book:'PU1',unit:'7',page:'85'}}};
+  response=await save([pu1Event],{srState:{vocab:{}},srSeq:2,srDelta:true,incrementSession:true});
+  ok(response.status===200 && stored.previewNotes['pu1-u7-p85'] && stored.previewNotes['pu3-u9-p111'],'new page 85 completion coexists with existing notes');
+  const pu1Count=stored.sessionCount;
+  await save([pu1Event],{srState:{vocab:{}},srSeq:2,srDelta:true,incrementSession:true});
+  ok(stored.sessionCount===pu1Count && stored.analytics.filter(e=>e.eventId==='pu1-note-study').length===1,'new lesson retry does not double-credit Study');
   console.log(checks+' preview-note API checks passed');
 })().catch(error=>{console.error(error);process.exitCode=1;});

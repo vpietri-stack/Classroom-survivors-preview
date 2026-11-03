@@ -9,6 +9,13 @@
             || location.protocol === 'file:' || host === 'localhost' || host === '127.0.0.1';
     }
     const user = () => typeof authActiveUser === 'undefined' ? null : authActiveUser;
+    // A corrected curriculum page must remain reachable for old assignments and
+    // interrupted-session placements, without rewriting their historical events.
+    function remapPlacement(placement) {
+        if (enabled() && placement && placement.book === 'PU1'
+            && String(placement.unit) === '7' && String(placement.page) === '84') placement.page = '85';
+        return placement;
+    }
     const isStudent = student => student && !['teacher', 'BM', 'admin'].includes(student.role);
     const key = student => 'csPreviewNotes:' + (/Classroom-survivors-preview/i.test(location.pathname) ? 'preview:' : 'local:') + student.id;
     function progress(student) {
@@ -52,7 +59,7 @@
         opening = { id, review, owner: student.id, request, frame };
         const url = new URL(note.reader, location.href);
         url.searchParams.set('embed', '1'); url.searchParams.set('mode', review ? 'review' : 'intro'); url.searchParams.set('request', request);
-        url.searchParams.set('v', '2026-11-03a'); frame.src = url.href; overlay.append(frame);
+        url.searchParams.set('v', '2026-11-03b'); frame.src = url.href; overlay.append(frame);
     }
     function openLibrary() {
         const student = user();
@@ -114,5 +121,5 @@
             else current.frame.contentWindow.postMessage({ action: 'note-study-error', request: current.request }, location.origin);
         }
     });
-    window.PreviewNotes = { onLogin, close, openLibrary, openNote, blocksAdvance, prepareStudy, completeStudy, markComplete, enabled };
+    window.PreviewNotes = { onLogin, close, openLibrary, openNote, blocksAdvance, prepareStudy, completeStudy, markComplete, enabled, remapPlacement };
 })();

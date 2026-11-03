@@ -462,7 +462,7 @@ for (const [unit, lastPage, missing, fixes, pages] of [
     [4, 54, 22, 32, [[45,5,6],[47,7,10],[48,4,6],[54,6,10]]],
     [5, 63, 28, 36, [[57,5,6],[59,8,10],[60,5,6],[61,6,8],[63,4,6]]],
     [6, 81, 32, 46, [[78,28,40],[81,4,6]]],
-    [7, 92, 28, 36, [[83,8,8],[84,8,12],[92,12,16]]]
+    [7, 92, 28, 36, [[83,8,8],[85,8,12],[92,12,16]]]
 ]) {
     const items = content.buildPool('PU1', unit, lastPage).entries.filter(e => e.item.id && e.item.unit === String(unit)).map(e => e.item);
     pu1Approved.push(...items);
