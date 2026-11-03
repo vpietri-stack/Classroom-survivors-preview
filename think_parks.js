@@ -2,6 +2,7 @@
 
 const $ = (id) => document.getElementById(id);
 const assets = "think_parks_assets/";
+const audioVersion = "?v=2";
 const newPictures = new Set([
     "public-park", "call-it", "almost", "wide", "at-one-end", "green-space",
     "lovely", "rose-garden", "glass-palace", "iguana", "real-name", "full-of", "get-there",
@@ -52,26 +53,28 @@ function shuffle(values) {
     return result;
 }
 
-function renderArticle(parks) {
+function playClip(english, chinese, filename) {
     const audio = $("audio");
-    $("dismiss").onclick = () => {
-        audio.pause();
-        $("player").hidden = true;
-    };
+    const source = assets + filename + audioVersion;
+    $("english").textContent = english;
+    $("chinese").textContent = chinese;
+    $("player").hidden = false;
+    if (audio.getAttribute("src") === source) audio.currentTime = 0;
+    else audio.src = source;
+    audio.play().catch(() => {});
+}
+
+$("dismiss").onclick = () => {
+    $("audio").pause();
+    $("player").hidden = true;
+};
+
+function renderArticle(parks) {
     let clip = 0;
-    parks.forEach(([title, sentences], parkIndex) => {
-        const group = element("div");
-        group.append(element("h3", title));
+    parks.forEach(([, sentences], parkIndex) => {
         sentences.forEach(([english, chinese], sentenceIndex) => {
-            const source = assets + "sentence-" + (++clip) + ".mp3";
-            const listen = () => {
-                $("english").textContent = english;
-                $("chinese").textContent = chinese;
-                $("player").hidden = false;
-                audio.src = source;
-                audio.play().catch(() => {});
-            };
-            group.append(button(english, listen, "sentence"), " ");
+            const filename = "sentence-" + (++clip) + ".mp3";
+            const listen = () => playClip(english, chinese, filename);
             hotspots[parkIndex][sentenceIndex].forEach(([x, y, right], line) => {
                 const area = button("", listen, "hotspot");
                 area.setAttribute("aria-label", english);
@@ -83,7 +86,6 @@ function renderArticle(parks) {
                 $("scan").append(area);
             });
         });
-        $("reading").append(group);
     });
 }
 
@@ -95,7 +97,7 @@ function startPractice(words, parks) {
     const sets = Array.from({ length: 5 }, (_, i) => words.slice(i * 5, i * 5 + 5));
     function recognition(round, targets = shuffle(sets[round]), index = 0) {
         const [answer, chinese, key] = targets[index];
-        promptAudio.src = assets + "word-" + key + ".mp3";
+        promptAudio.src = assets + "word-" + key + ".mp3" + audioVersion;
         const listen = () => {
             promptAudio.currentTime = 0;
             promptAudio.play().catch(() => {});
@@ -201,8 +203,10 @@ fetch("think_parks_data.json")
     })
     .then(({ words, parks }) => {
         for (const [english, chinese, key] of words) {
-            const card = element("div", "", "card");
-            card.append(picture(key), element("strong", english), element("span", chinese));
+            const card = button("", () => playClip(english, chinese, "word-" + key + ".mp3"), "card");
+            const icon = element("span", "♪", "listen-icon");
+            icon.setAttribute("aria-hidden", "true");
+            card.append(picture(key), element("strong", english), element("span", chinese), icon);
             $("cards").append(card);
         }
         renderArticle(parks);
