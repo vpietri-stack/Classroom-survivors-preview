@@ -1,3 +1,7 @@
+## Think Starter Unit 4 page 44 preview
+
+The preview site links to `think_parks.html` from the selection wizard. It has 25 illustrated vocabulary targets, the page 44 scan with sentence hotspots, and 18 original Track 4.12 sentence clips with Simplified Chinese translations. Its account-free practice runs five sets of five recognition questions followed by six paragraph gap-fills. The page keeps practice state in memory and does not use the regular Study credit or SR pipeline.
+
 ## PU1 Unit 7 page 85 preview (3 November 2026)
 
 `pu1-u7-p85` opens `pu1_u7_p85_notes.html` on first page-85 login or SR advancement. It preserves all three approved present-continuous infographics, with 41 locally saved word/phrase/sentence clips bundled with the reader to avoid stalled MP3 requests during playback, replay, slow playback, zoom and optional existing adaptive pronunciation practice. The shared reader now derives image paths, accessible labels and page totals from lesson data; PU3 defaults remain compatible. The heading is static artwork. Start studying has no listening or speaking gate.

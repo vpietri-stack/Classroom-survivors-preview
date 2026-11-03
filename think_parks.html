@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parks around the world · Classroom Survivors</title>
+<link rel="stylesheet" href="think_parks.css">
+<script defer src="think_parks.js"></script>
+<header>
+  <a href="index.html">Classroom Survivors</a>
+  <p>THINK STARTER · UNIT 4 · PAGE 44</p>
+  <h1>Parks around the world</h1>
+  <nav><a href="#words">1 预习词汇</a><a href="#article">2 点读课文</a><a href="#practice">3 开始练习</a></nav>
+</header>
+<main>
+  <section id="words"><h2>1. 预习词汇</h2><div id="cards" class="cards"></div></section>
+  <section id="article">
+    <h2>2. 点读课文</h2>
+    <p>点击课文中的句子，听原声并查看中文。也可以在图片下方选择句子。</p>
+    <div class="reader">
+      <div id="scan"><img src="think_parks_assets/page.webp" width="816" height="1108" alt="Think Starter 第44页，世界各地的公园"></div>
+      <div id="reading"></div>
+    </div>
+    <aside id="player" hidden>
+      <button id="dismiss" type="button" aria-label="关闭翻译">×</button>
+      <strong id="english"></strong><div id="chinese" aria-live="polite"></div>
+      <audio id="audio" controls preload="none" aria-label="原声音频"></audio>
+    </aside>
+  </section>
+  <section id="practice"><h2>3. 开始练习</h2><div id="activity"><button id="start">开始</button></div></section>
+  <p id="load-error" role="alert"></p>
+</main>
+</html>
