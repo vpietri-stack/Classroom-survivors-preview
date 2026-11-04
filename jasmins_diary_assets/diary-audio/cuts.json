@@ -1,0 +1,182 @@
+[
+  {
+    "file": "diary-audio/date.mp3",
+    "paragraph": 0,
+    "start": 14.19,
+    "end": 18.74
+  },
+  {
+    "file": "diary-audio/p1-s01.mp3",
+    "paragraph": 1,
+    "start": 18.74,
+    "end": 21.6
+  },
+  {
+    "file": "diary-audio/p1-s02.mp3",
+    "paragraph": 1,
+    "start": 21.6,
+    "end": 25.4
+  },
+  {
+    "file": "diary-audio/p1-s03.mp3",
+    "paragraph": 1,
+    "start": 25.4,
+    "end": 32.51
+  },
+  {
+    "file": "diary-audio/p1-s04.mp3",
+    "paragraph": 1,
+    "start": 32.51,
+    "end": 35.79
+  },
+  {
+    "file": "diary-audio/p1-s05.mp3",
+    "paragraph": 1,
+    "start": 35.79,
+    "end": 41.43
+  },
+  {
+    "file": "diary-audio/p1-s06.mp3",
+    "paragraph": 1,
+    "start": 41.43,
+    "end": 48.65
+  },
+  {
+    "file": "diary-audio/p1-s07.mp3",
+    "paragraph": 1,
+    "start": 48.65,
+    "end": 53.42
+  },
+  {
+    "file": "diary-audio/p1-s08.mp3",
+    "paragraph": 1,
+    "start": 53.42,
+    "end": 59.29
+  },
+  {
+    "file": "diary-audio/p1-s09.mp3",
+    "paragraph": 1,
+    "start": 59.29,
+    "end": 67.58
+  },
+  {
+    "file": "diary-audio/p1-s10.mp3",
+    "paragraph": 1,
+    "start": 67.58,
+    "end": 71.11
+  },
+  {
+    "file": "diary-audio/paragraph-1.mp3",
+    "paragraph": 1,
+    "start": 18.74,
+    "end": 71.11
+  },
+  {
+    "file": "diary-audio/p2-s01.mp3",
+    "paragraph": 2,
+    "start": 71.11,
+    "end": 78.84
+  },
+  {
+    "file": "diary-audio/p2-s02.mp3",
+    "paragraph": 2,
+    "start": 78.84,
+    "end": 83.32
+  },
+  {
+    "file": "diary-audio/p2-s03.mp3",
+    "paragraph": 2,
+    "start": 83.32,
+    "end": 85.55
+  },
+  {
+    "file": "diary-audio/p2-s04.mp3",
+    "paragraph": 2,
+    "start": 85.55,
+    "end": 90.47
+  },
+  {
+    "file": "diary-audio/paragraph-2.mp3",
+    "paragraph": 2,
+    "start": 71.11,
+    "end": 90.47
+  },
+  {
+    "file": "diary-audio/p3-s01.mp3",
+    "paragraph": 3,
+    "start": 90.47,
+    "end": 96.16
+  },
+  {
+    "file": "diary-audio/p3-s02.mp3",
+    "paragraph": 3,
+    "start": 96.16,
+    "end": 103.16
+  },
+  {
+    "file": "diary-audio/p3-s03.mp3",
+    "paragraph": 3,
+    "start": 103.16,
+    "end": 107.45
+  },
+  {
+    "file": "diary-audio/p3-s04.mp3",
+    "paragraph": 3,
+    "start": 107.45,
+    "end": 112.52
+  },
+  {
+    "file": "diary-audio/p3-s05.mp3",
+    "paragraph": 3,
+    "start": 112.52,
+    "end": 114.469
+  },
+  {
+    "file": "diary-audio/p3-s06.mp3",
+    "paragraph": 3,
+    "start": 114.469,
+    "end": 120.96
+  },
+  {
+    "file": "diary-audio/p3-s07.mp3",
+    "paragraph": 3,
+    "start": 120.96,
+    "end": 127.34
+  },
+  {
+    "file": "diary-audio/paragraph-3.mp3",
+    "paragraph": 3,
+    "start": 90.47,
+    "end": 127.34
+  },
+  {
+    "file": "diary-audio/p4-s01.mp3",
+    "paragraph": 4,
+    "start": 127.34,
+    "end": 134.81
+  },
+  {
+    "file": "diary-audio/p4-s02.mp3",
+    "paragraph": 4,
+    "start": 134.81,
+    "end": 139.38
+  },
+  {
+    "file": "diary-audio/p4-s03.mp3",
+    "paragraph": 4,
+    "start": 139.38,
+    "end": 142.97
+  },
+  {
+    "file": "diary-audio/paragraph-4.mp3",
+    "paragraph": 4,
+    "start": 127.34,
+    "end": 142.97
+  },
+  {
+    "file": "diary-audio/full-diary.mp3",
+    "paragraph": 0,
+    "start": 14.19,
+    "end": 142.97
+  }
+]

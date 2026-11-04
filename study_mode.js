@@ -83,8 +83,9 @@ function showStudyNotice(msg) {
 // Entry point
 function initStudyMode(options = {}) {
     if(window.GameRecovery)GameRecovery.pause();
-    const parks = options.previewNoteId === "think0-u4-p44" && window.ThinkParksStudy && authActiveUser && !isTestMode && (!authActiveUser.role || authActiveUser.role === "student");
-    if (options.previewNoteId === "think0-u4-p44" && !parks) return false;
+    const article = window.ArticleStudy?.get(options.previewNoteId);
+    const parks = article && authActiveUser && !isTestMode && (!authActiveUser.role || authActiveUser.role === "student");
+    if (article && !parks) return false;
     const notePlan = window.PreviewNotes && options.previewNoteId ? PreviewNotes.prepareStudy(options.previewNoteId) : null;
     if (options.previewNoteId && !notePlan) return false;
     if (window.ClientDiagnostics) ClientDiagnostics.checkpoint('study-start', { mode: 'study', active: true, word: '', letter: '' });
@@ -98,7 +99,7 @@ function initStudyMode(options = {}) {
     }
 
     // Get Spaced Repetition Content (SR-aware)
-    const SR_WORDS = parks ? ThinkParks.words.slice(0, 5).map(word => word[0]) : notePlan ? notePlan.words : getStudyContentSR(book, unit, page, 'vocab', 5);
+    const SR_WORDS = parks ? article.words.slice(0, 5).map(word => word[0]) : notePlan ? notePlan.words : getStudyContentSR(book, unit, page, 'vocab', 5);
     const mixed = parks ? null : notePlan ? notePlan.exercises : window.NonSpellingFlow ? NonSpellingFlow.prepareStudy(book, unit, page) : null;
     const SR_SENTENCES = parks || mixed ? [] : getStudyContentSR(book, unit, page, 'sentences', 5);
     const sentenceCount = mixed ? mixed.length : SR_SENTENCES.length;
@@ -181,7 +182,7 @@ function startRoundA(resuming) {
     if (!resuming) STUDY_STATE.remainingWordsRoundA = [...STUDY_STATE.words];
 
     const parks = STUDY_STATE.parks;
-    updateStudyUI(parks ? "Round A · " + (parks.set + 1) + " / 5" : "Round A: Word Recognition",
+    updateStudyUI(parks ? "Round A · " + (parks.set + 1) + " / " + ArticleStudy.active(STUDY_STATE).setCount : "Round A: Word Recognition",
         parks ? "听一听，点击正确的单词或短语。" : "Listen and click the correct word.");
 
     const container = document.getElementById('study-game-area');
@@ -239,12 +240,12 @@ function playRoundAPrompt() {
 }
 
 function playStudyRecognitionAudio() {
-    if (STUDY_STATE.parks) ThinkParksStudy.playWord();
+    if (STUDY_STATE.parks) ArticleStudy.active(STUDY_STATE).playWord();
     else playTTS();
 }
 
 function showStudyRecognitionClue(target) {
-    if (STUDY_STATE.parks) ThinkParksStudy.showWord(target);
+    if (STUDY_STATE.parks) ArticleStudy.active(STUDY_STATE).showWord(target);
     else {
         showTranslation('roundA-translation', target);
         showVocabImage('roundA-image', target);
@@ -286,7 +287,7 @@ function checkRoundA(word, btnElement) {
 
 function finishRoundA() {
     if (STUDY_STATE.parks) {
-        ThinkParksStudy.recognitionComplete();
+        ArticleStudy.active(STUDY_STATE).recognitionComplete();
         return;
     }
     // Round A (word recognition) completed → straight into Word Scramble.
@@ -1365,7 +1366,7 @@ async function finishStudySession() {
         durationMs: durationMs,
         durationFormatted: timeStr,
         ...(previewNote ? { previewNote } : {}),
-        ...(parks ? { studyContent: ThinkParksStudy.context } : {})
+        ...(parks ? { studyContent: ArticleStudy.active(STUDY_STATE).context } : {})
     });
     if (previewNote && window.PreviewNotes) PreviewNotes.markComplete(previewNote);
     // FIX (2026-08-25, "Doris refresh"): AWAIT the delivery of the session
@@ -1394,7 +1395,7 @@ async function finishStudySession() {
             ${messageHtml}
             
             <div class="flex flex-col gap-3 items-center w-full">
-                <button onclick="${parks ? "PreviewNotes.openNote('think0-u4-p44', false)" : "initStudyMode()"}" class="game-btn bg-blue-600 text-lg sm:text-xl w-full">再学习一下</button>
+                <button onclick="${parks ? `PreviewNotes.openNote('${ArticleStudy.active(STUDY_STATE).id}', false)` : "initStudyMode()"}" class="game-btn bg-blue-600 text-lg sm:text-xl w-full">再学习一下</button>
                 <button onclick="showGameSelection()" class="game-btn bg-orange-500 text-lg sm:text-xl w-full">边玩边学</button>
             </div>
         </div>
@@ -1448,10 +1449,11 @@ function updateStudyUI(title, subtitle) {
 function updateStudyProgress() {
     const mixed = !!STUDY_STATE.nonSpellingExercises;
     const parks = STUDY_STATE.parks;
-    const rounds = parks ? [...Array(5).fill('A'), ...Array(6).fill('E')] : mixed ? STUDY_ROUNDS.slice(0, 4) : STUDY_ROUNDS;
+    const article = parks && ArticleStudy.active(STUDY_STATE);
+    const rounds = article ? [...Array(article.setCount).fill('A'), ...Array(article.exerciseCount).fill('E')] : mixed ? STUDY_ROUNDS.slice(0, 4) : STUDY_ROUNDS;
     const currentRound = mixed && STUDY_STATE.round === 'F' ? 'E' : STUDY_STATE.round;
     const currentIdx = parks
-        ? STUDY_STATE.srFinalized ? rounds.length : currentRound === 'A' ? parks.set : 5 + STUDY_STATE.currentSentenceIndex
+        ? STUDY_STATE.srFinalized ? rounds.length : currentRound === 'A' ? parks.set : article.setCount + STUDY_STATE.currentSentenceIndex
         : rounds.indexOf(currentRound);
     let bar = document.getElementById('study-progress-indicator');
     if (!bar) {

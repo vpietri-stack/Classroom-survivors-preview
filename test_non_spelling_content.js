@@ -131,7 +131,7 @@ assert.equal(new Set([...unit1, ...unit2, ...unit3, ...unit4, ...unit5, ...unit6
 vm.runInContext(fs.readFileSync('translations.js', 'utf8'), sandbox);
 const translations = vm.runInContext('LOCAL_TRANSLATIONS', sandbox);
 assert.equal(translations.over, '越过；结束了', 'approved shared entry covers both meanings');
-assert.deepEqual(Array.from(vm.runInContext('AVAILABLE_CONTENT.PU3[9]', sandbox)), [107, 109, 110, 111]);
+assert.deepEqual(Array.from(vm.runInContext('AVAILABLE_CONTENT.PU3[9]', sandbox)), [107, 109, 110, 111, 112]);
 for (const [page, missing, fix, vocab, scrambles, pairs] of [[107, 8, 10, null, null, null], [110, 8, 12, 17, 10, 8], [111, 8, 14, 14, 12, 7]]) {
     const data = vm.runInContext('TEACHING_CONTENT.PU3[9][' + page + ']', sandbox);
     assert.equal(data.nonSpellingExercises.filter(e => e.type === 'missing-word').length, missing);

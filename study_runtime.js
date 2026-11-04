@@ -40,7 +40,7 @@
     }
     function cancel() {
         studyRuntimeEpoch++; studyCancelPending(); clearTimeout(roundDTimer);
-        if (w.ThinkParksStudy) ThinkParksStudy.pause();
+        w.ArticleStudy?.pause();
         nodes('#study-game-area .speech-rec-btn').forEach(e => { if(e.disposeSpeech)e.disposeSpeech(); });
         clearTimeout(STUDY_STATE._roundEResetTimer); STUDY_STATE._roundEResetTimer = null;
         nodes('#scramble-slots .study-slot').forEach(e => { clearTimeout(e._resetTimer); e._resetTimer = null; });
@@ -53,8 +53,8 @@
     }
     function pendingAction(name) {
         if (name === 'recognition_next') return () => { STUDY_STATE.isTransitioning = false; playRoundAPrompt(); };
-        if (name === 'parks_next') return ThinkParksStudy.next;
-        if (name === 'parks_reset') return ThinkParksStudy.reset;
+        if (name === 'parks_next') return w.ArticleStudy.active(STUDY_STATE).next;
+        if (name === 'parks_reset') return w.ArticleStudy.active(STUDY_STATE).reset;
         if (name === 'scramble_next') return () => { STUDY_STATE.currentWordIndex++; STUDY_STATE.isTransitioning = false; STUDY_STATE._roundCFrozen = false; startExerciseTracking(); nextRoundCWord(); };
         if (name === 'scramble_reset') return clearRoundC;
         if (name === 'handwriting_letter') return roundDShowTarget;
@@ -78,7 +78,7 @@
         showStudyModeScreen();
         const s = saved.state, ui = saved.ui;
         if (s.round === 'A') startRoundA(true);
-        else if (s.parks) ThinkParksStudy.renderCloze();
+        else if (s.parks) w.ArticleStudy.active(s).renderCloze();
         else if (s.round === 'C') nextRoundCWord();
         else if (s.round === 'D') nextRoundDWord(saved.handwriting);
         else if (s._mixedActive) NonSpellingFlow.restoreStudy(ui.typed);

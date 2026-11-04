@@ -25,6 +25,23 @@ function webpDimensions(bytes) {
 function checkNotesImages() {
     const { catalog } = require('../api/src/functions/shared/previewNotesCore');
     for (const note of catalog) {
+        if (note.id === 'pu3-u9-p112') {
+            const context = { window: {} };
+            vm.runInNewContext(fs.readFileSync(path.join(root, 'jasmins_diary_lesson.js'), 'utf8'), context);
+            const lesson = context.window.JasminsDiary;
+            const images = new Set([...lesson.words.map(word => word[3]),
+                ...lesson.columns.map(column => lesson.clip('illustrations/' + column.image + '.webp'))]);
+            let total = 0;
+            for (const image of images) {
+                const bytes = fs.readFileSync(path.join(root, image));
+                assert.ok(image.endsWith('.webp') && bytes.length <= PAGE_LIMIT, image);
+                webpDimensions(bytes);
+                total += bytes.length;
+            }
+            assert.ok(total <= LESSON_LIMIT, 'Diary images exceed lesson limit');
+            console.log(note.id + ': ' + images.size + ' WebP images, ' + total + ' bytes');
+            continue;
+        }
         if (note.id === 'think0-u4-p44') {
             const scan = fs.readFileSync(path.join(root, 'think_parks_assets/page.webp'));
             assert.ok(scan.length <= PAGE_LIMIT, 'Parks scan exceeds page limit');

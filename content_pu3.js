@@ -1095,6 +1095,36 @@ TEACHING_CONTENT["PU3"] = {
                     "b": "so Dad felt worried about our boat trip."
                 }
             ]
+        },
+        "112": {
+            vocab: ["compass","first aid kit","torch","sun cream","pyramid","rainforest","disaster","find your way","daytime","solution","the sun rises","the sun sets","usual","metal needle","rub","magnet","point north","safe"],
+            sentences: [
+                "Day five in Mexico!",
+                "Today was very interesting.",
+                "We went to visit a pyramid at the top of the Tepozteco Mountain in Morelos.",
+                "It was a beautiful walk.",
+                "We went past waterfalls and amazing rainforests!",
+                "We walked very far because the pyramid is very high up the mountain.",
+                "On the way, we saw lots of lizards.",
+                "We rested at the top of the mountain and we had a picnic.",
+                "The view was lovely; we could look down on the beautiful town of Tepoztlan.",
+                "Danny took lots of pictures.",
+                "When we were preparing to go back down the mountain, disaster happened!",
+                "Danny fell and our compass broke.",
+                "Oh no!",
+                "How could we find our way with no compass?",
+                "We couldn’t look at the stars because it was day time.",
+                "Danny wanted to make a compass but we didn’t have the right materials.",
+                "Then Mum found the solution.",
+                "The sun was getting lower in the sky.",
+                "Of course!",
+                "The sun rises in the east and it sets in the west.",
+                "Now we knew where west was and it was easy to find south.",
+                "We arrived back at the hotel hot and dirty, but safe.",
+                "Mum is now the superhero of the family.",
+                "What’s going to happen to us tomorrow?"
+            ],
+            sentencePairs: []
         }
     },
 };
@@ -1109,5 +1139,5 @@ AVAILABLE_CONTENT["PU3"] = {
     "6": [69, 71, 73],
     "7": [83, 85, 87],
     "8": [95, 97, 98, 99],
-    "9": [107, 109, 110, 111]
+    "9": [107, 109, 110, 111, 112]
 };

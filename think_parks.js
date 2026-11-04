@@ -1,7 +1,8 @@
 "use strict";
 
 const $ = (id) => document.getElementById(id);
-const lesson = parent !== window && parent.ThinkParks || window.ThinkParks;
+const diary = document.body.dataset.article === 'jasmins-diary';
+const lesson = diary ? window.JasminsDiary : parent !== window && parent.ThinkParks || window.ThinkParks;
 // Coordinates are relative to the 4x crop of the lower part of the source page.
 const hotspots = [
     [[[55,49,426]],[[432,49,535],[55,78,583]],[[55,106,593],[55,135,515]]],
@@ -82,30 +83,59 @@ function renderArticle(parks) {
     });
 }
 
-lesson.prefetchAudio("words");
-const scan = $("scan");
-const scanImage = scan.querySelector('img');
-try {
-    const cache = parent !== window && parent.AssetCache || window.AssetCache;
-    if (cache) cache.getBlobUrl('think_parks_assets/page.webp').then(url => {
-        if (url && (!scanImage.complete || !scanImage.naturalWidth)) scanImage.src = url;
-    });
-} catch (_) {}
-if ("IntersectionObserver" in window) {
-    const observer = new IntersectionObserver(entries => {
-        if (entries.some(entry => entry.isIntersecting)) {
-            lesson.prefetchAudio("sentences");
-            observer.disconnect();
+function renderDiary() {
+    const article = $("diary-columns");
+    const listen = (label, translation, filename, style) =>
+        button(label, () => playClip(label, translation, "diary-audio/" + filename + ".mp3"), style);
+    article.before(listen("播放整篇日记", "听课本原声", "full-diary", "diary-control"));
+    lesson.columns.forEach(({ image, alt, paragraphs }, column) => {
+        const panel = element("div", "", "diary-column");
+        const picture = element("img");
+        picture.src = lesson.clip("illustrations/" + image + ".webp");
+        picture.alt = alt;
+        picture.loading = "lazy";
+        panel.append(picture);
+        if (column === 0) panel.append(listen("Saturday July 15th", "7月15日，星期六", "date", "diary-date"));
+        for (const index of paragraphs) {
+            const paragraph = element("p", "", "diary-paragraph");
+            paragraph.lang = "en";
+            lesson.parks[index][1].forEach(([english, chinese], sentenceIndex) => {
+                const filename = "p" + (index + 1) + "-s" + String(sentenceIndex + 1).padStart(2, "0");
+                paragraph.append(listen(english, chinese, filename, "diary-sentence"), " ");
+            });
+            panel.append(paragraph);
         }
-    }, { rootMargin: "750px" });
-    observer.observe(scan);
-} else {
-    scan.addEventListener("pointerenter", () => lesson.prefetchAudio("sentences"), { once: true });
+        article.append(panel);
+    });
+}
+
+if (!diary) lesson.prefetchAudio("words");
+const scan = $("scan");
+if (scan) {
+    const scanImage = scan.querySelector('img');
+    try {
+        const cache = parent !== window && parent.AssetCache || window.AssetCache;
+        if (cache) cache.getBlobUrl('think_parks_assets/page.webp').then(url => {
+            if (url && (!scanImage.complete || !scanImage.naturalWidth)) scanImage.src = url;
+        });
+    } catch (_) {}
+    if ("IntersectionObserver" in window) {
+        const observer = new IntersectionObserver(entries => {
+            if (entries.some(entry => entry.isIntersecting)) {
+                lesson.prefetchAudio("sentences");
+                observer.disconnect();
+            }
+        }, { rootMargin: "750px" });
+        observer.observe(scan);
+    } else {
+        scan.addEventListener("pointerenter", () => lesson.prefetchAudio("sentences"), { once: true });
+    }
+
 }
 
 const imagePacks = new Map();
 function loadPicture(picture, image) {
-    const part = window.ThinkParksImageIndex[image];
+    const part = window.ThinkParksImageIndex?.[image];
     if (!part) { picture.src = image; return; }
     const [group, offset, length, type] = part;
     if (!imagePacks.has(group)) imagePacks.set(group,
@@ -125,7 +155,7 @@ const imageObserver = 'IntersectionObserver' in window ? new IntersectionObserve
     });
 }, { rootMargin: '500px' }) : null;
 for (const [english, chinese, key, image] of lesson.words) {
-    const card = button("", () => playClip(english, chinese, "word-" + key + ".mp3"), "card");
+    const card = button("", () => playClip(english, chinese, (lesson.wordFile ? lesson.wordFile(key) : "word-" + key + ".mp3")), "card");
     const picture = element("img");
     picture.alt = "";
     picture.loading = "lazy";
@@ -136,6 +166,7 @@ for (const [english, chinese, key, image] of lesson.words) {
     card.append(picture, element("strong", english), element("span", chinese), icon);
     $("cards").append(card);
 }
-renderArticle(lesson.parks);
+if (diary) renderDiary();
+else renderArticle(lesson.parks);
 
 document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); });
