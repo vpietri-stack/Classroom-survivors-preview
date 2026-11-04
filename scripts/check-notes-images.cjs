@@ -43,8 +43,14 @@ function checkNotesImages() {
                     total += data.length;
                     groups.set(group, data);
                 }
-                assert.ok(groups.get(group).subarray(offset, offset + length).equals(fs.readFileSync(path.join(root, image))),
-                    image + ' does not match its grouped image');
+                const packed = groups.get(group).subarray(offset, offset + length);
+                const source = fs.readFileSync(path.join(root, image));
+                // Git can check out the SVG with CRLF while the packed copy
+                // retains LF, or the reverse. Compare its text canonically.
+                const same = image.endsWith('.svg')
+                    ? packed.toString('utf8').replace(/\r\n/g, '\n') === source.toString('utf8').replace(/\r\n/g, '\n')
+                    : packed.equals(source);
+                assert.ok(same, image + ' does not match its grouped image');
             }
             assert.equal(groups.size, 5, 'Parks vocabulary images must have five groups');
             assert.ok(total <= LESSON_LIMIT, 'Parks images exceed lesson limit');

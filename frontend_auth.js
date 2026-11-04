@@ -13,7 +13,7 @@ const API_BASE = API_BASE_URL;
 // The version watchdog (startVersionWatchdog) compares this to the live
 // version.json; a mismatch means stale WeChat builds never self-heal or
 // permanently nag. See DEPLOY_VERSION_STAMP.md. Bump BOTH together.
-const APP_VERSION = '2026-11-04b';
+const APP_VERSION = '2026-11-04c';
 
 // --- SESSION TOKEN (c) design) ---
 // The server mints a signed token on login. We store it in localStorage
@@ -2110,6 +2110,10 @@ function checkAndAdvancePageIfAllOnCooldown() {
             
             if (activePageIndex + 1 < sortedPages.length) {
                 const nextPage = sortedPages[activePageIndex + 1];
+                // A legacy page-45 session can be resumed, but it is no longer
+                // an assignment destination for students on page 44.
+                if (nextPage.book === 'Think0' && nextPage.unit === '4' && nextPage.page === '45'
+                    && !(AVAILABLE_CONTENT.Think0?.['4'] || []).some(value => String(value) === '45')) break;
                 book = nextPage.book;
                 unit = nextPage.unit;
                 page = nextPage.page;

@@ -526,116 +526,120 @@ TEACHING_CONTENT["Think0"] = {
         }
     },
     "4": {
-        "45": {
+        "40": {
             vocab: [
-                // ===== GRAMMAR: there is / there are · some / any =====
-                'there is', "there's", 'there are',
-                "there isn't", "there aren't",
-                'some', 'any',
-
-                // ===== PLACES IN A TOWN (SB p38 core list) =====
-                'bank', 'chemist', 'library', 'museum', 'park',
-                'post office', 'supermarket', 'train station',
-
-                // ----- Vocabulary extra (SB p39) -----
-                'bus station', 'car park', 'police station', 'skate park', 'theatre',
-
-                // ----- Shops & town buildings -----
-                'shop', 'bookshop', 'clothes shop', 'electronics shop',
-                'music shop', 'sports shop', 'toy shop',
-                'cinema', 'shopping centre',
-
-                // ===== PREPOSITIONS OF PLACE =====
-                'behind', 'between', 'in front of', 'next to', 'opposite', 'on the corner',
-
-                // ===== DIRECTIONS & IMPERATIVES =====
-                'turn', 'go', 'go down', 'come in', 'sit down', 'be quiet', 'buy', "don't",
-                'left', 'right', 'straight on',
-                'map', 'app', 'corner',
-
-                // ===== MONEY & PRICES =====
-                'price', 'dollar', 'pound', 'euro', 'cent',
-
-                // ===== NUMBERS 100+ =====
-                'hundred', 'thousand',
-
-                // ===== LANDMARKS & SIGHTS =====
-                'bridge', 'tower', 'square', 'statue', 'palace', 'castle',
-
-                // ===== PARKS & NATURE (SB p44 Culture) =====
-                'cable car', 'feed', 'fountain', 'lake',
-                'animal', 'bird', 'flower', 'grass', 'tree',
-                'hill', 'path', 'sea', 'view',
-
-                // ===== MY TOWN / BROCHURE (SB p45 Writing) =====
-                'town', 'visitor', 'brochure',
-
-                // ===== FOOD =====
-                'ice cream',
-
-                // ===== ADJECTIVES =====
-                'fantastic', 'modern', 'interesting', 'amazing', 'lovely', 'wonderful'
+                "there is",
+                "there's",
+                "there are",
+                "there isn't",
+                "there aren't",
+                "some",
+                "any",
+                "bank",
+                "chemist",
+                "library",
+                "museum",
+                "park",
+                "post office",
+                "supermarket",
+                "train station",
+                "shop",
+                "cinema",
+                "buy",
+                "tower",
+                "square",
+                "statue",
+                "palace",
+                "animal",
+                "town",
+                "visitor",
+                "brochure",
+                "modern",
+                "interesting",
+                "wonderful"
             ],
             sentences: [
-                // ===== there is + singular countable =====
                 "There is a bank next to the supermarket.",
-                "There is a chemist on the corner.",
                 "There is a small library in my town.",
                 "There is a big museum near the train station.",
-                "There is a car park behind the theatre.",
-                "There is a café in front of the police station.",
-                "There is a skate park opposite the bus station.",
-                "There is a toy shop next to the music shop.",
-                "There is a clothes shop in the shopping centre.",
                 "There is a statue of a famous person in the square.",
-                "There is a long bridge near the lake.",
-                "There is a beautiful fountain in the park.",
-                "There is a castle on the hill.",
-                "There is a palace in the old city.",
-                // ===== there is + uncountable / some =====
-                "There is some food at the sports shop.",
                 "There is some water in my bag.",
-                "There is a lot of grass in the park.",
-                // ===== there are + plural / numbers =====
                 "There are six parks in my town.",
                 "There are some shops near the train station.",
-                "There are a lot of people in the shopping centre.",
-                "There are four hundred shops in the city.",
-                "There are a thousand students at the skate park.",
-                "There are some fantastic statues in the square.",
-                "There are lots of trees in the park.",
                 "There are some great places to eat.",
-                // ===== there isn't =====
                 "There isn't a bank in my street.",
                 "There isn't a museum near the train station.",
                 "There isn't any water in the café.",
-                "There isn't any ice cream in the supermarket.",
-                "There isn't a car park behind the theatre.",
-                // ===== there aren't / aren't + any =====
-                "There aren't any shops on the corner.",
                 "There aren't any cinemas in my town.",
-                "There aren't any car parks near the station.",
-                "There aren't any buses at the bus station.",
                 "There aren't any people in the library.",
-                "There aren't any good restaurants near the shopping centre.",
-                "There aren't any flowers on the hill.",
-                // ===== Is there / Are there (yes-no questions) =====
                 "Is there a bank in your town?",
                 "Is there a chemist near here?",
-                "Is there a car park next to the cinema?",
-                "Is there a skate park near your house?",
                 "Are there any parks in your town?",
                 "Are there any shops near the train station?",
                 "Are there any museums in your city?",
                 "Are there any good restaurants in this city?",
-                // ===== Where / How much questions =====
+                "They haven't got any homework today.",
+                "We haven't got any problems.",
+                "There's a big tower near the train station.",
+                "There's a modern museum in my town.",
+                "There's an interesting statue in the square."
+            ],
+            sentencePairs: [
+                { a: "How many pigs are there in the library?", b: "There aren't any." },
+                { a: "How many toilets are there in your bathroom?", b: "There's one." },
+                { a: "There isn't", b: "any water in the bottle." },
+                { a: "There aren't any", b: "cinemas near here." },
+                { a: "Is there", b: "any juice in the fridge?" },
+                { a: "What's the name of your town?", b: "It's Kunming." }
+            ]
+        },
+        "41": {
+            vocab: [
+                "bus station",
+                "car park",
+                "police station",
+                "skate park",
+                "theatre",
+                "sports shop",
+                "shopping centre",
+                "behind",
+                "between",
+                "in front of",
+                "next to",
+                "opposite",
+                "on the corner",
+                "turn",
+                "go",
+                "go down",
+                "come in",
+                "sit down",
+                "be quiet",
+                "don't",
+                "left",
+                "right",
+                "straight on",
+                "map",
+                "app",
+                "corner"
+            ],
+            sentences: [
+                "There is a chemist on the corner.",
+                "There is a car park behind the theatre.",
+                "There is a café in front of the police station.",
+                "There is a skate park opposite the bus station.",
+                "There is some food at the sports shop.",
+                "There are a lot of people in the shopping centre.",
+                "There isn't a car park behind the theatre.",
+                "There aren't any shops on the corner.",
+                "There aren't any car parks near the station.",
+                "There aren't any buses at the bus station.",
+                "There aren't any good restaurants near the shopping centre.",
+                "Is there a car park next to the cinema?",
+                "Is there a skate park near your house?",
                 "Where is the post office?",
                 "Where's the sports shop?",
                 "Where are the nice shops?",
                 "Where is the café, please?",
-                "How much is the ticket?",
-                "How much are these shoes?",
-                // ===== giving directions: imperatives =====
                 "Listen to me.",
                 "Look at the map.",
                 "Open your book.",
@@ -646,7 +650,6 @@ TEACHING_CONTENT["Think0"] = {
                 "Turn right here.",
                 "Go straight on.",
                 "Go down this street.",
-                "Buy some ice cream.",
                 "Look at the statue in the square.",
                 "Turn right at the corner.",
                 "Turn left in front of the bank.",
@@ -656,27 +659,66 @@ TEACHING_CONTENT["Think0"] = {
                 "Don't open the door.",
                 "Don't sit down on the floor.",
                 "Don't look at my map.",
-                "Don't buy that toy.",
                 "Don't eat in the library.",
-                "Don't feed the animals in the park.",
-                // ===== where things are (prepositions) =====
                 "The bank is opposite the supermarket.",
                 "The cinema is in front of the theatre.",
                 "The museum is behind the car park.",
                 "The library is next to the post office.",
                 "The chemist is on the corner.",
                 "The train station is between the two shops.",
-                "The bookshop is opposite the music shop.",
                 "The sports shop is behind the chemist.",
                 "The shopping centre is next to the sports shop.",
-                // ===== have got + some / any =====
-                "I've got some money for the shop.",
-                "He hasn't got any money.",
                 "I haven't got a map.",
                 "She's got an app on her phone.",
-                "They haven't got any homework today.",
-                "We haven't got any problems.",
-                // ===== prices & numbers 100+ =====
+                "There are lots of visitors in the shopping centre."
+            ],
+            sentencePairs: [
+                { a: "Are there any trains at the station?", b: "No, there aren't, but there are ten buses at the stop." },
+                { a: "Is there any food at the sports shop?", b: "Yes, there is some in the café." },
+                { a: "Where is the post office?", b: "It's next to the library." },
+                { a: "Where are the nice shops?", b: "They're in the shopping centre." },
+                { a: "How many children are there in the skate park?", b: "There are many." },
+                { a: "Sit", b: "down on the chair, please!" },
+                { a: "Look", b: "at the map!" },
+                { a: "Open", b: "your books!" },
+                { a: "Be", b: "quiet in the library!" },
+                { a: "Turn", b: "left at the corner!" },
+                { a: "Go", b: "straight on!" },
+                { a: "Come", b: "in, please!" },
+                { a: "Listen", b: "to me!" },
+                { a: "There's a", b: "chemist on the corner." },
+                { a: "What's in the shopping centre?", b: "There are lots of people." }
+            ]
+        },
+        "43": {
+            vocab: [
+                "bookshop",
+                "clothes shop",
+                "electronics shop",
+                "music shop",
+                "toy shop",
+                "price",
+                "dollar",
+                "pound",
+                "euro",
+                "cent",
+                "hundred",
+                "thousand",
+                "ice cream"
+            ],
+            sentences: [
+                "There is a toy shop next to the music shop.",
+                "There is a clothes shop in the shopping centre.",
+                "There are four hundred shops in the city.",
+                "There are a thousand students at the skate park.",
+                "There isn't any ice cream in the supermarket.",
+                "How much is the ticket?",
+                "How much are these shoes?",
+                "Buy some ice cream.",
+                "Don't buy that toy.",
+                "The bookshop is opposite the music shop.",
+                "I've got some money for the shop.",
+                "He hasn't got any money.",
                 "It's twelve pounds fifty.",
                 "The pen is ninety-nine pence.",
                 "The price is one hundred and fifty.",
@@ -684,63 +726,61 @@ TEACHING_CONTENT["Think0"] = {
                 "The book is five pounds.",
                 "It's fifteen euros, please.",
                 "The trainers are two thousand six hundred yuan.",
-                "There's a big tower near the train station.",
-                "There's a modern museum in my town.",
-                "There's an interesting statue in the square.",
-                "There's a lovely view near the lake.",
-                "There's an amazing cable car at the skate park.",
                 "There's a fantastic bookshop on the corner.",
                 "There is an electronics shop next to the cinema.",
+                "What's the price of the ticket?"
+            ],
+            sentencePairs: [
+                { a: "Excuse me, is there a bank near here?", b: "Yes, there is, you can change dollars there." },
+                { a: "Is there a toy shop in your town?", b: "No, there isn't, but there's a big supermarket over there." },
+                { a: "How much is the ticket?", b: "It's twelve pounds fifty." },
+                { a: "How much are the trainers?", b: "They're two thousand six hundred yuan." },
+                { a: "Buy", b: "some ice cream!" },
+                { a: "There's an", b: "electronics shop near the bank." }
+            ]
+        },
+        "44": {
+            vocab: [
+                "bridge",
+                "castle",
+                "cable car",
+                "feed",
+                "fountain",
+                "lake",
+                "bird",
+                "flower",
+                "grass",
+                "tree",
+                "hill",
+                "path",
+                "sea",
+                "view",
+                "fantastic",
+                "amazing",
+                "lovely"
+            ],
+            sentences: [
+                "There is a long bridge near the lake.",
+                "There is a beautiful fountain in the park.",
+                "There is a castle on the hill.",
+                "There is a palace in the old city.",
+                "There is a lot of grass in the park.",
+                "There are some fantastic statues in the square.",
+                "There are lots of trees in the park.",
+                "There aren't any flowers on the hill.",
+                "Don't feed the animals in the park.",
+                "There's a lovely view near the lake.",
+                "There's an amazing cable car at the skate park.",
                 "There is a beautiful view of the sea.",
                 "There is a wonderful fountain in the park.",
                 "There is a long path in the park.",
                 "There are two hundred birds in the park.",
-                "There are lots of visitors in the shopping centre.",
-                "This is a brochure about my town.",
-                "What's the price of the ticket?",
+                "This is a brochure about my town."
             ],
             sentencePairs: [
-                // ===== Yes / No — the answer adds information not in the question =====
-                { a: "Excuse me, is there a bank near here?", b: "Yes, there is, you can change dollars there." },
-                { a: "Is there a toy shop in your town?", b: "No, there isn't, but there's a big supermarket over there." },
-                { a: "Are there any trains at the station?", b: "No, there aren't, but there are ten buses at the stop." },
-                { a: "Is there any food at the sports shop?", b: "Yes, there is some in the café." },
-
-                // ===== Where / How much — it's vs they're =====
-                { a: "Where is the post office?", b: "It's next to the library." },
-                { a: "Where are the nice shops?", b: "They're in the shopping centre." },
-                { a: "How much is the ticket?", b: "It's twelve pounds fifty." },
-                { a: "How much are the trainers?", b: "They're two thousand six hundred yuan." },
-
-                // ===== How many — only one of these takes "There's one" =====
-                { a: "How many pigs are there in the library?", b: "There aren't any." },
-                { a: "How many children are there in the skate park?", b: "There are many." },
-                { a: "How many toilets are there in your bathroom?", b: "There's one." },
-
-                // ===== Imperatives — one sentence cut in two =====
-                { a: "Sit", b: "down on the chair, please!" },
-                { a: "Look", b: "at the map!" },
-                { a: "Open", b: "your books!" },
-                { a: "Buy", b: "some ice cream!" },
-                { a: "Be", b: "quiet in the library!" },
-                { a: "Turn", b: "left at the corner!" },
-                { a: "Go", b: "straight on!" },
-                { a: "Come", b: "in, please!" },
-                { a: "Listen", b: "to me!" },
                 { a: "Don't feed", b: "the animals in the park!" },
-
-                // ===== Statements & question stems — cut in two, agreement does the locking =====
-                { a: "There's a", b: "chemist on the corner." },
-                { a: "There's an", b: "electronics shop near the bank." },
-                { a: "There isn't", b: "any water in the bottle." },
-                { a: "There aren't any", b: "cinemas near here." },
-                { a: "Is there", b: "any juice in the fridge?" },
                 { a: "Are there", b: "any flowers on the hill?" },
-
-                // ===== Identification =====
-                { a: "What's this?", b: "It's a brochure about my town." },
-                { a: "What's the name of your town?", b: "It's Kunming." },
-                { a: "What's in the shopping centre?", b: "There are lots of people." }
+                { a: "What's this?", b: "It's a brochure about my town." }
             ]
         }
     }
@@ -751,5 +791,5 @@ AVAILABLE_CONTENT["Think0"] = {
     "1": [15, 17, 18],
     "2": [23, 25],
     "3": [30, 33, 35],
-    "4": [45]
+    "4": [40, 41, 43, 44]
 };

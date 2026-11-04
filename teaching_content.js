@@ -215,7 +215,16 @@ function getSortedPagesForBook(book) {
         if (!AVAILABLE_CONTENT[b]) return;
         const units = Object.keys(AVAILABLE_CONTENT[b]).sort((a, b) => parseInt(a) - parseInt(b));
         units.forEach(unit => {
-            const pages = AVAILABLE_CONTENT[b][unit].sort((a, b) => parseInt(a) - parseInt(b));
+            const pages = AVAILABLE_CONTENT[b][unit].slice();
+            // Keep older page-45 assignments and interrupted sessions usable.
+            // Page 45 is no longer offered for new Think Starter assignments.
+            const legacyPage = [authActiveUser, selectedClassContent].some(placement =>
+                placement && placement.book === 'Think0'
+                && String(placement.unit) === '4' && String(placement.page) === '45');
+            if (b === 'Think0' && unit === '4' && legacyPage && !pages.some(page => String(page) === '45')) {
+                pages.push(45);
+            }
+            pages.sort((a, b) => parseInt(a) - parseInt(b));
             pages.forEach(page => {
                 sorted.push({ book: b, unit, page: page.toString(), absIndex: absIndex++ });
             });

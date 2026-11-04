@@ -87,8 +87,14 @@ function populatePageSelect(selId, book, unit, currentVal) {
     if (!book || !unit || !AVAILABLE_CONTENT[book] || !AVAILABLE_CONTENT[book][unit]) return;
     AVAILABLE_CONTENT[book][unit].forEach(p => {
         const ps = String(p);
-        sel.innerHTML += `<option value="${ps}" ${ps===currentVal?'selected':''}>${ps}</option>`;
+        sel.innerHTML += `<option value="${ps}" ${ps===String(currentVal)?'selected':''}>${ps}</option>`;
     });
+    // Preserve an existing page-45 assignment when editing other settings.
+    if (selId === 'settingsPage' && book === 'Think0' && String(unit) === '4' && String(currentVal) === '45') {
+        const legacy = new Option('45 (existing assignment)', '45', true, true);
+        legacy.disabled = true;
+        sel.add(legacy);
+    }
 }
 
 function populateClassTimeSelect(selId, currentVal, includeCustom) {
