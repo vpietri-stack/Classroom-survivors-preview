@@ -1,0 +1,4 @@
+.race-part { margin: 1.5rem 0; padding: 1rem; border-radius: 1rem; background: #fff; box-shadow: 0 2px 12px #2442; }
+.race-part img { width: 100%; height: auto; display: block; }
+.race-sentences { display:flex; flex-wrap:wrap; gap:.45rem; margin-top:.8rem; }
+.race-sentences button { border:1px solid #b2bfe1; border-radius:.65rem; padding:.55rem .7rem; background:#f1f5ff; color:#183057; text-align:left; font-size:1rem; }

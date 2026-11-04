@@ -25,6 +25,7 @@ function webpDimensions(bytes) {
 function checkNotesImages() {
     const { catalog } = require('../api/src/functions/shared/previewNotesCore');
     for (const note of catalog) {
+
         if (note.id === 'pu3-u9-p112') {
             const context = { window: {} };
             vm.runInNewContext(fs.readFileSync(path.join(root, 'jasmins_diary_lesson.js'), 'utf8'), context);
@@ -41,6 +42,27 @@ function checkNotesImages() {
             assert.ok(total <= LESSON_LIMIT, 'Diary images exceed lesson limit');
             console.log(note.id + ': ' + images.size + ' WebP images, ' + total + ' bytes');
             continue;
+        }
+
+        if (note.id === 'pu2-u1-p14') {
+            const folder = path.join(root, 'pu2_race_assets');
+            const imageIndex = JSON.parse(fs.readFileSync(path.join(folder, 'image-index.json'), 'utf8'));
+            const groups = new Map(); let total = 0;
+            for (let i = 1; i <= 5; i++) {
+                const bytes = fs.readFileSync(path.join(folder, `story-${i}.webp`));
+                assert.ok(bytes.length <= PAGE_LIMIT, `Story image ${i} exceeds page limit`);
+                const [w, h] = webpDimensions(bytes); assert.ok(w > 0 && h > 0);
+                total += bytes.length;
+            }
+            assert.equal(Object.keys(imageIndex).length, 14, 'Race must have 14 vocabulary images');
+            for (const [name, [group, offset, length]] of Object.entries(imageIndex)) {
+                if (!groups.has(group)) { const bytes = fs.readFileSync(path.join(folder, `images-${group}.bin`)); assert.ok(bytes.length <= PAGE_LIMIT); groups.set(group, bytes); total += bytes.length; }
+                const source = fs.readFileSync(path.join(folder, `${name}.webp`));
+                assert.ok(groups.get(group).subarray(offset, offset + length).equals(source), `${name} differs from packed image`);
+            }
+            assert.equal(groups.size, 4); assert.ok(total <= LESSON_LIMIT, 'Race images exceed lesson limit');
+            console.log(`${note.id}: five story images, four vocabulary groups, ${total} bytes`); continue;
+
         }
         if (note.id === 'think0-u4-p44') {
             const scan = fs.readFileSync(path.join(root, 'think_parks_assets/page.webp'));

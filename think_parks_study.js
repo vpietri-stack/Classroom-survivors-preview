@@ -215,6 +215,7 @@
     }
     window.ArticleStudy = {
         get: id => articles[id],
+        register: (id, article) => { articles[id] = article; },
         active: state => articles[state.previewNote?.id],
         pause: () => Object.values(articles).forEach(article => article.pause())
     };

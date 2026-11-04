@@ -27,6 +27,11 @@ const parksEvent = { ...event, data: { previewNote: parksMarker } };
 ok(core.fromEvents([parksEvent])[parksMarker.id], 'Parks completion is recognized');
 for (const invalid of [{ wordCount: 5 }, { exerciseCount: 5 }, { page: '45' }, { version: 2 }])
   ok(!core.fromEvents([{ ...parksEvent, data: { previewNote: { ...parksMarker, ...invalid } } }])[parksMarker.id], 'partial or wrong Parks completion is rejected');
+const raceMarker = { id:'pu2-u1-p14', book:'PU2', unit:'1', page:'14', version:1, wordCount:14, exerciseCount:5 };
+const raceEvent = { ...event, data: { previewNote: raceMarker } };
+ok(core.fromEvents([raceEvent])[raceMarker.id], 'Race completion is recognized');
+for (const invalid of [{wordCount:13}, {exerciseCount:4}, {page:'15'}, {version:2}])
+  ok(!core.fromEvents([{...raceEvent,data:{previewNote:{...raceMarker,...invalid}}}])[raceMarker.id], 'partial or wrong Race completion is rejected');
 const sandbox = { window: null, console, Math, API_BASE_URL: '', document: { addEventListener() {} }, localStorage: { getItem:()=>null,setItem(){},removeItem(){} }, getCurrentSession:()=>10 };
 sandbox.window = sandbox; vm.createContext(sandbox);
 for (const file of ['sr_engine.js','teaching_content.js','content_pu3.js','non_spelling_content.js']) vm.runInContext(fs.readFileSync(file,'utf8'),sandbox);

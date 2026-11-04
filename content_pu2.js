@@ -1469,9 +1469,20 @@ TEACHING_CONTENT["PU2"] = {
     }
 };
 
+// Unit 1 literature page: ordinary game content accompanies the story preview.
+TEACHING_CONTENT["PU2"]["1"]["14"] = {
+    vocab: ['race', 'come on', 'everyone', 'winning', 'fall', 'call', 'come back', 'move', 'last', 'feel sad', 'stop', 'go back', "I'm sorry", 'help'],
+    sentences: ["Come on, Gwen!", "Jess is their puppy.", "Everyone goes to the field.", "Beth is winning the race.", "There is a rock in the leaves.", "Beth falls on the ground.", "Come back to me!", "I cannot move my leg.", "Gwen does not want to be last.", "She helps her sister to stand."],
+    sentencePairs: [
+        {a:"Who is Jess?",b:"She is their puppy."}, {a:"Where does Jess live?",b:"She lives in the field."},
+        {a:"Who falls?",b:"Beth falls."}, {a:"Can Beth move her leg?",b:"No, she cannot."},
+        {a:"Does Gwen go back?",b:"Yes, she does."}, {a:"What does Gwen do?",b:"She helps Beth to stand."}
+    ]
+};
+
 AVAILABLE_CONTENT["PU2"] = {
     "0": [5],
-    "1": [7, 9, 10, 16],
+    "1": [7, 9, 10, 14, 16],
     "2": [19, 21, 22, 25],
     "3": [31, 33, 40, 43],
     "4": [45, 46, 47, 54],

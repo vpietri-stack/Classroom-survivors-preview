@@ -9,7 +9,9 @@
         { id: 'think0-u4-p44', book: 'Think0', unit: '4', page: '44', version: 1,
         title: 'Think Starter · Unit 4 · 第44页', reader: 'think_parks.html', wordCount: 25, exerciseCount: 6 },
         { id: 'pu3-u9-p112', book: 'PU3', unit: '9', page: '112', version: 1,
-        title: 'Power Up 3 · Unit 9 · 第112–113页', reader: 'jasmins_diary.html', wordCount: 18, exerciseCount: 4 }];
+        title: 'Power Up 3 · Unit 9 · 第112–113页', reader: 'jasmins_diary.html', wordCount: 18, exerciseCount: 4 },
+        { id: 'pu2-u1-p14', book: 'PU2', unit: '1', page: '14', version: 1,
+        title: 'Power Up 2 · Unit 1 · 第14–15页', reader: 'pu2_race.html', wordCount: 14, exerciseCount: 5 }];
     const find = id => catalog.find(note => note.id === id);
     const atPage = page => page && catalog.find(note => note.book === page.book && note.unit === String(page.unit) && note.page === String(page.page));
     function normalize(value) {
