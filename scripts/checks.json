@@ -60,6 +60,7 @@
     "test_preview_notes_api.js",
     "test_preview_notes_browser.js",
     "test_think_parks_preview_browser.js",
+    "test_think_parks_audio.js",
     "test_notes_speech_browser.js",
     "scripts/checks.test.mjs"
   ],
@@ -146,6 +147,7 @@
         "test_preview_notes_api.js",
         "test_preview_notes_browser.js",
         "test_think_parks_preview_browser.js",
+        "test_think_parks_audio.js",
         "test_notes_speech_browser.js"
       ]
     },

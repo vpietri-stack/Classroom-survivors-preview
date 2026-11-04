@@ -84,6 +84,13 @@ function renderArticle(parks) {
 
 lesson.prefetchAudio("words");
 const scan = $("scan");
+const scanImage = scan.querySelector('img');
+try {
+    const cache = parent !== window && parent.AssetCache || window.AssetCache;
+    if (cache) cache.getBlobUrl('think_parks_assets/page.webp').then(url => {
+        if (url && (!scanImage.complete || !scanImage.naturalWidth)) scanImage.src = url;
+    });
+} catch (_) {}
 if ("IntersectionObserver" in window) {
     const observer = new IntersectionObserver(entries => {
         if (entries.some(entry => entry.isIntersecting)) {
@@ -102,8 +109,7 @@ function loadPicture(picture, image) {
     if (!part) { picture.src = image; return; }
     const [group, offset, length, type] = part;
     if (!imagePacks.has(group)) imagePacks.set(group,
-        fetch('think_parks_assets/images-' + group + '.bin?v=1')
-            .then(response => { if (!response.ok) throw new Error('Images unavailable'); return response.arrayBuffer(); })
+        lesson.fetchAsset('think_parks_assets/images-' + group + '.bin')
             .catch(() => null));
     imagePacks.get(group).then(pack => {
         picture.src = pack && offset + length <= pack.byteLength

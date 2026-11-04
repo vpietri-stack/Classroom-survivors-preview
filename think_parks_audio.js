@@ -4,13 +4,30 @@
     const pending = {};
     const urls = new Map();
 
+    // Try the local page and the app's persistent, mirror-aware cache in parallel.
+    lesson.fetchAsset = (path) => {
+        let cache;
+        try { cache = parent !== window && parent.AssetCache || window.AssetCache; } catch (_) {}
+        const direct = fetch(path).then(response => {
+            if (!response.ok) throw new Error('Asset unavailable');
+            return response.arrayBuffer();
+        });
+        if (!cache) return direct;
+        const mirrored = cache.getBlobUrl(path).then(url => {
+            if (!url) throw new Error('Mirror unavailable');
+            return fetch(url).then(response => response.arrayBuffer());
+        });
+        return new Promise((resolve, reject) => {
+            let failures = 0;
+            const failed = () => { if (++failures === 2) reject(new Error('Asset unavailable')); };
+            direct.then(resolve, failed);
+            mirrored.then(resolve, failed);
+        });
+    };
+
     lesson.prefetchAudio = (group) => {
         if (packs[group] || pending[group]) return;
-        pending[group] = fetch("think_parks_assets/" + group + ".bin?v=1")
-            .then(response => {
-                if (!response.ok) throw new Error("Audio pack unavailable");
-                return response.arrayBuffer();
-            })
+        pending[group] = lesson.fetchAsset("think_parks_assets/" + group + ".bin")
             .then(buffer => { packs[group] = buffer; })
             .catch(() => {})
             .finally(() => { delete pending[group]; });

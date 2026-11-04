@@ -40,6 +40,7 @@
     { prefix: 'sprites/td/',   token: 'td-sprites-v1' },
     { prefix: 'sprites/vs/',   token: 'vs-sprites-v3' },
     { prefix: 'images/vocab/', token: 'vocab-v1' },
+    { prefix: 'think_parks_assets/', token: 'think-parks-v1' },
     { prefix: 'audio_mp3/',    token: 'audio-v1' },
     { prefix: 'music/',        token: 'music-v1' },
     { prefix: 'sfx/',          token: 'sfx-v1' }
