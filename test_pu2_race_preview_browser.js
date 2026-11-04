@@ -55,6 +55,9 @@ async function fixture(page,id='notes-a',placement=lesson.placement,notes={}){
   await reader.locator('.card').first().click();
   ok(!(await reader.locator('#notes-mic').isDisabled()),'vocabulary tap enables pronunciation practice');
   await reader.locator('#article').scrollIntoViewIfNeeded();
+  await reader.locator('.race-part img').first().scrollIntoViewIfNeeded();
+  await page.waitForFunction(()=>document.querySelector('#preview-notes-overlay iframe')?.contentDocument?.querySelector('.race-part img')?.naturalWidth>0,null,{timeout:30000});
+  ok(true,'story image loads after scrolling into view');
   await reader.locator('.race-sentences button').first().click();
   ok(!(await reader.locator('#notes-mic').isDisabled()),'article sentence tap enables pronunciation practice');
   await reader.locator('#reader-study-start').click();
