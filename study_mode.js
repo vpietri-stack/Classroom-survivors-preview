@@ -83,8 +83,8 @@ function showStudyNotice(msg) {
 // Entry point
 function initStudyMode(options = {}) {
     if(window.GameRecovery)GameRecovery.pause();
-    const parks = options.parks === true && window.ThinkParksStudy && authActiveUser && !isTestMode && (!authActiveUser.role || authActiveUser.role === "student");
-    if (options.parks && !parks) return false;
+    const parks = options.previewNoteId === "think0-u4-p44" && window.ThinkParksStudy && authActiveUser && !isTestMode && (!authActiveUser.role || authActiveUser.role === "student");
+    if (options.previewNoteId === "think0-u4-p44" && !parks) return false;
     const notePlan = window.PreviewNotes && options.previewNoteId ? PreviewNotes.prepareStudy(options.previewNoteId) : null;
     if (options.previewNoteId && !notePlan) return false;
     if (window.ClientDiagnostics) ClientDiagnostics.checkpoint('study-start', { mode: 'study', active: true, word: '', letter: '' });
@@ -1355,7 +1355,7 @@ async function finishStudySession() {
     // Finalize SR state for this session before flushing
     const parks = STUDY_STATE.parks;
     const parksOwner = parks && authActiveUser && authActiveUser.id;
-    const previewNote = !parks && window.PreviewNotes ? PreviewNotes.completeStudy() : null;
+    const previewNote = window.PreviewNotes ? PreviewNotes.completeStudy() : null;
     const previewOwner = previewNote && STUDY_STATE.previewNote.owner;
     const completedStudyStart = STUDY_STATE.startTime;
     STUDY_STATE.srFinalized = true;
@@ -1394,7 +1394,7 @@ async function finishStudySession() {
             ${messageHtml}
             
             <div class="flex flex-col gap-3 items-center w-full">
-                <button onclick="${parks ? "ThinkParksStudy.start()" : "initStudyMode()"}" class="game-btn bg-blue-600 text-lg sm:text-xl w-full">再学习一下</button>
+                <button onclick="${parks ? "PreviewNotes.openNote('think0-u4-p44', false)" : "initStudyMode()"}" class="game-btn bg-blue-600 text-lg sm:text-xl w-full">再学习一下</button>
                 <button onclick="showGameSelection()" class="game-btn bg-orange-500 text-lg sm:text-xl w-full">边玩边学</button>
             </div>
         </div>

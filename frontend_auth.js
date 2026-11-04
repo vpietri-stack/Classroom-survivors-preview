@@ -13,7 +13,7 @@ const API_BASE = API_BASE_URL;
 // The version watchdog (startVersionWatchdog) compares this to the live
 // version.json; a mismatch means stale WeChat builds never self-heal or
 // permanently nag. See DEPLOY_VERSION_STAMP.md. Bump BOTH together.
-const APP_VERSION = '2026-11-03m';
+const APP_VERSION = '2026-11-04a';
 
 // --- SESSION TOKEN (c) design) ---
 // The server mints a signed token on login. We store it in localStorage
@@ -1853,7 +1853,6 @@ function finishLogin() {
     } else {
         targetBanner.classList.add('hidden');
     }
-    if (window.ThinkParksStudy) ThinkParksStudy.configureMenu();
     const gameLookup = window.GameRecovery ? GameRecovery.onLogin(() => {},true) : Promise.resolve();
     if (window.StudyRecovery) StudyRecovery.onLogin(() => { gameLookup.then(()=>{if(window.GameRecovery)GameRecovery.showOfferOr(()=>{if(window.PreviewNotes)PreviewNotes.onLogin();});else if(window.PreviewNotes)PreviewNotes.onLogin();}); });
     else if (window.PreviewNotes) PreviewNotes.onLogin();

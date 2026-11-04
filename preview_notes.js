@@ -59,7 +59,7 @@
         opening = { id, review, owner: student.id, request, frame };
         const url = new URL(note.reader, location.href);
         url.searchParams.set('embed', '1'); url.searchParams.set('mode', review ? 'review' : 'intro'); url.searchParams.set('request', request);
-        url.searchParams.set('v', '2026-11-03i'); frame.src = url.href; overlay.append(frame);
+        url.searchParams.set('v', '2026-11-04a'); frame.src = url.href; overlay.append(frame);
     }
     function openLibrary() {
         const student = user();
@@ -82,12 +82,17 @@
         if (!active) return;
         student.previewNotes = progress(student);
         const note = core.atPage(student);
+        if (note?.id === 'think0-u4-p44' && window.ThinkParks) ThinkParks.prefetchAudio('words');
         if (note && !complete(student, note.id)) openNote(note.id, false);
     }
     function prepareStudy(id) {
         const student = user(), note = core.find(id);
         if (!enabled() || !isStudent(student) || !note || !core.atPage(student) || core.atPage(student).id !== id) return null;
         if (!selectedClassContent || !core.atPage(selectedClassContent) || core.atPage(selectedClassContent).id !== id) return null;
+        if (id === 'think0-u4-p44' && window.ThinkParks) {
+            return { words: ThinkParks.words.slice(0, 5).map(word => word[0]), exercises: null,
+                context: { id: note.id, owner: student.id, book: note.book, unit: note.unit, page: note.page, version: note.version } };
+        }
         const content = TEACHING_CONTENT[note.book]?.[note.unit]?.[note.page];
         const words = shuffleArray(Array.from(new Set(content?.vocab || []))).slice(0, 5);
         const exercises = NonSpellingContent.selectPage(note.book, note.unit, note.page, 5);
@@ -96,6 +101,11 @@
     }
     function completeStudy() {
         const student = user(), state = typeof STUDY_STATE === 'undefined' ? null : STUDY_STATE, context = state && state.previewNote;
+        if (context && context.id === 'think0-u4-p44' && student && context.owner === student.id
+            && state.active && state.parks && state.parks.set === 4 && state.currentSentenceIndex === 6) {
+            const { owner, ...marker } = context;
+            return { ...marker, wordCount: 25, exerciseCount: 6 };
+        }
         if (!context || !student || context.owner !== student.id || !state.active || state.words.length !== 5
             || !state.nonSpellingExercises || state.nonSpellingExercises.length !== 5 || state.currentNonSpellingIndex !== 5) return null;
         const { owner, ...marker } = context;
@@ -121,5 +131,5 @@
             else current.frame.contentWindow.postMessage({ action: 'note-study-error', request: current.request }, location.origin);
         }
     });
-    window.PreviewNotes = { onLogin, close, openLibrary, openNote, blocksAdvance, prepareStudy, completeStudy, markComplete, enabled, remapPlacement };
+    window.PreviewNotes = { isReader: frame => !!opening && opening.frame.contentWindow === frame && user()?.id === opening.owner, onLogin, close, openLibrary, openNote, blocksAdvance, prepareStudy, completeStudy, markComplete, enabled, remapPlacement };
 })();

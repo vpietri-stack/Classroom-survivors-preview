@@ -1,7 +1,7 @@
 "use strict";
 
 const $ = (id) => document.getElementById(id);
-const lesson = window.ThinkParks;
+const lesson = parent !== window && parent.ThinkParks || window.ThinkParks;
 // Coordinates are relative to the 4x crop of the lower part of the source page.
 const hotspots = [
     [[[55,49,426]],[[432,49,535],[55,78,583]],[[55,106,593],[55,135,515]]],
@@ -24,22 +24,44 @@ function button(text, action, className) {
     node.addEventListener("click", action);
     return node;
 }
-function playClip(english, chinese, filename) {
-    const audio = $("audio");
-    const source = lesson.clip(filename);
-    $("english").textContent = english;
-    $("chinese").textContent = chinese;
-    $("player").hidden = false;
-    if (audio.getAttribute("src") === source) audio.currentTime = 0;
-    else audio.src = source;
-    audio.play().catch(() => {});
+const embedded = new URLSearchParams(location.search);
+if (parent === window || !parent.PreviewNotes?.isReader(window)) {
+    location.replace('index.html');
+    throw new Error('Open this preview from the notes library.');
 }
-
-$("dismiss").onclick = () => {
-    $("audio").pause();
-    $("player").hidden = true;
+const request = embedded.get('request');
+const review = embedded.get('mode') === 'review';
+const action = $('reader-study-start');
+action.textContent = review ? '返回主界面' : '开始学习';
+action.onclick = () => {
+    stop();
+    if (!review) action.disabled = true;
+    parent.postMessage({ action: review ? 'close-note' : 'start-note-study', request }, location.origin);
 };
-
+window.addEventListener('message', event => {
+    if (event.source === parent && event.origin === location.origin && event.data?.request === request && event.data.action === 'note-study-error') action.disabled = false;
+});
+let audio = null, current = null;
+function stop() {
+    if (audio) { audio.pause(); audio = null; }
+    $('stop').disabled = true;
+}
+function playClip(english, chinese, filename) {
+    stop();
+    current = { english, chinese, filename };
+    window.dispatchEvent(new CustomEvent('notes-select', { detail: { id: filename, text: english } }));
+    $('nowPlaying').textContent = english;
+    $('playerStatus').textContent = chinese;
+    $('stop').disabled = false;
+    $('replay').disabled = false;
+    audio = new Audio(lesson.clip(filename));
+    audio.playbackRate = Number($('speed').value);
+    audio.play().catch(() => { $('playerStatus').textContent = '音频正在加载，请再试一次。'; });
+}
+$('stop').onclick = stop;
+$('replay').onclick = () => { if (current) playClip(current.english, current.chinese, current.filename); };
+$('speed').onchange = () => { if (audio) audio.playbackRate = Number($('speed').value); };
+window.InteractiveNotesPOC = { pause: stop };
 function renderArticle(parks) {
     let clip = 0;
     parks.forEach(([, sentences], parkIndex) => {
@@ -74,15 +96,40 @@ if ("IntersectionObserver" in window) {
     scan.addEventListener("pointerenter", () => lesson.prefetchAudio("sentences"), { once: true });
 }
 
+const imagePacks = new Map();
+function loadPicture(picture, image) {
+    const part = window.ThinkParksImageIndex[image];
+    if (!part) { picture.src = image; return; }
+    const [group, offset, length, type] = part;
+    if (!imagePacks.has(group)) imagePacks.set(group,
+        fetch('think_parks_assets/images-' + group + '.bin?v=1')
+            .then(response => { if (!response.ok) throw new Error('Images unavailable'); return response.arrayBuffer(); })
+            .catch(() => null));
+    imagePacks.get(group).then(pack => {
+        picture.src = pack && offset + length <= pack.byteLength
+            ? URL.createObjectURL(new Blob([pack.slice(offset, offset + length)], { type })) : image;
+    });
+}
+const imageObserver = 'IntersectionObserver' in window ? new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            imageObserver.unobserve(entry.target);
+            loadPicture(entry.target, entry.target.dataset.image);
+        }
+    });
+}, { rootMargin: '500px' }) : null;
 for (const [english, chinese, key, image] of lesson.words) {
     const card = button("", () => playClip(english, chinese, "word-" + key + ".mp3"), "card");
     const picture = element("img");
     picture.alt = "";
     picture.loading = "lazy";
-    picture.src = image;
+    if (imageObserver) { picture.dataset.image = image; imageObserver.observe(picture); }
+    else loadPicture(picture, image);
     const icon = element("span", "♪", "listen-icon");
     icon.setAttribute("aria-hidden", "true");
     card.append(picture, element("strong", english), element("span", chinese), icon);
     $("cards").append(card);
 }
 renderArticle(lesson.parks);
+
+document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); });

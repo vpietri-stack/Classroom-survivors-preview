@@ -59,6 +59,7 @@
     "test_pu1_u7_preview_browser.js",
     "test_preview_notes_api.js",
     "test_preview_notes_browser.js",
+    "test_think_parks_preview_browser.js",
     "test_notes_speech_browser.js",
     "scripts/checks.test.mjs"
   ],
@@ -136,7 +137,7 @@
     },
     "notes": {
       "paths": [
-        "^(preview_notes|interactive_notes|notes_speech)[^/]*\\.(js|html|css)$"
+        "^(preview_notes|interactive_notes|notes_speech|think_parks)[^/]*\\.(js|html|css)$"
       ],
       "tests": [
         "test_preview_notes_state.js",
@@ -144,6 +145,7 @@
         "test_pu1_u7_preview_browser.js",
         "test_preview_notes_api.js",
         "test_preview_notes_browser.js",
+        "test_think_parks_preview_browser.js",
         "test_notes_speech_browser.js"
       ]
     },

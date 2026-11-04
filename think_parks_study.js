@@ -24,15 +24,6 @@
         if (word) image.src = word[3];
     }
 
-    function start() {
-        if (!authActiveUser || isTestMode || (authActiveUser.role && authActiveUser.role !== "student")) {
-            showStudyNotice("请先登录学生账号。");
-            return;
-        }
-        lesson.prefetchAudio("words");
-        initStudyMode({ parks: true });
-    }
-
     function recognitionComplete() {
         const parks = STUDY_STATE.parks;
         if (parks.set < 4) {
@@ -82,7 +73,7 @@
         const scan = document.createElement("img");
         scan.src = "think_parks_assets/page.webp";
         scan.alt = "Think Starter 课本第 44 页";
-        scan.width = 816;
+        scan.width = 817;
         scan.height = 1108;
         scan.loading = "lazy";
         reader.append(summary, scan);
@@ -187,12 +178,6 @@
         renderCloze();
     }
 
-    function configureMenu() {
-        const requested = new URLSearchParams(location.search).get("lesson") === "think-parks";
-        $("think-parks-start").classList.toggle("hidden", !requested || !authActiveUser || isTestMode);
-        if (requested) lesson.prefetchAudio("words");
-    }
-
-    window.ThinkParksStudy = { context, start, configureMenu, recognitionComplete, playWord, showWord,
+    window.ThinkParksStudy = { context, recognitionComplete, playWord, showWord,
         renderCloze, reset, next, pause: () => audio.pause() };
 })(window.ThinkParks);

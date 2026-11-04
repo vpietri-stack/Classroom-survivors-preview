@@ -5,7 +5,9 @@
         { id: 'pu1-u7-p85', book: 'PU1', unit: '7', page: '85', version: 1,
         title: 'Power Up 1 · Unit 7 · 第85页', reader: 'pu1_u7_p85_notes.html' },
         { id: 'pu2-u5-p59', book: 'PU2', unit: '5', page: '59', version: 1,
-        title: 'Power Up 2 · Unit 5 · 第59页', reader: 'pu2_u5_p59_notes.html' }];
+        title: 'Power Up 2 · Unit 5 · 第59页', reader: 'pu2_u5_p59_notes.html' },
+        { id: 'think0-u4-p44', book: 'Think0', unit: '4', page: '44', version: 1,
+        title: 'Think Starter · Unit 4 · 第44页', reader: 'think_parks.html', wordCount: 25, exerciseCount: 6 }];
     const find = id => catalog.find(note => note.id === id);
     const atPage = page => page && catalog.find(note => note.book === page.book && note.unit === String(page.unit) && note.page === String(page.page));
     function normalize(value) {
@@ -23,7 +25,7 @@
             const marker = event && event.data && event.data.previewNote, note = marker && find(marker.id);
             if (!note || event.type !== 'session' || event.sessionType !== 'study' || marker.version !== note.version
                 || marker.book !== note.book || String(marker.unit) !== note.unit || String(marker.page) !== note.page
-                || marker.wordCount !== 5 || marker.exerciseCount !== 5 || !Number.isFinite(Date.parse(event.timestamp))) continue;
+                || marker.wordCount !== (note.wordCount || 5) || marker.exerciseCount !== (note.exerciseCount || 5) || !Number.isFinite(Date.parse(event.timestamp))) continue;
             const completedAt = new Date(event.timestamp).toISOString();
             if (!result[note.id] || completedAt < result[note.id].completedAt) result[note.id] = { version: note.version, completedAt };
         }

@@ -22,6 +22,11 @@ for (const invalid of [
   { ...event, data: { previewNote: { ...marker, version: 999 } } }
 ]) ok(Object.keys(core.fromEvents([invalid])).length === 0, 'partial, wrong-page or unknown marker cannot complete notes');
 ok(Object.keys(core.normalize(Object.fromEntries(Array.from({length:1000},(_,i) => ['unknown'+i, {version:1,completedAt:event.timestamp}])))).length === 0, 'storage bounded by the registered catalog');
+const parksMarker = { id: 'think0-u4-p44', book: 'Think0', unit: '4', page: '44', version: 1, wordCount: 25, exerciseCount: 6 };
+const parksEvent = { ...event, data: { previewNote: parksMarker } };
+ok(core.fromEvents([parksEvent])[parksMarker.id], 'Parks completion is recognized');
+for (const invalid of [{ wordCount: 5 }, { exerciseCount: 5 }, { page: '45' }, { version: 2 }])
+  ok(!core.fromEvents([{ ...parksEvent, data: { previewNote: { ...parksMarker, ...invalid } } }])[parksMarker.id], 'partial or wrong Parks completion is rejected');
 const sandbox = { window: null, console, Math, API_BASE_URL: '', document: { addEventListener() {} }, localStorage: { getItem:()=>null,setItem(){},removeItem(){} }, getCurrentSession:()=>10 };
 sandbox.window = sandbox; vm.createContext(sandbox);
 for (const file of ['sr_engine.js','teaching_content.js','content_pu3.js','non_spelling_content.js']) vm.runInContext(fs.readFileSync(file,'utf8'),sandbox);

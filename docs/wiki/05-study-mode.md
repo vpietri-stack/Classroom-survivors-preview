@@ -1,6 +1,6 @@
 ## Think Starter Unit 4 page 44 preview
 
-The preview site links to `think_parks.html` from the selection wizard. It has 25 illustrated vocabulary targets, the page 44 scan with sentence hotspots, and 18 original Track 4.12 sentence clips with Simplified Chinese translations. The preview prefetches separate vocabulary and article audio packs while retaining the individual clips as a first-tap fallback. Its Study link opens the standard authenticated Study overlay. Five sets of five recognition questions lead into six paragraph gap-fills with the page 44 scan available inside each exercise. Check grades all placements together and resets the entire dock after an error. The lesson uses normal Study completion, analytics and recovery, and excludes its results from SR.
+Think0 Unit 4 page 44 uses the normal preview catalog and opens automatically for an assigned student until its 25-item recognition and six-paragraph Study session is complete. Completion unlocks the standard notes library. It uses the shared adaptive speech controls on each vocabulary item and article sentence. Study completion earns a normal Study credit and does not update SR. The reader loads images in small grouped packs and audio in two packs.
 
 ## PU1 Unit 7 page 85 preview (3 November 2026)
 
