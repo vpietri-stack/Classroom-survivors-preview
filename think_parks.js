@@ -55,9 +55,17 @@ function playClip(english, chinese, filename) {
     $('playerStatus').textContent = chinese;
     $('stop').disabled = false;
     $('replay').disabled = false;
-    audio = new Audio(lesson.clip(filename));
-    audio.playbackRate = Number($('speed').value);
-    audio.play().catch(() => { $('playerStatus').textContent = '音频正在加载，请再试一次。'; });
+    const player = audio = new Audio();
+    const play = source => {
+        if (audio !== player) return;
+        player.src = source;
+        player.playbackRate = Number($('speed').value);
+        player.play().catch(() => {
+            if (audio === player) $('playerStatus').textContent = '音频正在加载，请再试一次。';
+        });
+    };
+    if (lesson.audioSource) lesson.audioSource(filename).then(play);
+    else play(lesson.clip(filename));
 }
 $('stop').onclick = stop;
 $('replay').onclick = () => { if (current) playClip(current.english, current.chinese, current.filename); };

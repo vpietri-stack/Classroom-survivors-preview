@@ -2,6 +2,27 @@
     'use strict';
     const base = 'jasmins_diary_assets/';
     const clip = file => base + file;
+    const audioUrls = new Map();
+    function audioSource(file) {
+        const path = clip(file);
+        if (!audioUrls.has(path)) {
+            const pending = fetch(path).then(async response => {
+                if (!response.ok) throw new Error('Audio unavailable');
+                const bytes = await response.arrayBuffer();
+                return URL.createObjectURL(new Blob([bytes], { type: 'audio/mpeg' }));
+            }).catch(async () => {
+                try {
+                    const cache = parent !== window && parent.AssetCache || window.AssetCache;
+                    const url = await cache?.getBlobUrl(path);
+                    if (url) return url;
+                } catch (_) {}
+                audioUrls.delete(path);
+                return path;
+            });
+            audioUrls.set(path, pending);
+        }
+        return audioUrls.get(path);
+    }
     const words = [
         ['compass', '指南针'],
         ['first aid kit', '急救包'],
@@ -70,5 +91,5 @@
         ['day time', 'compass', 'solution', 'rises', 'sets'],
         ['safe']
     ];
-    window.JasminsDiary = { words, parks, columns, targets, clip, wordFile: key => 'vocab-audio/' + key + '.mp3' };
+    window.JasminsDiary = { words, parks, columns, targets, clip, audioSource, wordFile: key => 'vocab-audio/' + key + '.mp3' };
 })();

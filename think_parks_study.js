@@ -8,13 +8,26 @@
         const words = new Map(lesson.words.map(word => [word[0], word]));
         const $ = id => document.getElementById(id);
 
+        let audioRequest = 0;
+        function pauseAudio() {
+            audioRequest++;
+            audio.pause();
+        }
+
         function playWord() {
             const word = words.get(currentTTSWord);
             if (!word) return;
-            const source = lesson.clip(lesson.wordFile ? lesson.wordFile(word[2]) : "word-" + word[2] + ".mp3");
-            if (audio.getAttribute("src") === source) audio.currentTime = 0;
-            else audio.src = source;
-            audio.play().catch(() => {});
+            pauseAudio();
+            const request = audioRequest;
+            const file = lesson.wordFile ? lesson.wordFile(word[2]) : "word-" + word[2] + ".mp3";
+            const play = source => {
+                if (request !== audioRequest || currentTTSWord !== word[0]) return;
+                if (audio.getAttribute("src") === source) audio.currentTime = 0;
+                else audio.src = source;
+                audio.play().catch(() => {});
+            };
+            if (lesson.audioSource) lesson.audioSource(file).then(play);
+            else play(lesson.clip(file));
         }
 
         function showWord(target) {
@@ -34,7 +47,7 @@
                 STUDY_STATE.words = lesson.words.slice(parks.set * 5, parks.set * 5 + 5).map(word => word[0]);
                 startRoundA();
             } else {
-                audio.pause();
+                pauseAudio();
                 STUDY_STATE.round = "E";
                 STUDY_STATE.currentSentenceIndex = 0;
                 startExerciseTracking();
@@ -183,7 +196,7 @@
         }
 
         return { id, context, setCount, exerciseCount, words: lesson.words, recognitionComplete, playWord, showWord,
-            renderCloze, reset, next, pause: () => audio.pause() };
+            renderCloze, reset, next, pause: pauseAudio };
     }
 
     const articles = {};
