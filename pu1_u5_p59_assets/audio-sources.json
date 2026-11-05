@@ -1,0 +1,261 @@
+[
+  {
+    "id": "whose",
+    "text": "Whose",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=Whose",
+    "bytes": 10989
+  },
+  {
+    "id": "i",
+    "text": "I",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=I",
+    "bytes": 10258
+  },
+  {
+    "id": "my",
+    "text": "my",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=my",
+    "bytes": 10797
+  },
+  {
+    "id": "you",
+    "text": "you",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=you",
+    "bytes": 10221
+  },
+  {
+    "id": "your",
+    "text": "your",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=your",
+    "bytes": 11565
+  },
+  {
+    "id": "he",
+    "text": "he",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=he",
+    "bytes": 9837
+  },
+  {
+    "id": "his",
+    "text": "his",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=his",
+    "bytes": 9453
+  },
+  {
+    "id": "she",
+    "text": "she",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=she",
+    "bytes": 12333
+  },
+  {
+    "id": "her",
+    "text": "her",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=her",
+    "bytes": 9453
+  },
+  {
+    "id": "it",
+    "text": "it",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=it",
+    "bytes": 8493
+  },
+  {
+    "id": "its",
+    "text": "its",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=its",
+    "bytes": 9453
+  },
+  {
+    "id": "we",
+    "text": "we",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=we",
+    "bytes": 10413
+  },
+  {
+    "id": "our",
+    "text": "our",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=our",
+    "bytes": 6941
+  },
+  {
+    "id": "they",
+    "text": "they",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=they",
+    "bytes": 10884
+  },
+  {
+    "id": "their",
+    "text": "their",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=their",
+    "bytes": 11093
+  },
+  {
+    "id": "whose-bike",
+    "text": "Whose bike is this?",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/dbc45d70-d901-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 13440
+  },
+  {
+    "id": "leo-bike",
+    "text": "It's Leo's bike.",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/dc8def00-d901-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 14400
+  },
+  {
+    "id": "his-bike-orange",
+    "text": "His bike is orange.",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/de654710-d901-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 16320
+  },
+  {
+    "id": "whose-car",
+    "text": "Whose car is this?",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/dda29350-d901-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 13824
+  },
+  {
+    "id": "mia-car",
+    "text": "It's Mia's car.",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/e0c752f0-d901-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 12480
+  },
+  {
+    "id": "her-car-red",
+    "text": "Her car is red.",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/e0fb0d20-d901-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 13440
+  },
+  {
+    "id": "whose-house",
+    "text": "Whose house is this?",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/e1123ea0-d901-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 13824
+  },
+  {
+    "id": "shared-house",
+    "text": "It's Leo and Mia's house.",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/e122b960-d901-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 20544
+  },
+  {
+    "id": "their-house-yellow",
+    "text": "Their house is yellow.",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/e1c5b020-d901-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 15360
+  },
+  {
+    "id": "my-kite",
+    "text": "It's my kite.",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/e426d1a0-d901-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 10560
+  },
+  {
+    "id": "your-doll",
+    "text": "It's your doll.",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/e4a02050-d901-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 9984
+  },
+  {
+    "id": "his-robot",
+    "text": "It's his robot.",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/e52ecbc0-d901-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 12480
+  },
+  {
+    "id": "her-plane",
+    "text": "It's her plane.",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/e690ccc0-d901-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 10944
+  },
+  {
+    "id": "blue-head",
+    "text": "Its head is blue.",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/e656d100-d901-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 11904
+  },
+  {
+    "id": "our-balls",
+    "text": "They're our balls.",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/e743a200-d901-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 12480
+  },
+  {
+    "id": "their-bike",
+    "text": "It's their bike.",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/e84581a0-d901-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 10944
+  },
+  {
+    "id": "whose-robot",
+    "text": "Whose robot is it?",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/e8909460-d901-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 13440
+  },
+  {
+    "id": "leo-robot",
+    "text": "It's Leo's robot.",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/e8eda880-d901-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 15744
+  },
+  {
+    "id": "whose-balls",
+    "text": "Whose balls are they?",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/ea677740-d901-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 14400
+  },
+  {
+    "id": "shared-balls",
+    "text": "They're Leo and Mia's balls.",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/eb7f4fe0-d901-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 21120
+  },
+  {
+    "id": "their-balls",
+    "text": "They're their balls.",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/ebd0a430-d901-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 12096
+  },
+  {
+    "id": "its-robot",
+    "text": "It's a robot.",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/ec1c2c20-d901-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 10176
+  }
+]

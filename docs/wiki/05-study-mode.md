@@ -1,3 +1,18 @@
+## PU1 Unit 5 page 59 grammar preview (5 November 2026)
+
+`pu1-u5-p59` opens `pu1_u5_p59_notes.html` for assigned page-59 students. The
+three approved ownership infographics use original Leo/Mia characters, with 37
+bundled British English word/sentence clips, tap-to-listen, replay, slow playback,
+zoom and the shared optional pronunciation controls. Original illustrations must
+not reuse Friendly Farm character names. Words use Youdao type 1 and sentences
+use Sound of Text en-GB; provenance is recorded beside the assets.
+
+The existing grammar Study selects five of the seven page-59 vocabulary entries
+and five existing page-59 non-spelling boards. Completion earns one normal Study
+credit and normal SR outcomes, persists the version-1 completion marker and
+unlocks review. Curriculum, exercise content, SR keys and recovery are unchanged.
+The browser and isolated preview API register the same catalog entry.
+
 ## PU3 Unit 3 page 35 preview (5 November 2026)
 
 `pu3-u3-p35` assigns the six approved pp.34–35 vocabulary/grammar infographics to
