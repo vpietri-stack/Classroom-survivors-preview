@@ -1,0 +1,426 @@
+[
+  {
+    "id": "cough",
+    "text": "cough",
+    "kind": "word",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=cough",
+    "bytes": 12717
+  },
+  {
+    "id": "temperature",
+    "text": "temperature",
+    "kind": "word",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=temperature",
+    "bytes": 8613
+  },
+  {
+    "id": "sore-throat",
+    "text": "sore throat",
+    "kind": "word",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=sore+throat",
+    "bytes": 34489
+  },
+  {
+    "id": "cold",
+    "text": "cold",
+    "kind": "word",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=cold",
+    "bytes": 10221
+  },
+  {
+    "id": "backache",
+    "text": "backache",
+    "kind": "word",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=backache",
+    "bytes": 22701
+  },
+  {
+    "id": "stomach-ache",
+    "text": "stomach-ache",
+    "kind": "word",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=stomach-ache",
+    "bytes": 31533
+  },
+  {
+    "id": "headache",
+    "text": "headache",
+    "kind": "word",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=headache",
+    "bytes": 10029
+  },
+  {
+    "id": "toothache",
+    "text": "toothache",
+    "kind": "word",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=toothache",
+    "bytes": 12717
+  },
+  {
+    "id": "ill",
+    "text": "ill",
+    "kind": "word",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=ill",
+    "bytes": 9645
+  },
+  {
+    "id": "sick",
+    "text": "sick",
+    "kind": "word",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=sick",
+    "bytes": 11757
+  },
+  {
+    "id": "want-to",
+    "text": "want to",
+    "kind": "word",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=want+to",
+    "bytes": 31801
+  },
+  {
+    "id": "need-to",
+    "text": "need to",
+    "kind": "word",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=need+to",
+    "bytes": 47142
+  },
+  {
+    "id": "play",
+    "text": "play",
+    "kind": "word",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=play",
+    "bytes": 9837
+  },
+  {
+    "id": "rest",
+    "text": "rest",
+    "kind": "word",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=rest",
+    "bytes": 11373
+  },
+  {
+    "id": "dont",
+    "text": "don't",
+    "kind": "word",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=don%27t",
+    "bytes": 10467
+  },
+  {
+    "id": "doesnt",
+    "text": "doesn't",
+    "kind": "word",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=doesn%27t",
+    "bytes": 7359
+  },
+  {
+    "id": "do",
+    "text": "do",
+    "kind": "word",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=do",
+    "bytes": 9453
+  },
+  {
+    "id": "does",
+    "text": "does",
+    "kind": "word",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=does",
+    "bytes": 14400
+  },
+  {
+    "id": "but",
+    "text": "but",
+    "kind": "word",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=but",
+    "bytes": 6314
+  },
+  {
+    "id": "want",
+    "text": "want",
+    "kind": "word",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=want",
+    "bytes": 10605
+  },
+  {
+    "id": "wants",
+    "text": "wants",
+    "kind": "word",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=wants",
+    "bytes": 29488
+  },
+  {
+    "id": "need",
+    "text": "need",
+    "kind": "word",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=need",
+    "bytes": 11373
+  },
+  {
+    "id": "needs",
+    "text": "needs",
+    "kind": "word",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=needs",
+    "bytes": 25389
+  },
+  {
+    "id": "have-cough",
+    "text": "I've got a cough.",
+    "kind": "sentence",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/26764cb0-d8ea-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 11904
+  },
+  {
+    "id": "has-temperature",
+    "text": "She's got a temperature.",
+    "kind": "sentence",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/25fd2510-d8ea-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 15744
+  },
+  {
+    "id": "have-sore-throat",
+    "text": "I've got a sore throat.",
+    "kind": "sentence",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/28b78a20-d8ea-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 15936
+  },
+  {
+    "id": "has-cold",
+    "text": "He's got a cold.",
+    "kind": "sentence",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/281bbf50-d8ea-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 12864
+  },
+  {
+    "id": "back-hurts",
+    "text": "My back hurts.",
+    "kind": "sentence",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/28ca27c0-d8ea-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 13824
+  },
+  {
+    "id": "have-stomach-ache",
+    "text": "I've got a stomach-ache.",
+    "kind": "sentence",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/28c9b290-d8ea-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 15744
+  },
+  {
+    "id": "have-headache",
+    "text": "I've got a headache.",
+    "kind": "sentence",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/29789030-d8ea-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 12480
+  },
+  {
+    "id": "has-toothache",
+    "text": "She's got a toothache.",
+    "kind": "sentence",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/2b861370-d8ea-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 13824
+  },
+  {
+    "id": "feel-ill",
+    "text": "I feel ill.",
+    "kind": "sentence",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/2bb40140-d8ea-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 12096
+  },
+  {
+    "id": "matter",
+    "text": "What's the matter?",
+    "kind": "sentence",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/2cdfd710-d8ea-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 12480
+  },
+  {
+    "id": "knee-hurts",
+    "text": "My knee hurts.",
+    "kind": "sentence",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/2d429080-d8ea-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 13056
+  },
+  {
+    "id": "fly-kite",
+    "text": "I want to fly my kite.",
+    "kind": "sentence",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/2d1f2a00-d8ea-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 17856
+  },
+  {
+    "id": "finish-homework",
+    "text": "I need to finish my homework.",
+    "kind": "sentence",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/2efd86f0-d8ea-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 17856
+  },
+  {
+    "id": "draw-picture",
+    "text": "She wants to draw a picture.",
+    "kind": "sentence",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/2f9a8a40-d8ea-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 18240
+  },
+  {
+    "id": "get-paper",
+    "text": "She needs to get some paper.",
+    "kind": "sentence",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/30190910-d8ea-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 19584
+  },
+  {
+    "id": "dont-football",
+    "text": "I don't want to play football.",
+    "kind": "sentence",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/3067ec60-d8ea-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 17280
+  },
+  {
+    "id": "doesnt-sing",
+    "text": "She doesn't want to sing.",
+    "kind": "sentence",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/314776f0-d8ea-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 16320
+  },
+  {
+    "id": "want-read",
+    "text": "Do you want to read?",
+    "kind": "sentence",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/31a24120-d8ea-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 12096
+  },
+  {
+    "id": "yes-do",
+    "text": "Yes, I do.",
+    "kind": "sentence",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/706a30c0-caa8-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 13824
+  },
+  {
+    "id": "want-dance",
+    "text": "Does she want to dance?",
+    "kind": "sentence",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/32e87cc0-d8ea-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 14976
+  },
+  {
+    "id": "no-doesnt",
+    "text": "No, she doesn't.",
+    "kind": "sentence",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/33da56d0-d8ea-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 16704
+  },
+  {
+    "id": "what-want",
+    "text": "What do you want to do?",
+    "kind": "sentence",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/35991dd0-d8ea-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 14976
+  },
+  {
+    "id": "play-game",
+    "text": "I want to play a game.",
+    "kind": "sentence",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/36643600-d8ea-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 15936
+  },
+  {
+    "id": "what-need",
+    "text": "What do you need to do?",
+    "kind": "sentence",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/35f65900-d8ea-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 14400
+  },
+  {
+    "id": "pack-bag",
+    "text": "I need to pack my bag.",
+    "kind": "sentence",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/360d6370-d8ea-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 15744
+  },
+  {
+    "id": "outside-raining",
+    "text": "I want to play outside, but it's raining.",
+    "kind": "sentence",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/37142510-d8ea-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 26496
+  },
+  {
+    "id": "play-homework",
+    "text": "She wants to play, but she needs to finish her homework.",
+    "kind": "sentence",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/37ae1b20-d8ea-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 33024
+  },
+  {
+    "id": "have-cold",
+    "text": "I've got a cold.",
+    "kind": "sentence",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/385fb7e0-d8ea-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 12864
+  },
+  {
+    "id": "play-ill",
+    "text": "I want to play, but I feel ill.",
+    "kind": "sentence",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/3ac19cb0-d8ea-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 23040
+  },
+  {
+    "id": "need-rest",
+    "text": "You need to rest.",
+    "kind": "sentence",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/38ec4070-d8ea-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 12864
+  }
+]

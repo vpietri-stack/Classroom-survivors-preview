@@ -52,5 +52,11 @@ async function save(events,extra={}) {
   const pu1Count=stored.sessionCount;
   await save([pu1Event],{srState:{vocab:{}},srSeq:2,srDelta:true,incrementSession:true});
   ok(stored.sessionCount===pu1Count && stored.analytics.filter(e=>e.eventId==='pu1-note-study').length===1,'new lesson retry does not double-credit Study');
+  const pu3Event={...event,eventId:'pu3-p35-note-study',data:{...event.data,previewNote:{...marker,id:'pu3-u3-p35',book:'PU3',unit:'3',page:'35'}}};
+  response=await save([pu3Event],{srState:{vocab:{}},srSeq:3,srDelta:true,incrementSession:true});
+  ok(response.status===200 && stored.previewNotes['pu3-u3-p35'],'page 35 completion survives server normalization');
+  const pu3Count=stored.sessionCount;
+  await save([pu3Event],{srState:{vocab:{}},srSeq:3,srDelta:true,incrementSession:true});
+  ok(stored.sessionCount===pu3Count,'page 35 completion retry does not double-credit Study');
   console.log(checks+' preview-note API checks passed');
 })().catch(error=>{console.error(error);process.exitCode=1;});

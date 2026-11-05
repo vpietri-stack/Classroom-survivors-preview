@@ -1,3 +1,18 @@
+## PU3 Unit 3 page 35 preview (5 November 2026)
+
+`pu3-u3-p35` assigns the six approved pp.34–35 vocabulary/grammar infographics to
+app page 35. Its shared reader includes 53 bundled British English audio clips,
+tap-to-listen, replay, slow playback, zoom and optional existing pronunciation
+practice. The vocabulary clips use Youdao type 1 and sentences use Sound of Text
+en-GB; source metadata stays with the assets. All six images preserve their
+original dimensions and fit the existing WebP lesson budget.
+
+The existing intro/Study/library flow selects five words and five non-spelling
+boards strictly from the already approved page-35 bank. Normal completion grants
+one Study credit, preserves the old page-40 typed SR keys and unlocks the lesson
+in the review library. The same version-1 note ID is registered in the isolated
+preview API catalog. Production is a separate release.
+
 ## Speech preparation
 
 Study entry and restoration start the optional speech model in the background. Study exercises can run while the model prepares.
