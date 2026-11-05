@@ -1,5 +1,7 @@
 ## Student startup
 
+The login and saved-profile shell initializes before the deferred lesson scripts and general stylesheet links. Inline fallback styling keeps the form usable when the stylesheet downloads stall. The shared runtime still executes in order and can warm in parallel with sign-in.
+
 The login and profile UI use precompiled Tailwind CSS. Run `npm run build:student-css` when changing student utility classes and update the stylesheet query when the generated CSS changes. Phaser and the three Phaser scene scripts load on first game entry or UNO resume. Failed game downloads can be retried from the game button. Game media warm-up starts when the game menu opens.
 
 ## PU1 Unit 7 page correction (3 November 2026)

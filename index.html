@@ -10,7 +10,7 @@
                 window.__csDiagEarly.push(String(e.message).slice(0, 300) + ' ' + String(e.filename || '').split('?')[0] + ':' + e.lineno);
         });
     </script>
-    <script async src="client_diagnostics.js?v=2026-10-30a"></script>
+    <script async src="client_diagnostics.js?v=startup-2"></script>
     <!--
       Anti-cache hints. WeChat's iOS in-app WebView (WKWebView) aggressively
       caches index.html/JS and ignores the server's Cache-Control, which can
@@ -59,21 +59,24 @@
     <meta name="referrer" content="no-referrer">
     <title>Classroom Survivors: ESL Edition (Phaser)</title>
 
-    <link rel="stylesheet" href="lib/student-tailwind.css?v=1">
-    <!-- Self-hosted fonts (was fonts.googleapis.com — hard-blocked in CN) -->
-    <link href="fonts/fonts.css?v=1" rel="stylesheet">
-    <!-- Self-hosted Font Awesome (was cdnjs.cloudflare.com) -->
-    <link rel="stylesheet" href="lib/fontawesome/css/all.min.css?v=1">
-    <link rel="stylesheet" href="style.css?v=2026-10-23c">
-    <link rel="stylesheet" href="non_spelling_exercises.css?v=2026-10-14i">
+    <style>
+        .hidden, [hidden] { display: none !important; }
+        :where(#loginOverlay, #profileSelectionOverlay, #changePasswordOverlay, #avatarSelectionOverlay, #studentBootStatus) {
+            position: fixed; inset: 0; z-index: 50; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; overflow: auto;
+            box-sizing: border-box; padding: 1rem; color: white; background: #141414; font-family: system-ui, sans-serif;
+        }
+        :where(#loginOverlay, #changePasswordOverlay) > div { width: min(100%, 24rem); }
+        :where(#loginOverlay, #changePasswordOverlay) input,
+        :where(#loginOverlay, #changePasswordOverlay) button { box-sizing: border-box; display: block; width: 100%; margin-block: .6rem; padding: .7rem; }
+        :where(#loginOverlay, #changePasswordOverlay) input { color: white; background: #333; }
+        :where(#profile-list) { display: flex; flex-wrap: wrap; gap: 1rem; }
+        :where(.profile-btn) { min-width: 5rem; padding: .75rem; text-align: center; cursor: pointer; }
+        :where(#studentBootStatus) a { color: inherit; text-decoration: underline; }
+    </style>
 </head>
 
 <body>
-
-    <!-- Theme Toggle Button -->
-    <button id="themeToggleBtn" class="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle theme">
-        <span id="themeToggleIcon">☀️</span>
-    </button>
 
     <!-- AUTH SCREENS -->
     <div id="profileSelectionOverlay" class="overlay hidden bg-[#141414] flex-col items-center justify-center z-50">
@@ -121,6 +124,44 @@
             <button onclick="selectAvatar('🦁')" class="w-24 h-24 sm:w-32 sm:h-32 rounded-md bg-orange-500 flex items-center justify-center text-5xl hover:border-4 border-white transition-all">🦁</button>
         </div>
     </div>
+
+    <div id="studentBootStatus" role="status">
+        <p id="studentBootMessage">正在打开…</p>
+        <a href="" id="studentBootRetry" hidden>重新加载</a>
+    </div>
+    <script>
+        window.studentBoot = { ready: false, failed: false, pending: null };
+        window.addEventListener('error', function (event) {
+            if (event.target.dataset && 'studentRuntime' in event.target.dataset) {
+                studentBoot.failed = true;
+                if (studentBoot.pending) showStudentBootStatus('课程加载失败。', true);
+            }
+        }, true);
+        window.setTimeout(function () {
+            if (!document.getElementById('studentBootStatus').hidden) {
+                document.getElementById('studentBootRetry').hidden = false;
+            }
+        }, 12000);
+    </script>
+    <script src="config.js?v=2026-11-01d"></script>
+    <script src="frontend_auth.js?v=2026-11-05f"></script>
+    <script>
+        if (typeof startStudentShell === 'function') startStudentShell();
+    </script>
+
+    <link fetchpriority="low" data-student-runtime rel="stylesheet" href="lib/student-tailwind.css?v=1">
+    <!-- Self-hosted fonts (was fonts.googleapis.com — hard-blocked in CN) -->
+    <link fetchpriority="low" href="fonts/fonts.css?v=1" rel="stylesheet">
+    <!-- Self-hosted Font Awesome (was cdnjs.cloudflare.com) -->
+    <link fetchpriority="low" rel="stylesheet" href="lib/fontawesome/css/all.min.css?v=1">
+    <link fetchpriority="low" data-student-runtime rel="stylesheet" href="style.css?v=2026-10-23c">
+    <link fetchpriority="low" rel="stylesheet" href="non_spelling_exercises.css?v=2026-10-14i">
+
+    <main id="studentRuntimeContent" hidden>
+    <!-- Theme Toggle Button -->
+    <button id="themeToggleBtn" class="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle theme">
+        <span id="themeToggleIcon">☀️</span>
+    </button>
 
     <!-- HUD -->
     <div id="hud">
@@ -738,53 +779,51 @@
         </div>
     </div>
 
-    <script src="translations.js?v=2026-11-05c"></script>
-    <script src="config.js?v=2026-11-01d"></script>
-    <script src="sr_engine.js?v=2026-11-01c"></script>
-    <script src="practice_telemetry.js?v=2026-11-01c"></script>
-    <script src="api/src/functions/shared/studyResumeCore.js?v=2026-11-01c"></script>
-    <script src="api/src/functions/shared/gameResumeCore.js?v=2026-11-01f"></script>
-    <script src="game_recovery.js?v=2026-11-05c"></script>
-    <script src="study_recovery.js?v=2026-11-05c"></script>
+    <script defer fetchpriority="low" data-student-runtime src="translations.js?v=2026-11-05c"></script>
+    <script defer fetchpriority="low" data-student-runtime src="sr_engine.js?v=2026-11-01c"></script>
+    <script defer fetchpriority="low" data-student-runtime src="practice_telemetry.js?v=2026-11-01c"></script>
+    <script defer fetchpriority="low" data-student-runtime src="api/src/functions/shared/studyResumeCore.js?v=2026-11-01c"></script>
+    <script defer fetchpriority="low" data-student-runtime src="api/src/functions/shared/gameResumeCore.js?v=2026-11-01f"></script>
+    <script defer fetchpriority="low" data-student-runtime src="game_recovery.js?v=2026-11-05c"></script>
+    <script defer fetchpriority="low" data-student-runtime src="study_recovery.js?v=2026-11-05c"></script>
     <link rel="stylesheet" href="study_recovery.css?v=2026-11-01c">
-    <script src="frontend_auth.js?v=2026-11-05e"></script>
-    <script src="teaching_content.js?v=2026-11-05c"></script>
-    <script src="content_pu1.js?v=2026-11-03b"></script>
-    <script src="content_pu2.js?v=2026-11-05c"></script>
-    <script src="jasmins_diary_lesson.js?v=2"></script>
-    <script src="content_pu3.js?v=2026-11-05c"></script>
-    <script src="content_think0.js?v=2026-11-05c"></script>
-    <script src="content_think1.js?v=2026-10-17a"></script>
-    <script src="content_think2.js?v=2026-07-25a"></script>
-    <script src="content_test.js?v=2026-07-25a"></script>
-    <script src="non_spelling_content.js?v=2026-11-03-pu2-p59"></script>
-    <script src="non_spelling_widget.js?v=2026-11-01d"></script>
-    <script src="api/src/functions/shared/previewNotesCore.js?v=2026-11-04f"></script>
-    <script src="preview_notes.js?v=2026-11-04g"></script>
+    <script defer fetchpriority="low" data-student-runtime src="teaching_content.js?v=startup-2"></script>
+    <script defer fetchpriority="low" data-student-runtime src="content_pu1.js?v=2026-11-03b"></script>
+    <script defer fetchpriority="low" data-student-runtime src="content_pu2.js?v=2026-11-05c"></script>
+    <script defer fetchpriority="low" data-student-runtime src="jasmins_diary_lesson.js?v=2"></script>
+    <script defer fetchpriority="low" data-student-runtime src="content_pu3.js?v=2026-11-05c"></script>
+    <script defer fetchpriority="low" data-student-runtime src="content_think0.js?v=2026-11-05c"></script>
+    <script defer fetchpriority="low" data-student-runtime src="content_think1.js?v=2026-10-17a"></script>
+    <script defer fetchpriority="low" data-student-runtime src="content_think2.js?v=2026-07-25a"></script>
+    <script defer fetchpriority="low" data-student-runtime src="content_test.js?v=2026-07-25a"></script>
+    <script defer fetchpriority="low" data-student-runtime src="non_spelling_content.js?v=2026-11-03-pu2-p59"></script>
+    <script defer fetchpriority="low" data-student-runtime src="non_spelling_widget.js?v=2026-11-01d"></script>
+    <script defer fetchpriority="low" data-student-runtime src="api/src/functions/shared/previewNotesCore.js?v=2026-11-04f"></script>
+    <script defer fetchpriority="low" data-student-runtime src="preview_notes.js?v=2026-11-04g"></script>
     <link rel="stylesheet" href="preview_notes.css?v=1">
-    <script src="class_config.js?v=2026-11-03b"></script>
-    <script src="boot.js?v=startup-1"></script>
-    <script src="bgm.js?v=2"></script>
-    <script src="gomoku.js?v=2026-11-01d"></script>
+    <script defer fetchpriority="low" data-student-runtime src="class_config.js?v=2026-11-03b"></script>
+    <script defer fetchpriority="low" data-student-runtime src="boot.js?v=startup-1"></script>
+    <script defer fetchpriority="low" data-student-runtime src="bgm.js?v=2"></script>
+    <script defer fetchpriority="low" data-student-runtime src="gomoku.js?v=2026-11-01d"></script>
 
     <!-- ===== Speech-recognition engine (self-contained, global: LocalEngine / Recorder / Scorer) ===== -->
-    <script src="speech_scorer.js?v=4"></script>
-    <script src="speech_recorder.js?v=2026-11-01f"></script>
-    <script src="speech_engine.js?v=12"></script>
-    <script src="speech_adaptive_app.js?v=2026-11-01f"></script>
-    <script src="speech_ui.js?v=2026-11-02b"></script>
+    <script defer fetchpriority="low" data-student-runtime src="speech_scorer.js?v=4"></script>
+    <script defer fetchpriority="low" data-student-runtime src="speech_recorder.js?v=2026-11-01f"></script>
+    <script defer fetchpriority="low" data-student-runtime src="speech_engine.js?v=12"></script>
+    <script defer fetchpriority="low" data-student-runtime src="speech_adaptive_app.js?v=2026-11-01f"></script>
+    <script defer fetchpriority="low" data-student-runtime src="speech_ui.js?v=2026-11-02b"></script>
     <!-- TEMPORARY (research, 2026-10-11 → 2026-10-26): stores the WAV the
          recogniser received for CONSENTED students only, so candidate ASR
          models can be evaluated against real classroom voices. Inert unless the
          server confirms consent for this student and the window is open; goes
          permanently inert on 2026-10-26. Remove with speech_sample_capture.js. -->
-    <script src="speech_sample_capture.js?v=4"></script>
+    <script defer fetchpriority="low" data-student-runtime src="speech_sample_capture.js?v=4"></script>
     <!-- TEMPORARY (debugging phase): on-screen speech-load diagnostics + defines
          window.__speechLog. Must load BEFORE speech_preload.js so the log hook
          exists when the model load starts. Remove once loading is reliable. -->
-    <script src="speech_debug.js?v=2026-10-23j"></script>
+    <script defer fetchpriority="low" data-student-runtime src="speech_debug.js?v=2026-10-23j"></script>
     <!-- Speech status is ready at startup. Activity entry points prepare the model. -->
-    <script src="speech_preload.js?v=startup-1"></script>
+    <script defer fetchpriority="low" data-student-runtime src="speech_preload.js?v=startup-1"></script>
     <!-- Tower Defense HUD (top bar) -->
     <div id="tdHUD" class="hidden fixed top-0 left-0 right-0 z-40 flex justify-between items-center px-3 py-1 td-hud-bar">
         <div class="td-hud-item">🪙 <span id="tdCoins">0</span></div>
@@ -906,49 +945,50 @@
         .td-play-again-btn:hover { background: #66bb6a; }
     </style>
 
-    <script src="game.js?v=startup-1"></script>
-    <script src="non_spelling_flow.js?v=2026-11-01d"></script>
+    <script defer fetchpriority="low" data-student-runtime src="game.js?v=startup-1"></script>
+    <script defer fetchpriority="low" data-student-runtime src="non_spelling_flow.js?v=2026-11-01d"></script>
     <!-- Mirror-aware asset cache: prefetch + IndexedDB for TD sprites, vocab
          images and hand-recorded MP3s (fast first load in CN; survives WeChat
          cache eviction). Must load BEFORE tower_defense.js reads AssetCache. -->
-    <script src="asset_cache.js?v=startup-1"></script>
+    <script defer fetchpriority="low" data-student-runtime src="asset_cache.js?v=startup-1"></script>
     <!-- Handwriting round (study Round C): mask geometry + trace box. Must load
          before study_mode.js, which calls hwEnsureFont()/hwCreateTraceBox(). -->
-    <script src="handwriting_model/preprocess.js?v=2026-10-23c"></script>
-    <script src="handwriting_model/decision.js?v=2026-10-23c"></script>
-    <script src="handwriting_recognition.js?v=2026-10-23j"></script>
-    <script src="handwriting.js?v=2026-11-01c"></script>
+    <script defer fetchpriority="low" data-student-runtime src="handwriting_model/preprocess.js?v=2026-10-23c"></script>
+    <script defer fetchpriority="low" data-student-runtime src="handwriting_model/decision.js?v=2026-10-23c"></script>
+    <script defer fetchpriority="low" data-student-runtime src="handwriting_recognition.js?v=2026-10-23j"></script>
+    <script defer fetchpriority="low" data-student-runtime src="handwriting.js?v=2026-11-01c"></script>
     <!-- Trace collection for the handwriting round (research; temporary — see the
          removal checklist in docs/wiki/05-study-mode.md). Inert unless the server
          enables it for this student. -->
-    <script src="handwriting_sample_capture.js?v=2026-10-12a"></script>
+    <script defer fetchpriority="low" data-student-runtime src="handwriting_sample_capture.js?v=2026-10-12a"></script>
     <link rel="stylesheet" href="think_parks_study.css?v=1">
-    <script src="think_parks_lesson.js?v=1"></script>
-    <script src="think_parks_audio.js?v=2"></script>
-    <script src="think_parks_study.js?v=5"></script>
-    <script src="pu2_race_lesson.js?v=1"></script>
-    <script src="pu2_race_study.js?v=1"></script>
-    <script src="study_mode.js?v=startup-1"></script>
-    <script src="study_runtime.js?v=startup-1"></script>
+    <script defer fetchpriority="low" data-student-runtime src="think_parks_lesson.js?v=1"></script>
+    <script defer fetchpriority="low" data-student-runtime src="think_parks_audio.js?v=2"></script>
+    <script defer fetchpriority="low" data-student-runtime src="think_parks_study.js?v=5"></script>
+    <script defer fetchpriority="low" data-student-runtime src="pu2_race_lesson.js?v=1"></script>
+    <script defer fetchpriority="low" data-student-runtime src="pu2_race_study.js?v=1"></script>
+    <script defer fetchpriority="low" data-student-runtime src="study_mode.js?v=startup-1"></script>
+    <script defer fetchpriority="low" data-student-runtime src="study_runtime.js?v=startup-1"></script>
     <template id="phaser-scripts">
         <script src="phaser.min.js"></script>
         <script src="vampire_survivors.js?v=2026-10-30a"></script>
         <script src="uno.js?v=2026-11-01d"></script>
         <script src="tower_defense.js?v=2026-07-28c"></script>
     </template>
-    <script src="game_runtime.js?v=startup-1"></script>
+    <script defer fetchpriority="low" data-student-runtime src="game_runtime.js?v=startup-1"></script>
     <script>
         // School Defense 3D (three.js POC) menu entry: revealed ONLY where
         // THREE_TD_ENABLED (config.js) is true — preview deploy, localhost,
         // file://, or ?3d=1. On the live site the button simply doesn't exist
         // (deliberately NOT the greyed-out treatment used for Tower Defense).
-        (function () {
+        document.addEventListener('DOMContentLoaded', function () {
             if (typeof THREE_TD_ENABLED !== 'undefined' && THREE_TD_ENABLED) {
                 var b = document.getElementById('threeTdBtn');
                 if (b) b.classList.remove('hidden');
             }
-        })();
+        });
     </script>
+    </main>
 </body>
 
 </html>

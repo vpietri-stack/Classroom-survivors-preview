@@ -193,9 +193,16 @@
         try { previous = JSON.parse(read(key('heartbeat_' + tabId)) || 'null'); } catch (_) {}
         context = { version: version };
         installConsole();
+        var startup = {};
+        if (w.studentBoot && performance.getEntriesByName) {
+            ['shell-ready', 'sign-in-start', 'sign-in-response', 'lesson-ready'].forEach(function (stage) {
+                var entry = performance.getEntriesByName('student-' + stage).pop();
+                if (entry) startup[stage] = Math.round(entry.startTime);
+            });
+        }
         record('boot', { navigation: (performance.getEntriesByType('navigation')[0] || {}).type || 'unknown',
             wasDiscarded: typeof document.wasDiscarded === 'boolean' ? document.wasDiscarded : 'unsupported',
-            previous: previous }, true);
+            previous: previous, startup: startup }, true);
         (w.__csDiagEarly || []).slice(0, 8).forEach(function (e) { record('error', e, true); });
         w.__csDiagEarly = [];
         heartbeat(false); lastTick = Date.now();
@@ -267,6 +274,7 @@
     w.addEventListener('online', function () { scheduleUpload(1000); });
     // Async loading must never delay DOMContentLoaded/login. If login already
     // finished while this file downloaded, attach to that student now.
-    try { if (typeof authActiveUser !== 'undefined' && authActiveUser && typeof isTestMode !== 'undefined' && !isTestMode)
+    try { if (typeof authActiveUser !== 'undefined' && authActiveUser && typeof isTestMode !== 'undefined' && !isTestMode &&
+        (!w.studentBoot || w.studentBoot.ready))
         attach(authActiveUser, typeof APP_VERSION !== 'undefined' ? APP_VERSION : ''); } catch (_) {}
 })(window);

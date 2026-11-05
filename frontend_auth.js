@@ -1,5 +1,6 @@
 // API_BASE_URL is defined in config.js (loaded before this script)
 const API_BASE = API_BASE_URL;
+var authActiveUser = null;
 
 // ---------------------------------------------------------------------------
 // APP_VERSION — single source of truth for the deployment stamp. The deploy
@@ -13,7 +14,7 @@ const API_BASE = API_BASE_URL;
 // The version watchdog (startVersionWatchdog) compares this to the live
 // version.json; a mismatch means stale WeChat builds never self-heal or
 // permanently nag. See DEPLOY_VERSION_STAMP.md. Bump BOTH together.
-const APP_VERSION = '2026-11-05e';
+const APP_VERSION = '2026-11-05f';
 
 // --- SESSION TOKEN (c) design) ---
 // The server mints a signed token on login. We store it in localStorage
@@ -986,7 +987,45 @@ async function trySilentRelogin() {
     }
 }
 
+function showStudentBootStatus(message, retry = false) {
+    const status = document.getElementById('studentBootStatus');
+    status.hidden = false;
+    document.getElementById('studentBootMessage').textContent = message;
+    document.getElementById('studentBootRetry').hidden = !retry;
+}
+
+function markStudentStartup(stage) {
+    if (window.studentBoot && window.performance && performance.mark) {
+        performance.mark('student-' + stage);
+    }
+}
+
+function startStudentShell() {
+    const boot = window.studentBoot;
+    const testMode = new URLSearchParams(location.search).get('testMode') === 'true';
+    if (!testMode) {
+        initAuth();
+        document.getElementById('studentBootStatus').hidden = true;
+        markStudentStartup('shell-ready');
+    }
+    registerAppUpdateServiceWorker();
+    startVersionWatchdog();
+    document.addEventListener('DOMContentLoaded', () => {
+        boot.ready = !boot.failed && typeof loadContent === 'function' && !!window.StudyRuntime;
+        if (!boot.ready) {
+            if (testMode || boot.pending) showStudentBootStatus('课程加载失败。', true);
+            return;
+        }
+        document.getElementById('studentRuntimeContent').hidden = false;
+        document.getElementById('studentBootStatus').hidden = true;
+        if (testMode) initAuth();
+        if (boot.pending && authActiveUser === boot.pending) finishLogin();
+        boot.pending = null;
+    }, { once: true });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    if (window.studentBoot) return;
     initAuth();
     registerAppUpdateServiceWorker();
     startVersionWatchdog();
@@ -1203,7 +1242,7 @@ async function startVersionWatchdog() {
 
 function initAuth() {
     // Only run on pages that have the student UI (not teacher_dashboard.html)
-    if (!document.getElementById('startScreen')) return;
+    if (!document.getElementById('loginOverlay')) return;
 
     // Check for test mode (teacher testing student content)
     const urlParams = new URLSearchParams(window.location.search);
@@ -1247,7 +1286,7 @@ function initAuth() {
     }
 
     // Hide start screen if it is visible
-    document.getElementById('startScreen').classList.add('hidden');
+    document.getElementById('startScreen')?.classList.add('hidden');
     
     const savedUsers = JSON.parse(localStorage.getItem('savedUsers') || '[]');
     if (savedUsers.length > 0) {
@@ -1312,6 +1351,7 @@ async function loginWithProfile(user, clickedBtn) {
     // Prevent double-clicks while a login is already in progress
     if (window.authLoading) return;
     window.authLoading = true;
+    markStudentStartup('sign-in-start');
 
     // --- Visual feedback: dim all profiles, show spinner on the clicked one ---
     const allProfileBtns = document.querySelectorAll('#profile-list .profile-btn');
@@ -1366,6 +1406,7 @@ async function loginWithProfile(user, clickedBtn) {
         }
         if (response.ok) {
             const data = await response.json();
+            markStudentStartup('sign-in-response');
             setSessionToken(data.token); // (c) persist session token
             if (data.needsPasswordChange) {
                 // Edge case: admin reset password while user was logged out
@@ -1530,6 +1571,7 @@ async function handleLoginSubmit() {
 
     // --- Visual feedback: disable form, show spinner on button ---
     window.authLoading = true;
+    markStudentStartup('sign-in-start');
     errorDiv.classList.add('hidden');
     if (submitBtn) {
         submitBtn.disabled = true;
@@ -1571,6 +1613,7 @@ async function handleLoginSubmit() {
         }
         
         const data = await response.json();
+        markStudentStartup('sign-in-response');
         setSessionToken(data.token); // (c) persist session token
         authActiveUser = {
             id: data.id,
@@ -1736,8 +1779,6 @@ function saveActiveUserToCache() {
 }
 
 function finishLogin() {
-    if (window.PreviewNotes && PreviewNotes.remapPlacement) PreviewNotes.remapPlacement(authActiveUser);
-    if (window.ClientDiagnostics && !isTestMode) ClientDiagnostics.attach(authActiveUser, APP_VERSION);
     hideAllAuthScreens();
 
     // Redirect teachers and admins to the dashboard
@@ -1745,6 +1786,18 @@ function finishLogin() {
         window.location.href = 'teacher_dashboard.html';
         return;
     }
+
+    const boot = window.studentBoot;
+    if (boot && !boot.ready) {
+        boot.pending = authActiveUser;
+        showStudentBootStatus(boot.failed ? '课程加载失败。' : '正在加载课程…', boot.failed);
+        if (!boot.failed) setTimeout(() => {
+            if (boot.pending && !boot.ready) showStudentBootStatus('课程仍在加载…', true);
+        }, 12000);
+        return;
+    }
+
+    if (window.PreviewNotes && PreviewNotes.remapPlacement) PreviewNotes.remapPlacement(authActiveUser);
 
     // FIX #2: arm the pagehide/visibilitychange flush now that a student is
     // logged in, so a tab-close / app-background right after game-over still
@@ -1843,6 +1896,8 @@ function finishLogin() {
     document.getElementById('step-greeting').classList.remove('hidden');
     document.getElementById('greeting-text').innerText = `Hello, ${authActiveUser.name}!`;
     document.getElementById('greeting-avatar').innerText = authActiveUser.avatar || '👤';
+    markStudentStartup('lesson-ready');
+    if (window.ClientDiagnostics && !isTestMode) ClientDiagnostics.attach(authActiveUser, APP_VERSION);
 
     // Handle target banner
     const targetBanner = document.getElementById('greeting-target-banner');

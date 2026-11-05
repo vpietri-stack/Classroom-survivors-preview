@@ -25,7 +25,7 @@ var selectedUnit = null;
 var selectedClassContent = null;
 
 // --- AUTH & ANALYTICS STATE ---
-var authActiveUser = null;
+var authActiveUser = typeof authActiveUser === 'undefined' ? null : authActiveUser;
 // NOTE: analyticsQueue is intentionally NOT reset to [] on script load. It is
 // hydrated from localStorage (see loadPersistedAnalyticsQueue) so events that
 // could not be delivered before the app was killed/closed are retried on the

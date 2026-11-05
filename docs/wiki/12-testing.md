@@ -1,5 +1,7 @@
 ## Student startup coverage
 
+The startup browser fixture holds lesson scripts and styles, checks the real form reaches a mocked login endpoint, then releases the assets and verifies the assigned lesson and distinct timing marks.
+
 The browser startup test intercepts Phaser and speech model requests, then checks that a fresh login form and saved profiles render independently. The game recovery browser suite exercises on-demand UNO loading during a resume.
 
 ## PU1 page-85 preview coverage (3 November 2026)

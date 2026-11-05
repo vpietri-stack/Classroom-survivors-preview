@@ -1,3 +1,7 @@
+## Student startup stages
+
+When existing opt-in client diagnostics are enabled, the boot event can include elapsed times for the visible student shell, sign-in request start, successful response, and lesson greeting readiness. The timings contain no credentials.
+
 # Telemetry & Data Delivery
 
 Optional speech practice (2026-10-28b preview) adds one `speech_practice` exercise

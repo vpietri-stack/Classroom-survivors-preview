@@ -1,3 +1,7 @@
+## Student startup stages
+
+The student entry point can authenticate before its lesson runtime finishes loading. The authorized account is held until the runtime is ready. The shell displays course loading and a reload option if startup stalls or a required resource fails. The dashboard keeps its existing startup path.
+
 ## Corrected preview placement (3 November 2026)
 
 On preview/local only, `PreviewNotes.remapPlacement` maps PU1 Unit 7 page 84 to 85 before login content resolution and before pending placement replay. `loadContent` also resolves saved recovery placements. This adjusts the active placement without rewriting historical analytics, completion or mastery. No other book, unit or environment is remapped.

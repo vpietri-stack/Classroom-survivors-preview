@@ -1,5 +1,5 @@
 {
-  "version": "2026-11-05e",
+  "version": "2026-11-05f",
   "deployedAt": "2026-11-05",
-  "notes": "Preview: defer Phaser and speech model downloads until activity entry and serve compiled student CSS."
+  "notes": "Preview: open the student login shell before lesson scripts and track startup stages."
 }

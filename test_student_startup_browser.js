@@ -28,13 +28,35 @@ const server = http.createServer(async (req, res) => {
         const errors = [];
         const heavy = [];
         page.on('pageerror', error => errors.push(error.message));
-        await page.route('**/*', route => {
+        let releaseLesson;
+        const lessonGate = new Promise(resolve => { releaseLesson = resolve; });
+        let loginRequests = 0;
+        await page.route('**/*', async route => {
             const url = new URL(route.request().url());
             if (/\/(phaser\.min\.js|speech_adaptive_worker\.js|speech_assets\/|models\/|lib\/wasm\/)/.test(url.pathname)) {
                 heavy.push(url.pathname);
                 return route.abort();
             }
-            return url.origin === origin ? route.continue() : route.abort();
+            if (url.port === '7074' && url.pathname.startsWith('/api/')) {
+                const headers = {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Headers': 'content-type,x-app-key,x-auth-token',
+                    'Access-Control-Allow-Methods': 'GET,POST,OPTIONS'
+                };
+                if (route.request().method() === 'OPTIONS') return route.fulfill({ status: 204, headers });
+                const login = url.pathname === '/api/login';
+                if (login) loginRequests++;
+                return route.fulfill({ headers, json: login ? {
+                    id: 'startup-fixture', fullName: 'Startup fixture', role: 'student',
+                    avatar: '\u{1F642}', book: 'PU1', unit: '1', page: '11'
+                } : { enabled: false, addedEventIds: [], duplicateEventIds: [] } });
+            }
+            if (url.origin !== origin) return route.abort();
+            if (/\.(js|css)$/.test(url.pathname) &&
+                !/\/(config|frontend_auth|client_diagnostics)\.js$/.test(url.pathname)) {
+                await lessonGate;
+            }
+            return route.continue();
         });
         const cdp = await page.context().newCDPSession(page);
         await cdp.send('Network.enable');
@@ -42,22 +64,32 @@ const server = http.createServer(async (req, res) => {
             offline: false, latency: 180, downloadThroughput: 192 * 1024, uploadThroughput: 64 * 1024
         });
 
-        await page.goto(origin + '/index.html');
-        await page.locator('#loginOverlay').waitFor();
-        const username = page.locator('#login-username');
-        await username.fill('fixture');
-        assert.equal(await username.inputValue(), 'fixture');
-        assert.equal(await page.locator('#loginOverlay').evaluate(el => getComputedStyle(el).display), 'flex');
+        await page.goto(origin + '/index.html', { waitUntil: 'commit' });
+        const login = page.locator('#loginOverlay');
+        await login.waitFor();
+        assert.equal(await login.evaluate(el => getComputedStyle(el).display), 'flex');
+        await page.locator('#login-username').fill('fixture');
+        await page.locator('#login-password').fill('fixture');
+        await login.getByRole('button', { name: '\u767b\u5f55', exact: true }).click();
+        await page.getByText('\u6b63\u5728\u52a0\u8f7d\u8bfe\u7a0b…').waitFor();
+        assert.equal(loginRequests, 1);
+        assert.equal(await page.evaluate(() => typeof loadContent), 'undefined');
+        assert.equal(await page.locator('#step-greeting').isVisible(), false);
+        releaseLesson();
 
-        await page.evaluate(() => localStorage.setItem('savedUsers', JSON.stringify([
-            { id: 'fixture', name: 'Saved fixture', avatar: '🙂' }
-        ])));
+        await page.getByText('Hello, Startup fixture!').waitFor();
+        const result = await page.evaluate(() => ({
+            lesson: selectedClassContent,
+            marks: performance.getEntriesByType('mark').filter(e => e.name.startsWith('student-')).map(e => e.name)
+        }));
+        assert.deepEqual(result.lesson, { book: 'PU1', unit: '1', page: '11' });
+        assert.deepEqual(result.marks, ['student-shell-ready', 'student-sign-in-start', 'student-sign-in-response', 'student-lesson-ready']);
         await page.reload();
-        await page.getByText('Saved fixture', { exact: true }).waitFor();
-        assert.equal(await page.locator('#loginOverlay').isVisible(), false);
+        await page.getByText('Startup fixture', { exact: true }).waitFor();
+        assert.equal(await login.isVisible(), false);
         assert.deepEqual(heavy, []);
         assert.deepEqual(errors, []);
-        console.log('PASS login and saved profiles render with no Phaser or speech model requests');
+        console.log('PASS sign-in works while lesson assets are held, the assigned lesson opens after release, and saved profiles render on reload');
     } finally {
         await browser.close();
         server.close();
