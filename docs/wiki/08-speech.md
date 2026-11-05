@@ -1,3 +1,7 @@
+## Student startup
+
+Study entry, the game menu and session restoration start the shared speech model. Signing in does not initiate a model download. The diagnostic Retry control can still start preparation directly.
+
 # Speech Recognition & Pronunciation Scoring
 
 Preview feedback update (2 November 2026): recognised words carry a bottom-right
@@ -142,7 +146,7 @@ The app does **fully in-browser speech recognition** (no server round-trip, no A
 | `speech_recorder.js` (161 ln) | `window.Recorder` | Mic capture via getUserMedia + ScriptProcessor → 16-bit mono WAV (VAD-trimmed) |
 | `speech_scorer.js` (274 ln) | `window.Scorer` | Pass/fail decision: char-accuracy OR WER OR phonetic coverage, per level + per book + **per try** |
 | `speech_ui.js` (601 ln) | `window.SpeechUI` | Record button, sentence gates, junk-audio/hallucination gates, permission recovery, telemetry |
-| `speech_preload.js` (78 ln) | `window.SpeechStatus` | Eager model preload before login; state machine for UI |
+| `speech_preload.js` (78 ln) | `window.SpeechStatus` | Activity-triggered model preparation and status for UI |
 | `speech_debug.js` (153 ln) | `window.__speechLog` + debug panel | On-screen load diagnostics + rolling log + Retry |
 | `speech_sample_capture.js` | `window.SpeechSampleCapture` | ⏳ **Temporary** (2026-10-11 → 2026-10-26): stores the WAV for consented students so ASR changes can be measured. See §11.1 |
 | `sr_engine.js` (329 ln) | pure functions | ⚠️ **Not speech** — "SR" = *Spaced Repetition*. Item selection + SR interval math (see §7) |
@@ -325,7 +329,7 @@ Despite sitting in the speech file cluster, `sr_engine.js` is the **Spaced Repet
 
 ## 8. Model preload & status (`speech_preload.js`)
 
-`SpeechStatus` state machine: `idle → loading → (pct 100) preparing → ready | error | unsupported`. `start()` fires on DOMContentLoaded **before login** so the 41 MB download overlaps the login/lobby time. `supported` requires `LocalEngine` + `Recorder.isSupported()`; unsupported sets a Chinese mic-availability message and stops. `retry()` calls `LocalEngine.resetLoad()` (re-probes mirrors, re-downloads) then restarts — wired to the debug panel's Retry button so a transient download failure recovers without a page reload.
+`SpeechStatus` state machine: `idle → loading → (pct 100) preparing → ready | error | unsupported`. `start()` runs at Study or game entry so downloads can overlap practice. `supported` requires `LocalEngine` + `Recorder.isSupported()`; unsupported sets a Chinese mic-availability message and stops. `retry()` calls `LocalEngine.resetLoad()` (re-probes mirrors, re-downloads) then restarts — wired to the debug panel's Retry button so a transient download failure recovers without a page reload.
 
 `gen_missing_audio.js` is a different "audio" concern — **playback** asset coverage, not recognition: for every unique vocab item in a content file it probes Youdao `dictvoice` (the app's primary TTS; failure = HTTP 500 on "X - Y" combos or < 4 KB bodies) and, with `--generate`, fills gaps via the Sound of Text API (Google TTS, voice en-GB) into `audio_mp3/` using the same sanitized-filename convention as `asset_cache.js audioPath()`.
 

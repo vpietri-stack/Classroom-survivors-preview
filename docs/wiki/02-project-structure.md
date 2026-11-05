@@ -1,3 +1,7 @@
+## Student entry point
+
+The Phaser scripts live in an inert template in index.html and execute in order when the game loader requests them. Student Tailwind utilities are served from lib/student-tailwind.css.
+
 # Project Structure & File Map
 
 `speech_word_collection.html` and `speech_collection_*` form a separate preview-only teacher recorder: 148 words / 333 prompts, IndexedDB audio, reviewed labels and whole-collection backup/restore. It loads no speech model or API. `speech_collection_inspect.cjs` validates private backups and prepares development-only inputs under `.hermes/word-collection/`. See `docs/speech-word-collection.md`.

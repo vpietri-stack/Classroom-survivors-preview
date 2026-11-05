@@ -1,5 +1,5 @@
 {
-  "version": "2026-11-05c",
+  "version": "2026-11-05e",
   "deployedAt": "2026-11-05",
-  "notes": "Separate article preview vocabulary from regular Study and Game."
+  "notes": "Preview: defer Phaser and speech model downloads until activity entry and serve compiled student CSS."
 }

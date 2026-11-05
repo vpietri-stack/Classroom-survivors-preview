@@ -47,7 +47,10 @@ const server = http.createServer((req, res) => {
     });
     const page = await context.newPage(); page.on('pageerror', e => { errors.push(e.message); console.log(e.stack); });
     await page.goto(base + '/Classroom-survivors-preview/index.html');
-    await page.waitForFunction(() => window.StudyRuntime && window.AdaptiveSpeech && __workers.length === 1);
+    await page.waitForFunction(() => window.StudyRuntime && window.AdaptiveSpeech);
+    ok(await page.evaluate(() => __workers.length === 0), 'login does not start speech preparation');
+    await page.evaluate(() => SpeechStatus.start());
+    await page.waitForFunction(() => __workers.length === 1);
     await page.evaluate(() => {
       window.playTTS = () => {}; window.synthError = () => {}; window.playHappySound = () => {}; window.osc = () => {};
       window.__events = []; window.queueExerciseEvent = (...args) => __events.push(args);
@@ -194,7 +197,9 @@ const server = http.createServer((req, res) => {
     await page.evaluate(saved=>GameRuntime.restore(saved),grammarSaved);
     ok(await page.locator('#grammar-speech-gate').count()===0&&await page.locator('#grammar-result-action').isVisible(), 'unavailable model during game sentence recovery exposes the original reward');
     await page.goto(base + '/Classroom-survivors-preview/index.html');
-    await page.waitForFunction(() => window.AdaptiveSpeech && __workers.length === 1);
+    await page.waitForFunction(() => window.AdaptiveSpeech);
+    await page.evaluate(() => showGameSelection());
+    await page.waitForFunction(() => __workers.length === 1);
     await page.clock.install();
     await page.evaluate(() => { __visibility(true); __workers[0].emit({ error: 'background interruption' }); });
     await page.clock.runFor(600000);

@@ -334,21 +334,20 @@
     TD_SPRITES: TD_SPRITES,
     VS_SPRITES: VS_SPRITES,
     MUSIC: MUSIC,
-    SFX: SFX
+    SFX: SFX,
+    warmGames: warmGames
   };
 
-  // Game sprites + BGM + SFX recordings: warm up shortly after load (never
-  // competes with critical page assets; the Whisper model streams from a
-  // different host, no contention). Page content: poll until login/class
-  // selection reveals the current page — re-checks cheaply so a mid-session
-  // page change prefetches the new page too.
+  let gamesWarmed = false;
+  function warmGames() {
+    if (gamesWarmed) return;
+    gamesWarmed = true;
+    prefetch(TD_SPRITES, 'td-sprites');
+    prefetch(VS_SPRITES, 'vs-sprites');
+    prefetch(MUSIC, 'music');
+    prefetch(SFX, 'sfx');
+  }
   function start() {
-    setTimeout(function () {
-      prefetch(TD_SPRITES, 'td-sprites');
-      prefetch(VS_SPRITES, 'vs-sprites');
-      prefetch(MUSIC, 'music');
-      prefetch(SFX, 'sfx');
-    }, 2000);
     setInterval(prefetchCurrentPage, 2000);
   }
   if (document.readyState === 'complete') start();

@@ -1,3 +1,7 @@
+## Phaser startup
+
+Boot owns shared game state on initial load. The game loader initializes Phaser and registers the three scenes on demand. UNO recovery awaits the same loader before restoring the scene. Gomoku uses the existing canvas path.
+
 # Game Modes & Minigames
 
 ## Preview app integration — 1 November 2026

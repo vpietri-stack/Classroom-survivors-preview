@@ -66,6 +66,7 @@
         return null;
     }
     function restore(saved) {
+        w.SpeechStatus?.start?.();
         cancel();
         if (w.PreviewNotes) PreviewNotes.close();
         if (roundDTrace) { roundDTrace.destroy(); roundDTrace = null; }

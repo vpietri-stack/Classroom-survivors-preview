@@ -1,7 +1,6 @@
 /* =========================================================================
  * speech_preload.js  —  invisible, eager model preload.
- * Kicks off the Whisper download+compile on FIRST page load (before login),
- * so the model is ready by the time the student reaches a speech round.
+ * Study and game entry points start model preparation ahead of speech rounds.
  * Exposes window.SpeechStatus for the UI to read (Round B / game mode).
  * ========================================================================= */
 (function (global) {
@@ -73,10 +72,4 @@
 
   global.SpeechStatus = SpeechStatus;
 
-  // Start as early as possible — page parsed, before login.
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function () { SpeechStatus.start(); }, { once: true });
-  } else {
-    SpeechStatus.start();
-  }
 })(window);

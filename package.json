@@ -4,6 +4,7 @@
   "description": "",
   "main": "admin_dashboard.js",
   "scripts": {
+    "build:student-css": "npx --yes tailwindcss@3.4.19 -i scripts/student-tailwind.input.css -o lib/student-tailwind.css --content \"./index.html,./*.js,!./test*.js,!./*.min.js\" --minify",
     "test": "node scripts/checks.mjs --all",
     "test:td": "node test_td_gate.js && node test_td_core.js",
     "test:dashboard-exercises": "node test_dashboard_non_spelling.js",

@@ -1,3 +1,7 @@
+## Speech preparation
+
+Study entry and restoration start the optional speech model in the background. Study exercises can run while the model prepares.
+
 ## Think Starter Unit 4 page 44 preview
 
 Think0 Unit 4 page 44 uses the normal preview catalog and opens automatically for an assigned student until its 25-item recognition and six-paragraph Study session is complete. Completion unlocks the standard notes library. It uses the shared adaptive speech controls on each vocabulary item and article sentence. Study completion earns a normal Study credit and does not update SR. The reader loads images in small grouped packs and audio in two packs. Regular Think0 Unit 4 content is assigned to pages 40, 41, 43 and 44. Page 45 is no longer offered for new assignments. Existing page-45 assignments and resumable sessions retain an internal review boundary and are not automatically rewritten.

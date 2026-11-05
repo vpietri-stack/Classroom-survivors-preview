@@ -1,3 +1,7 @@
+## Student startup coverage
+
+The browser startup test intercepts Phaser and speech model requests, then checks that a fresh login form and saved profiles render independently. The game recovery browser suite exercises on-demand UNO loading during a resume.
+
 ## PU1 page-85 preview coverage (3 November 2026)
 
 `test_pu1_u7_preview.js` checks the retired page, unchanged content counts, all twenty stable typed-board keys, strict page-only random selection, registered completion markers, three source-image dimensions and all 42 saved MP3/hotspot mappings. `test_pu1_u7_preview_browser.js` reuses the full existing login/Study/completion contract with PU1 fixtures, all four real exercise widgets, legacy assignment, automatic advancement, weekly credit and account isolation. The shared browser solver skips the fixed spaces/punctuation in multiword vocabulary like the actual scramble widget. `test_preview_notes_api.js` also verifies the second lesson and duplicate-credit protection. Both content/notes groups and the full suite include the new checks.

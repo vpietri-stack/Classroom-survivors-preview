@@ -82,6 +82,7 @@ function showStudyNotice(msg) {
 
 // Entry point
 function initStudyMode(options = {}) {
+    window.SpeechStatus?.start?.();
     if(window.GameRecovery)GameRecovery.pause();
     const article = window.ArticleStudy?.get(options.previewNoteId);
     const parks = article && authActiveUser && !isTestMode && (!authActiveUser.role || authActiveUser.role === "student");

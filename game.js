@@ -808,6 +808,8 @@ function applyVsPromo() {
 }
 
 function showGameSelection() {
+    window.SpeechStatus?.start?.();
+    window.AssetCache?.warmGames();
     if(window.GameRecovery)GameRecovery.pause();
     if(window.GameRuntime&&GameRuntime.isActive())GameRuntime.suspend();
     // Reset all screens

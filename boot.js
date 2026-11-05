@@ -8,7 +8,6 @@
 
 // --- PHASER CONFIG ---
 const config = {
-    type: Phaser.AUTO,
     width: window.innerWidth,
     height: window.innerHeight,
     parent: null, // dynamically assigned by the game's trigger function
@@ -22,10 +21,7 @@ const config = {
         }
     },
     scene: [], // scenes register themselves via registerScene()
-    scale: {
-        mode: Phaser.Scale.RESIZE,
-        autoCenter: Phaser.Scale.CENTER_BOTH
-    },
+    scale: {},
     input: {
         activePointers: 3
     }
@@ -120,4 +116,58 @@ function exitHiDpi() {
     if (game.canvas) { game.canvas.style.width = ''; game.canvas.style.height = ''; game.canvas.style.margin = ''; }
     game.scale.resize(window.innerWidth, window.innerHeight);
     game.scale.refresh();
+}
+
+// Fetch the shared engine first, then register the scenes in their original order.
+let phaserLoad;
+let phaserScriptsLoaded = 0;
+function ensurePhaserGames() {
+    if (phaserLoad) return phaserLoad;
+    phaserLoad = (async () => {
+        const sources = document.getElementById('phaser-scripts').content.querySelectorAll('script');
+        while (phaserScriptsLoaded < sources.length) {
+            await new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = sources[phaserScriptsLoaded].getAttribute('src');
+                script.onload = resolve;
+                script.onerror = () => {
+                    script.remove();
+                    reject(new Error('Game script unavailable'));
+                };
+                document.head.appendChild(script);
+            });
+            if (phaserScriptsLoaded++ === 0) {
+                config.type = Phaser.AUTO;
+                config.scale.mode = Phaser.Scale.RESIZE;
+                config.scale.autoCenter = Phaser.Scale.CENTER_BOTH;
+            }
+        }
+        window.GameRuntime?.attachUno();
+    })().catch(error => {
+        phaserLoad = null;
+        throw error;
+    });
+    return phaserLoad;
+}
+
+async function openPhaserGame(button, action) {
+    const label = button.textContent;
+    button.disabled = true;
+    button.textContent = '正在加载游戏…';
+    try {
+        await ensurePhaserGames();
+        if (button.getClientRects().length) window[action]();
+        button.textContent = button.dataset.gameLabel || label;
+    } catch (error) {
+        console.warn(error);
+        button.dataset.gameLabel ||= label;
+        button.textContent = '游戏加载失败，点击重试';
+    } finally {
+        button.disabled = false;
+    }
+}
+
+// Preserve the callable entry points for test mode and other direct callers.
+for (const action of ['triggerUno', 'triggerVampireSurvivors', 'triggerTowerDefense']) {
+    window[action] = (...args) => ensurePhaserGames().then(() => window[action](...args));
 }

@@ -1,3 +1,7 @@
+## Student startup
+
+The login and profile UI use precompiled Tailwind CSS. Run `npm run build:student-css` when changing student utility classes and update the stylesheet query when the generated CSS changes. Phaser and the three Phaser scene scripts load on first game entry or UNO resume. Failed game downloads can be retried from the game button. Game media warm-up starts when the game menu opens.
+
 ## PU1 Unit 7 page correction (3 November 2026)
 
 The preview curriculum now groups the former page 84 vocabulary, nine sentences, five sentence pairs and twenty authored non-spelling boards under page 85. Available Unit 7 pages are 83, 85 and 92. The moved content retains `srPage: 84`; normalization carries it to the typed boards so their existing SR keys stay stable while their displayed/selected page is 85. Legacy sentence and pair keys are unchanged. Production curriculum is a separate release.

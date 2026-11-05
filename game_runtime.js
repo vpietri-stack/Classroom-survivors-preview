@@ -9,12 +9,12 @@
     function tick(){if(w.GameRecovery&&!restoring)GameRecovery.capture();}
     function later(kind,fn,ms){clearTimeout(pendingTimer);const token=epoch;pending={kind,due:Date.now()+ms};pendingTimer=setTimeout(()=>{if(token!==epoch)return;pending=null;pendingTimer=null;fn();tick();},ms);tick();return pendingTimer;}
     function cancelQuestion(){epoch++;clearTimeout(pendingTimer);pendingTimer=null;pending=null;clearInterval(recTimer);}
-    function cancel(){cancelQuestion();clearInterval(minigameCountdownInterval);clearInterval(unoESLTimerInterval);unoESLTimerInterval=null;
+    function cancel(){cancelQuestion();clearInterval(minigameCountdownInterval);if (typeof unoESLTimerInterval !== 'undefined') { clearInterval(unoESLTimerInterval); unoESLTimerInterval=null; }
         all('.speech-rec-btn').forEach(b=>{if(b.disposeSpeech)b.disposeSpeech();});
         ['spellingGame','grammarGame'].forEach(id=>{const e=$(id);clearTimeout(e._spellingResetTimer);clearTimeout(e._grammarResetTimer);});
         if(w.NonSpellingFlow)NonSpellingFlow.cleanupGame();
     }
-    function suspend(){restoreSerial++;restoring=false;unoLaunchEpoch++;cancel();gomokuGameActive=false;unoGameActive=false;clearTimeout(gomokuAiTimeout);clearInterval(gomokuSpeedInterval);clearInterval(w.gomokuTimerInterval);clearInterval(w.unoTimerInterval);
+    function suspend(){restoreSerial++;restoring=false;if (typeof unoLaunchEpoch !== 'undefined') { unoLaunchEpoch++; unoGameActive=false; }cancel();gomokuGameActive=false;clearTimeout(gomokuAiTimeout);clearInterval(gomokuSpeedInterval);clearInterval(w.gomokuTimerInterval);clearInterval(w.unoTimerInterval);
         const s=scene();if(s){s.clearAllTurnTimers();game.scene.stop('UnoScene');}unoRestore=null;
         ['gomokuScreen','unoScreen','unoESLOverlay','unoTensionOverlay','spellingGame','wordRecGame','grammarGame','sentenceMatchGame'].forEach(id=>$(id)?.classList.add('hidden'));
     }
@@ -63,7 +63,11 @@
     }
     function applyCommon(saved){selectedClassContent=clone(saved.content);srGameResults=clone(saved.srResults);srInSessionFailures=new Set(saved.ui.failures);srInSessionSuccesses=new Set(saved.ui.successes);srLastServedKey=clone(saved.ui.last);totalMinigameTimeMs=saved.ui.totalQuest;question=saved.ui.question||0;exerciseAttempts=saved.exercise.attempts;exerciseStartTime=Date.now()-saved.exercise.elapsedMs;}
     async function restore(saved){suspend();if(w.PreviewNotes)PreviewNotes.close();const serial=++restoreSerial,runtimeEpoch=epoch;restoring=true;applyCommon(saved);
-        try {if(saved.game==='gomoku'){
+        try {
+        w.SpeechStatus?.start?.();
+        if (saved.game === 'uno' && typeof UnoScene === 'undefined') await ensurePhaserGames();
+        if (runtimeEpoch !== epoch) throw Error('Recovery cancelled');
+        if(saved.game==='gomoku'){
             triggerGomoku(saved.state.mode);clearInterval(gomokuSpeedInterval);clearTimeout(gomokuAiTimeout);const s=saved.state;
             gomokuBoard=clone(s.board);gomokuMode=s.mode;gomokuDifficulty=s.difficulty;gomokuTurn=s.turn;lastGomokuMove=s.last;pendingGomokuMove=s.pendingMove;gomokuViewport={...s.viewport};gomokuAccumulatedTime=s.elapsed;gomokuStartTime=Date.now();currentGomokuSpeedIntervalTime=s.speedInterval;drawGomokuBoard();updateGomokuStatus(s.status);
             if(s.mode==='speed')startGomokuSpeedClock(s.speedRemaining);else if(s.turn==='ai')scheduleGomokuAi(s.aiRemaining);
@@ -84,11 +88,14 @@
         else {s._recoveryBase=clone(v);s._recoveryTask=clone(task);s.time.delayedCall(150,()=>{if(task.kind==='effect')s.handleCardEffect(...task.args);else if(typeof s[task.kind]==='function')s[task.kind](...task.args);});}
         return true;
     }
-    // Keep a serializable intent while an animation/penalty callback is in flight.
-    ['humanPlay','humanSnapCard','humanDrawPending','humanDeclareNoPlay','humanCatchBot','aiTurn','handleCardEffect','handleESLResult'].forEach(name=>{const original=UnoScene.prototype[name];UnoScene.prototype[name]=function(...args){if(enabled()&&!restoring)checkpointUno(this,name==='handleCardEffect'?'effect':name,args);const value=original.apply(this,args);tick();return value;};});
-    const turn=UnoScene.prototype.startTurn;UnoScene.prototype.startTurn=function(){const value=turn.apply(this,arguments);if(enabled()){this._recoveryBase=null;this._recoveryTask={kind:'turn',args:[]};tick();}return value;};
-    const esl=UnoScene.prototype.triggerUnoESL;UnoScene.prototype.triggerUnoESL=function(){const value=esl.apply(this,arguments);if(enabled()){this._recoveryBase=null;this._recoveryTask={kind:'esl',args:[]};tick();}return value;};
-    w.GameRuntime={capture,restore,suspend,isActive:()=>!!current(),restoring:()=>restoring,later,cancel,cancelLater:kind=>{if(pending&&pending.kind===kind){clearTimeout(pendingTimer);pendingTimer=null;pending=null;}},tick,questionId:()=>question,newQuestion:()=>{cancelQuestion();claimed=false;question++;},claim:()=>{if(!enabled()||!w.GameRecovery||!GameRecovery.active())return true;if(claimed)return false;claimed=true;cancelQuestion();return true;},checkpointUno,initUno,unoData,
+    function attachUno() {
+        // Keep a serializable intent while an animation/penalty callback is in flight.
+        ['humanPlay','humanSnapCard','humanDrawPending','humanDeclareNoPlay','humanCatchBot','aiTurn','handleCardEffect','handleESLResult'].forEach(name=>{const original=UnoScene.prototype[name];UnoScene.prototype[name]=function(...args){if(enabled()&&!restoring)checkpointUno(this,name==='handleCardEffect'?'effect':name,args);const value=original.apply(this,args);tick();return value;};});
+        const turn=UnoScene.prototype.startTurn;UnoScene.prototype.startTurn=function(){const value=turn.apply(this,arguments);if(enabled()){this._recoveryBase=null;this._recoveryTask={kind:'turn',args:[]};tick();}return value;};
+        const esl=UnoScene.prototype.triggerUnoESL;UnoScene.prototype.triggerUnoESL=function(){const value=esl.apply(this,arguments);if(enabled()){this._recoveryBase=null;this._recoveryTask={kind:'esl',args:[]};tick();}return value;};
+    }
+    if (typeof UnoScene !== 'undefined') attachUno();
+    w.GameRuntime={attachUno,capture,restore,suspend,isActive:()=>!!current(),restoring:()=>restoring,later,cancel,cancelLater:kind=>{if(pending&&pending.kind===kind){clearTimeout(pendingTimer);pendingTimer=null;pending=null;}},tick,questionId:()=>question,newQuestion:()=>{cancelQuestion();claimed=false;question++;},claim:()=>{if(!enabled()||!w.GameRecovery||!GameRecovery.active())return true;if(claimed)return false;claimed=true;cancelQuestion();return true;},checkpointUno,initUno,unoData,
         updateUnoFlags:s=>{if(s._recoveryBase&&s._recoveryTask&&s._recoveryTask.kind==='next')s._recoveryBase.vulnerable=s.vulnerable.slice();tick();},transition:(s,p,ms,clear=-1)=>checkpointUno(s,'next',[p,clear,ms]),pendingEffect:(s,pi,card)=>checkpointUno(s,'effect',[pi,card]),deal:(s,step)=>checkpointUno(s,'deal',[step]),initialDiscard:(s,card)=>checkpointUno(s,'initialDiscard',[card]),
         tension:(s,ms)=>{s._recoveryTensionUntil=Date.now()+ms;checkpointUno(s,'tension',[]);},win:(s,pi)=>checkpointUno(s,'win',[pi])};
 })(window);
