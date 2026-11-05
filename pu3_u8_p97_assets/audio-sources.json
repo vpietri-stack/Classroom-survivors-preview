@@ -1,0 +1,93 @@
+[
+  {
+    "id": "camping",
+    "text": "We're going to go camping next Friday.",
+    "source": "Sound of Text en-GB",
+    "bytes": 12525
+  },
+  {
+    "id": "negative",
+    "text": "She isn't going to swim tomorrow.",
+    "source": "Sound of Text en-GB",
+    "bytes": 10797
+  },
+  {
+    "id": "boat",
+    "text": "Are you going to take a boat ride?",
+    "source": "Sound of Text en-GB",
+    "bytes": 9549
+  },
+  {
+    "id": "yes",
+    "text": "Yes, I am.",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/20c7e8a0-d21e-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 7245
+  },
+  {
+    "id": "no",
+    "text": "No, I'm not.",
+    "source": "Sound of Text en-GB",
+    "bytes": 7725
+  },
+  {
+    "id": "sunday",
+    "text": "What are you going to do on Sunday?",
+    "source": "Sound of Text en-GB",
+    "bytes": 10509
+  },
+  {
+    "id": "museum",
+    "text": "I'm going to visit the museum.",
+    "source": "Sound of Text en-GB",
+    "bytes": 10029
+  },
+  {
+    "id": "clouds",
+    "text": "Look at those dark clouds!",
+    "source": "Sound of Text en-GB",
+    "bytes": 8877
+  },
+  {
+    "id": "rain",
+    "text": "It's going to rain.",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/e4bf1e30-d8fa-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 7245
+  },
+  {
+    "id": "play",
+    "text": "I'm going to play.",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/e74d1c10-d8fa-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 7149
+  },
+  {
+    "id": "doctor",
+    "text": "She's going to be a doctor.",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/e6205be0-d8fa-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 12621
+  },
+  {
+    "id": "tomorrow",
+    "text": "tomorrow",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=tomorrow",
+    "bytes": 13101
+  },
+  {
+    "id": "next-week",
+    "text": "next week",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=next+week",
+    "bytes": 15309
+  },
+  {
+    "id": "on-sunday",
+    "text": "on Sunday",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=on+Sunday",
+    "bytes": 35382
+  }
+]

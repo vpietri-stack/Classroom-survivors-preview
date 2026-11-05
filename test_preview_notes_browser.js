@@ -3,7 +3,8 @@ const assert=require('node:assert/strict'),http=require('node:http'),fs=require(
 const {chromium}=require('playwright-core');
 const pu1=process.argv.includes('--pu1');
 const pu3p35=process.argv.includes('--pu3-p35');
-const lesson=pu3p35?{book:'PU3',unit:'3',page:'35',previous:'33',id:'pu3-u3-p35',pageCount:6,missing:'M11',secondMissing:'M12',fix:'F16',srKey:'non-spelling:find-fix:pu3:3:40:f16'}:pu1?{book:'PU1',unit:'7',page:'85',previous:'83',id:'pu1-u7-p85',pageCount:3,missing:'M9',secondMissing:'M16',fix:'F20',srKey:'non-spelling:find-fix:pu1:7:84:f20'}:{book:'PU3',unit:'9',page:'111',previous:'110',id:'pu3-u9-p111',pageCount:4,missing:'M1',secondMissing:'M8',fix:'F14',srKey:'non-spelling:find-fix:pu3:9:111:f14'};
+const pu3p97=process.argv.includes('--pu3-p97');
+const lesson=pu3p97?{book:'PU3',unit:'8',page:'97',previous:'95',id:'pu3-u8-p97',pageCount:1,missing:'M7',secondMissing:'M8',fix:'F5',srKey:'non-spelling:find-fix:pu3:8:97:f5'}:pu3p35?{book:'PU3',unit:'3',page:'35',previous:'33',id:'pu3-u3-p35',pageCount:6,missing:'M11',secondMissing:'M12',fix:'F16',srKey:'non-spelling:find-fix:pu3:3:40:f16'}:pu1?{book:'PU1',unit:'7',page:'85',previous:'83',id:'pu1-u7-p85',pageCount:3,missing:'M9',secondMissing:'M16',fix:'F20',srKey:'non-spelling:find-fix:pu1:7:84:f20'}:{book:'PU3',unit:'9',page:'111',previous:'110',id:'pu3-u9-p111',pageCount:4,missing:'M1',secondMissing:'M8',fix:'F14',srKey:'non-spelling:find-fix:pu3:9:111:f14'};
 lesson.placement={book:lesson.book,unit:lesson.unit,page:lesson.page};
 const root=__dirname,qa=path.join(os.tmpdir(),'classroom-preview-notes-integration',lesson.id);fs.mkdirSync(qa,{recursive:true});
 let count=0;function ok(value,label){assert.ok(value,label);count++;console.log('PASS '+label);}

@@ -13,6 +13,16 @@ one Study credit, preserves the old page-40 typed SR keys and unlocks the lesson
 in the review library. The same version-1 note ID is registered in the isolated
 preview API catalog. Production is a separate release.
 
+## PU3 Unit 8 page 97 grammar preview
+
+The preview catalog registers `pu3-u8-p97` at PU3 Unit 8 page 97 and opens
+`pu3_u8_p97_notes.html` for an assigned student. The approved bilingual infographic
+has bundled British English tap audio and the shared optional pronunciation controls.
+Its normal grammar Study uses five of the seven existing page-97 phrases and five
+existing page-97 non-spelling boards. Completion earns the normal Study credit and
+normal SR outcomes, unlocks review, and uses the existing recovery/completion flow.
+No curriculum placement or SR keys change. Frontend and API share the catalog.
+
 ## Speech preparation
 
 Study entry and restoration start the optional speech model in the background. Study exercises can run while the model prepares.

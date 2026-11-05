@@ -6,6 +6,8 @@
         title: 'Power Up 1 · Unit 7 · 第85页', reader: 'pu1_u7_p85_notes.html' },
         { id: 'pu2-u5-p59', book: 'PU2', unit: '5', page: '59', version: 1,
         title: 'Power Up 2 · Unit 5 · 第59页', reader: 'pu2_u5_p59_notes.html' },
+        { id: 'pu3-u8-p97', book: 'PU3', unit: '8', page: '97', version: 1,
+        title: 'Power Up 3 · Unit 8 · 第97页', reader: 'pu3_u8_p97_notes.html' },
         { id: 'pu3-u3-p35', book: 'PU3', unit: '3', page: '35', version: 1,
         title: 'Power Up 3 · Unit 3 · 第34–35页', reader: 'pu3_u3_p35_notes.html' },
         { id: 'think0-u4-p44', book: 'Think0', unit: '4', page: '44', version: 1,
