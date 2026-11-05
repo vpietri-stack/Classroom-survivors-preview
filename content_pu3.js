@@ -1097,7 +1097,7 @@ TEACHING_CONTENT["PU3"] = {
             ]
         },
         "112": {
-            vocab: ["compass","first aid kit","torch","sun cream","pyramid","rainforest","disaster","find your way","daytime","solution","the sun rises","the sun sets","usual","metal needle","rub","magnet","point north","safe"],
+            vocab: ["compass", "first aid kit", "torch", "sun cream", "rainforest", "disaster", "find your way", "daytime", "solution", "sunrise", "sunset", "usual", "magnet", "safe"],
             sentences: [
                 "Day five in Mexico!",
                 "Today was very interesting.",

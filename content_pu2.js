@@ -1471,7 +1471,7 @@ TEACHING_CONTENT["PU2"] = {
 
 // Unit 1 literature page: ordinary game content accompanies the story preview.
 TEACHING_CONTENT["PU2"]["1"]["14"] = {
-    vocab: ['race', 'come on', 'everyone', 'winning', 'fall', 'call', 'come back', 'move', 'last', 'feel sad', 'stop', 'go back', "I'm sorry", 'help'],
+    vocab: ["race", "come on", "everyone", "come back", "move", "last", "stop", "go back", "I'm sorry"],
     sentences: ["Come on, Gwen!", "Jess is their puppy.", "Everyone goes to the field.", "Beth is winning the race.", "There is a rock in the leaves.", "Beth falls on the ground.", "Come back to me!", "I cannot move my leg.", "Gwen does not want to be last.", "She helps her sister to stand."],
     sentencePairs: [
         {a:"Who is Jess?",b:"She is their puppy."}, {a:"Where does Jess live?",b:"She lives in the field."},

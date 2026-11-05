@@ -1,4 +1,5 @@
 const { app } = require('@azure/functions');
+const { pruneRetiredVocab } = require('./shared/retiredVocab');
 const { validateApiKey } = require('./shared/validateApiKey');
 const { getContainer } = require('./shared/db');
 const auth = require('./shared/auth');
@@ -397,6 +398,7 @@ app.http('saveAnalytics', {
                     gameResume.markCredit(user,cleanEvents);
                     srApplied = true;
                 }
+                if (user.srState) user.srState = pruneRetiredVocab(user.srState);
                 sessionCount = user.sessionCount || 0;
 
                 // Automatic rolling archival: if user.analytics gets too large (>=700 events),

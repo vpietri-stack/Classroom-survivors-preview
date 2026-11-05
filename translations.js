@@ -2,6 +2,35 @@
 // Contains simplified Chinese translations for vocabulary and sentences
 
 const LOCAL_TRANSLATIONS = {
+    // Regular vocabulary from the article and story pages
+    "public park": "向公众开放的公园",
+    "almost": "将近",
+    "wide": "宽的",
+    "at one end": "在一端",
+    "green space": "绿地",
+    "iguana": "鬣蜥",
+    "full of": "到处都是",
+    "race": "赛跑；比赛",
+    "come on": "快点儿",
+    "everyone": "每个人",
+    "come back": "回来",
+    "last": "最后一个",
+    "stop": "停下来",
+    "go back": "返回",
+    "I'm sorry": "对不起",
+    "compass": "指南针",
+    "first aid kit": "急救包",
+    "sun cream": "防晒霜",
+    "rainforest": "热带雨林",
+    "disaster": "突发的糟糕情况",
+    "find your way": "找到该走的路",
+    "daytime": "白天",
+    "solution": "解决办法",
+    "sunrise": "日出",
+    "sunset": "日落",
+    "usual": "平常的",
+    "magnet": "磁铁",
+    "safe": "安全的",
 
     // --- School Supplies ---
     "bag": "书包",

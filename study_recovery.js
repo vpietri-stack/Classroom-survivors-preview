@@ -211,7 +211,8 @@
         (u.analytics||[]).concat(typeof analyticsQueue!=='undefined'?analyticsQueue:[])
             .filter(e=>e.type==='session'&&e.sessionType==='study'&&(!e.ownerId||e.ownerId===owner)).slice(-40)
             .forEach(e=>remember(e.data&&e.data.studyRunId||e.eventId));
-        let candidate=local&&local.status==='active'&&core.validate(local.snapshot,owner);
+        const eligible = (saved) => saved && (saved.state.parks || !hasRetiredArticleVocab(saved.state.words || [], saved.content)) ? saved : null;
+        let candidate=local&&local.status==='active'&&eligible(core.validate(local.snapshot,owner));
         if(candidate&&!core.pending(candidate,u.studyRecoveryCompletion))candidate=null;
         try {
             const r=await request();
@@ -220,7 +221,7 @@
                 version=r.data.version||0;
                 const marker=r.data.completed;remember(marker&&marker.runId);
                 if(candidate&&(!core.pending(candidate,marker)||r.data.closedRunId===candidate.runId))candidate=null;
-                let remote=core.validate(r.data.snapshot,owner);
+                let remote=eligible(core.validate(r.data.snapshot,owner));
                 if(remote&&local&&local.status==='completed'&&!core.pending(remote,{runId:local.runId}))remote=null;
                 if(remote&&(!candidate||remote.createdAt>candidate.createdAt||remote.runId===candidate.runId&&remote.seq>candidate.seq))candidate=remote;
             }

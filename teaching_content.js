@@ -674,3 +674,20 @@ function getGameSentencePairsSR(book, unit, page, inSessionFailures, inSessionSu
     return result ? { pageAbsIndex: result.pageAbsIndex, pairs: result.items } : null;
 }
 
+
+
+// Reject old regular checkpoints that contain vocabulary retired from the article pages.
+const retiredArticleVocab = new Set([
+    'get there', 'real name', 'rose garden', 'glass palace', 'call it',
+    'feel sad', 'winning', 'fall / falls', 'call', 'call / calls to someone',
+    'help her to stand', 'pyramid', 'point north', 'metal needle', 'rub',
+    'the sun rises', 'the sun sets'
+]);
+
+function hasRetiredArticleVocab(words, content) {
+    const racePage = content?.book === 'PU2' && String(content.page) === '14';
+    return words.some(word => {
+        const key = typeof word === 'string' ? itemKey(word) : '';
+        return retiredArticleVocab.has(key) || (racePage && (key === 'fall' || key === 'help'));
+    });
+}

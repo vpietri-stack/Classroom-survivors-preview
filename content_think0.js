@@ -757,7 +757,16 @@ TEACHING_CONTENT["Think0"] = {
                 "view",
                 "fantastic",
                 "amazing",
-                "lovely"
+                "lovely",
+                "public park",
+                "almost",
+                "wide",
+                "at one end",
+                "green space",
+                "iguana",
+                "full of",
+                "friendly",
+                "mountain"
             ],
             sentences: [
                 "There is a long bridge near the lake.",

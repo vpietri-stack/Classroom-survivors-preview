@@ -1,3 +1,4 @@
+const { pruneRetiredVocab } = require('./retiredVocab');
 const crypto = require('crypto');
 
 // ============================================================================
@@ -189,6 +190,7 @@ function needsPlaintextRecovery(stored) {
 function publicUser(user) {
     if (!user) return user;
     const { password, _rid, _self, _etag, _attachments, _ts, ...rest } = user;
+    if (rest.srState) rest.srState = pruneRetiredVocab(rest.srState);
     return rest;
 }
 

@@ -206,7 +206,13 @@
         (u.analytics||[]).concat(typeof analyticsQueue!=='undefined'?analyticsQueue:[])
             .filter(e=>e.type==='session'&&['gomoku','uno'].includes(e.sessionType)&&(!e.ownerId||e.ownerId===owner)).slice(-40)
             .forEach(e=>remember(e.data&&e.data.gameRunId||e.eventId));
-        let candidate=local&&local.status==='active'&&core.validate(local.snapshot,owner);
+        const eligible = (saved) => {
+        const mini = saved?.ui?.mini;
+        if (mini && ['spellingGame', 'wordRecGame'].includes(mini.id) &&
+            hasRetiredArticleVocab([mini.tts, ...(mini.choices || []).map(choice => choice.text)], saved.content)) return null;
+        return saved;
+    };
+        let candidate=local&&local.status==='active'&&eligible(core.validate(local.snapshot,owner));
         if(candidate&&!core.pending(candidate,u.gameRecoveryCompletion))candidate=null;
         try {
             const r=await request();
@@ -215,7 +221,7 @@
                 version=r.data.version||0;
                 const marker=r.data.completed;remember(marker&&marker.runId);
                 if(candidate&&(!core.pending(candidate,marker)||r.data.closedRunId===candidate.runId))candidate=null;
-                let remote=core.validate(r.data.snapshot,owner);
+                let remote=eligible(core.validate(r.data.snapshot,owner));
                 if(remote&&local&&local.status==='completed'&&!core.pending(remote,{runId:local.runId}))remote=null;
                 if(remote&&(!candidate||remote.createdAt>candidate.createdAt||remote.runId===candidate.runId&&remote.seq>candidate.seq))candidate=remote;
             }
