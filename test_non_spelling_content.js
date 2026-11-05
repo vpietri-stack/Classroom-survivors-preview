@@ -35,7 +35,7 @@ assert.equal(new Set([...unit1, ...unit2].map(e => e.key)).size, 78, 'Unit 1 and
 assert.equal(unit2.find(e => e.id === 'M2').sentences[1], 'These are the pancakes ___ we ate.', 'M2 retains the approved pancakes replacement');
 assert.equal(unit2.find(e => e.id === 'F9').sentence, "He's the teacher who teaches me English last year.");
 assert.equal(unit2.find(e => e.id === 'F11').sentence, 'This is the tree house which they build last summer.');
-const unit3 = content.buildPool('PU3', 3, 40).entries.filter(e => e.item.id && e.item.unit === '3').map(e => e.item);
+const unit3 = content.buildPool('PU3', 3, 36).entries.filter(e => e.item.id && e.item.unit === '3').map(e => e.item);
 assert.equal(unit3.filter(e => e.type === 'missing-word').length, 22, 'Unit 3 has the approved 22 missing boards');
 const fixes3 = unit3.filter(e => e.type === 'find-fix');
 assert.equal(fixes3.length, 27, 'Unit 3 has the approved 27 distinct fixes');
@@ -44,7 +44,7 @@ assert.ok(!fixes3.some(e => e.id === 'F27'), 'F27 duplicate remains excluded');
 assert.ok(!fixes3.find(e => e.id === 'F28').sentence.includes('but'), 'F28 omits the rejected conjunction');
 assert.equal(unit3.find(e => e.id === 'M22').answers.length, 4, 'M22 retains four blanks');
 assert.equal(new Set([...unit1, ...unit2, ...unit3].map(e => e.key)).size, 127, 'all three units retain scoped SR keys');
-assert.ok(unit3.every(e => e.page === '40'), 'Unit 3 belongs to page 40');
+assert.ok(unit3.every(e => ['31','33','35','36'].includes(e.page)), 'Unit 3 belongs to its textbook lesson groups');
 const unit4 = content.buildPool('PU3', 4, 54).entries.filter(e => e.item.id && e.item.unit === '4').map(e => e.item);
 assert.equal(unit4.filter(e => e.answers).length, 16, 'Unit 4 has 16 approved missing boards');
 assert.equal(unit4.filter(e => e.answer).length, 20, 'Unit 4 has 20 approved fixes');
@@ -53,7 +53,7 @@ assert.equal(unit4.filter(e => e.prefixes).length, 13, 'only the 13 requested bo
 for (const item of unit4.filter(e => e.prefixes)) assert.deepEqual(item.prefixes, item.answers.map(a => a[0]));
 assert.equal(unit4.find(e => e.id === 'F14').wrongWord, 'then', 'F14 avoids the ambiguous as repair');
 assert.equal(new Set([...unit1, ...unit2, ...unit3, ...unit4].map(e => e.key)).size, 163, 'four units retain scoped keys');
-assert.equal(content.buildPool('PU3', 3, 40).entries.some(e => e.item.unit === '4'), false, 'Unit 4 cannot appear early');
+assert.equal(content.buildPool('PU3', 3, 36).entries.some(e => e.item.unit === '4'), false, 'Unit 4 cannot appear early');
 const unit5 = content.buildPool('PU3', 5, 66).entries.filter(e => e.item.id && e.item.unit === '5').map(e => e.item);
 assert.equal(unit5.filter(e => e.answers).length, 16, 'Unit 5 has 16 approved missing boards');
 assert.equal(unit5.filter(e => e.answer).length, 20, 'Unit 5 has 20 approved fixes');
@@ -602,7 +602,7 @@ for (let sample = 0; sample < 100; sample++) {
     const next = content.select('PU3', 2, 28, 5);
     assert.equal(next.length, 5);
     assert.ok(new Set(next.map(e => e.type)).size >= 3, 'Unit 2 selects a varied five-board round');
-    const third = content.select('PU3', 3, 40, 5);
+    const third = content.select('PU3', 3, 36, 5);
     assert.equal(third.length, 5);
     assert.ok(new Set(third.map(e => e.type)).size >= 3, 'Unit 3 selects a varied five-board round');
 }

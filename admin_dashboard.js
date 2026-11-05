@@ -89,9 +89,11 @@ function populatePageSelect(selId, book, unit, currentVal) {
         const ps = String(p);
         sel.innerHTML += `<option value="${ps}" ${ps===String(currentVal)?'selected':''}>${ps}</option>`;
     });
-    // Preserve an existing page-45 assignment when editing other settings.
-    if (selId === 'settingsPage' && book === 'Think0' && String(unit) === '4' && String(currentVal) === '45') {
-        const legacy = new Option('45 (existing assignment)', '45', true, true);
+    // Preserve retired review-page assignments when editing unrelated settings.
+    const existingReview = (book === 'Think0' && String(unit) === '4' && String(currentVal) === '45')
+        || (book === 'PU3' && String(unit) === '3' && String(currentVal) === '40');
+    if (selId === 'settingsPage' && existingReview) {
+        const legacy = new Option(currentVal + ' (existing assignment)', String(currentVal), true, true);
         legacy.disabled = true;
         sel.add(legacy);
     }

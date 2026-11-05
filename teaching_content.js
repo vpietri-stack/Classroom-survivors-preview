@@ -224,6 +224,13 @@ function getSortedPagesForBook(book) {
             if (b === 'Think0' && unit === '4' && legacyPage && !pages.some(page => String(page) === '45')) {
                 pages.push(45);
             }
+            // Retain the old Unit 3 review boundary only for its existing placement/resume.
+            const legacyPU3 = [authActiveUser, selectedClassContent].some(placement =>
+                placement && placement.book === 'PU3'
+                && String(placement.unit) === '3' && String(placement.page) === '40');
+            if (b === 'PU3' && unit === '3' && legacyPU3 && !pages.some(page => String(page) === '40')) {
+                pages.push(40);
+            }
             pages.sort((a, b) => parseInt(a) - parseInt(b));
             pages.forEach(page => {
                 sorted.push({ book: b, unit, page: page.toString(), absIndex: absIndex++ });

@@ -1129,11 +1129,32 @@ TEACHING_CONTENT["PU3"] = {
     },
 };
 
+// Unit 3 keeps its original page-40 bank for existing assignments/checkpoints.
+// New assignments use the textbook lesson groups; wording and SR string keys stay unchanged.
+(() => {
+    const unit = TEACHING_CONTENT.PU3['3'];
+    const review = unit['40'];
+    const take = (items, positions) => positions.map(position => items[position - 1]);
+    const groups = {
+        31: { vocab: [1,2,3,4,5,6,7,8,9], sentences: [18], pairs: [9] },
+        33: { vocab: [21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36],
+            sentences: [1,2,3,5,6,7,8,9,10,25,26,27], pairs: [1,2,3,7,8,10] },
+        35: { vocab: [13,14,15,16,17,18,19,20,37,38],
+            sentences: [4,11,12,13,14,15,16,17,23,24], pairs: [4,5,6] },
+        36: { vocab: [10,11,12], sentences: [19,20,21,22], pairs: [] }
+    };
+    for (const [page, group] of Object.entries(groups)) {
+        unit[page] = { srPage: '40', vocab: take(review.vocab, group.vocab),
+            sentences: take(review.sentences, group.sentences),
+            sentencePairs: take(review.sentencePairs, group.pairs) };
+    }
+})();
+
 AVAILABLE_CONTENT["PU3"] = {
     "0": [5],
     "1": [16],
     "2": [28],
-    "3": [40],
+    "3": [31, 33, 35, 36],
     "4": [54],
     "5": [57, 59, 66],
     "6": [69, 71, 73],

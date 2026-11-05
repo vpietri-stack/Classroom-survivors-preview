@@ -1,3 +1,16 @@
+## PU3 Unit 3 lesson grouping (5 November 2026)
+
+Preview assignments use pages 31 (body vocabulary), 33 (printed pp.32–33,
+comparison grammar), 35 (printed pp.34–35, health and want/need), and 36 (printed
+pp.36–37, anatomy). No existing bank items specifically cover the pp.38–39 story.
+The original page-40 bank stays internal for existing assignments and resumed
+sessions; it is absent from new assignment choices and cannot become a new
+automatic assignment. Existing page-40 settings remain visible when editing a
+student. Vocabulary, scramble and pair wording remains unchanged. Split pages
+retain `srPage: '40'` for all 49 authored typed boards, preserving their SR keys.
+Conservation, selection boundaries and legacy compatibility are covered by
+`test_pu3_unit3_distribution.js`.
+
 ## Student startup
 
 The login and saved-profile shell initializes before the deferred lesson scripts and general stylesheet links. Inline fallback styling keeps the form usable when the stylesheet downloads stall. The shared runtime still executes in order and can warm in parallel with sign-in.
