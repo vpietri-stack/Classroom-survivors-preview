@@ -22,6 +22,13 @@ practice. The vocabulary clips use Youdao type 1 and sentences use Sound of Text
 en-GB; source metadata stays with the assets. All six images preserve their
 original dimensions and fit the existing WebP lesson budget.
 
+The media loading follow-up reduces six WebP images from 1,452,186 to 1,053,602
+bytes at unchanged dimensions and the 53 mono MP3s from 873,455 to 377,133 bytes.
+The initial media is one image and one audio pack (184,351 bytes), replacing the
+1,371,012-byte first-image/base64-bundle download. AssetCache provides persistent
+mirror/origin-backed media; later pages warm on approach. Study and completion
+versions remain unchanged, so students do not repeat an already completed intro.
+
 The existing intro/Study/library flow selects five words and five non-spelling
 boards strictly from the already approved page-35 bank. Normal completion grants
 one Study credit, preserves the old page-40 typed SR keys and unlocks the lesson

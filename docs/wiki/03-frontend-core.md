@@ -13,6 +13,17 @@ Conservation, selection boundaries and legacy compatibility are covered by
 
 ## Student startup
 
+PU3 Unit 3 page 35 uses the existing AssetCache/IndexedDB system for its six
+infographics and six binary audio packs. Group token `pu3-u3-p35-v2` invalidates
+the earlier media only. `getBlobUrl(path, { race: true })` retains memory/IDB-first
+lookup, then races mirror/origin on a miss and cancels the slower source; other
+callers retain the original sequential background policy. The lesson loader warms
+only the first page initially and observes later images with a 450px margin.
+Audio packs preserve each MP3 byte range and deduplicate clips shared by pages.
+The shared notes reader's optional loadImage/loadAudio hooks are inactive for
+older lessons. The old base64 bundle stays available for cached old HTML but is
+not loaded by the updated reader.
+
 The login and saved-profile shell initializes before the deferred lesson scripts and general stylesheet links. Inline fallback styling keeps the form usable when the stylesheet downloads stall. The shared runtime still executes in order and can warm in parallel with sign-in.
 
 The login and profile UI use precompiled Tailwind CSS. Run `npm run build:student-css` when changing student utility classes and update the stylesheet query when the generated CSS changes. Phaser and the three Phaser scene scripts load on first game entry or UNO resume. Failed game downloads can be retried from the game button. Game media warm-up starts when the game menu opens.

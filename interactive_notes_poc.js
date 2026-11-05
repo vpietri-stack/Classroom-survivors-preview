@@ -82,7 +82,12 @@
       timer = setTimeout(onFailure, 4000);
       audio.play().catch(onFailure);
     }
-    startAudio(audioCache.get(clip.audio) || clip.audio);
+    if (lesson.loadAudio) {
+      $('playerStatus').textContent = '正在加载这段音频，请稍等…';
+      lesson.loadAudio(id).then(source => {
+        if (token === generation) { usedBlob = true; startAudio(source); }
+      }).catch(error => { if (token === generation) failed(error); });
+    } else startAudio(audioCache.get(clip.audio) || clip.audio);
   }
   lesson.pages.forEach((page, index) => {
     const article = document.createElement('article'); article.className = 'note-page'; article.id = 'page-' + (index + 1);
@@ -91,7 +96,10 @@
     const title = document.createElement('span'); title.textContent = page.title; label.append(number, title);
     const viewport = document.createElement('div'); viewport.className = 'paper-viewport';
     const paper = document.createElement('div'); paper.className = 'paper'; paper.style.aspectRatio = page.width + ' / ' + page.height;
-    const image = document.createElement('img'); image.className = 'page-image'; image.src = (lesson.assetBase || 'interactive_notes_assets/') + page.file;
+    const image = document.createElement('img'); image.className = 'page-image';
+    const imagePath = (lesson.assetBase || 'interactive_notes_assets/') + page.file;
+    if (lesson.loadImage) lesson.loadImage(image, imagePath, index);
+    else image.src = imagePath;
     image.alt = (lesson.label || 'PU3 Unit 9 p.111') + ' 预习图，第 ' + (index + 1) + ' 页：' + page.title;
     image.width = page.width; image.height = page.height; image.draggable = false;
     if (index > 0) image.loading = 'lazy';

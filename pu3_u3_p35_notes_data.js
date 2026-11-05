@@ -131,6 +131,9 @@
           ],
           "kind": "text"
         }
+      ],
+      "audioPacks": [
+        1
       ]
     },
     {
@@ -259,6 +262,9 @@
           ],
           "kind": "text"
         }
+      ],
+      "audioPacks": [
+        2
       ]
     },
     {
@@ -407,6 +413,9 @@
           ],
           "kind": "text"
         }
+      ],
+      "audioPacks": [
+        3
       ]
     },
     {
@@ -595,6 +604,9 @@
           ],
           "kind": "word"
         }
+      ],
+      "audioPacks": [
+        4
       ]
     },
     {
@@ -803,6 +815,10 @@
           ],
           "kind": "word"
         }
+      ],
+      "audioPacks": [
+        5,
+        4
       ]
     },
     {
@@ -931,6 +947,11 @@
           ],
           "kind": "word"
         }
+      ],
+      "audioPacks": [
+        6,
+        3,
+        4
       ]
     }
   ],
@@ -940,371 +961,636 @@
       "text": "cough",
       "translation": "咳嗽",
       "kind": "word",
-      "audio": "pu3_u3_p35_assets/audio/cough.mp3"
+      "audio": "pu3_u3_p35_assets/audio/cough.mp3",
+      "audioPack": [
+        1,
+        0,
+        6556
+      ]
     },
     "temperature": {
       "id": "temperature",
       "text": "temperature",
       "translation": "体温；这里指发烧",
       "kind": "word",
-      "audio": "pu3_u3_p35_assets/audio/temperature.mp3"
+      "audio": "pu3_u3_p35_assets/audio/temperature.mp3",
+      "audioPack": [
+        1,
+        12903,
+        4675
+      ]
     },
     "sore-throat": {
       "id": "sore-throat",
       "text": "sore throat",
       "translation": "喉咙痛",
       "kind": "word",
-      "audio": "pu3_u3_p35_assets/audio/sore-throat.mp3"
+      "audio": "pu3_u3_p35_assets/audio/sore-throat.mp3",
+      "audioPack": [
+        1,
+        25910,
+        4884
+      ]
     },
     "cold": {
       "id": "cold",
       "text": "cold",
       "translation": "感冒；冷的",
       "kind": "word",
-      "audio": "pu3_u3_p35_assets/audio/cold.mp3"
+      "audio": "pu3_u3_p35_assets/audio/cold.mp3",
+      "audioPack": [
+        2,
+        0,
+        5302
+      ]
     },
     "backache": {
       "id": "backache",
       "text": "backache",
       "translation": "背痛",
       "kind": "word",
-      "audio": "pu3_u3_p35_assets/audio/backache.mp3"
+      "audio": "pu3_u3_p35_assets/audio/backache.mp3",
+      "audioPack": [
+        2,
+        12171,
+        5824
+      ]
     },
     "stomach-ache": {
       "id": "stomach-ache",
       "text": "stomach-ache",
       "translation": "胃痛；肚子痛",
       "kind": "word",
-      "audio": "pu3_u3_p35_assets/audio/stomach-ache.mp3"
+      "audio": "pu3_u3_p35_assets/audio/stomach-ache.mp3",
+      "audioPack": [
+        2,
+        25387,
+        8019
+      ]
     },
     "headache": {
       "id": "headache",
       "text": "headache",
       "translation": "头痛",
       "kind": "word",
-      "audio": "pu3_u3_p35_assets/audio/headache.mp3"
+      "audio": "pu3_u3_p35_assets/audio/headache.mp3",
+      "audioPack": [
+        3,
+        0,
+        5406
+      ]
     },
     "toothache": {
       "id": "toothache",
       "text": "toothache",
       "translation": "牙痛",
       "kind": "word",
-      "audio": "pu3_u3_p35_assets/audio/toothache.mp3"
+      "audio": "pu3_u3_p35_assets/audio/toothache.mp3",
+      "audioPack": [
+        3,
+        12066,
+        6451
+      ]
     },
     "ill": {
       "id": "ill",
       "text": "ill",
       "translation": "生病的；不舒服的",
       "kind": "word",
-      "audio": "pu3_u3_p35_assets/audio/ill.mp3"
+      "audio": "pu3_u3_p35_assets/audio/ill.mp3",
+      "audioPack": [
+        3,
+        32360,
+        4780
+      ]
     },
     "sick": {
       "id": "sick",
       "text": "sick",
       "translation": "生病的；不舒服的",
       "kind": "word",
-      "audio": "pu3_u3_p35_assets/audio/sick.mp3"
+      "audio": "pu3_u3_p35_assets/audio/sick.mp3",
+      "audioPack": [
+        3,
+        37140,
+        6138
+      ]
     },
     "want-to": {
       "id": "want-to",
       "text": "want to",
       "translation": "想要做",
       "kind": "word",
-      "audio": "pu3_u3_p35_assets/audio/want-to.mp3"
+      "audio": "pu3_u3_p35_assets/audio/want-to.mp3",
+      "audioPack": [
+        4,
+        0,
+        4675
+      ]
     },
     "need-to": {
       "id": "need-to",
       "text": "need to",
       "translation": "需要做",
       "kind": "word",
-      "audio": "pu3_u3_p35_assets/audio/need-to.mp3"
+      "audio": "pu3_u3_p35_assets/audio/need-to.mp3",
+      "audioPack": [
+        4,
+        4675,
+        4989
+      ]
     },
     "play": {
       "id": "play",
       "text": "play",
       "translation": "玩",
       "kind": "word",
-      "audio": "pu3_u3_p35_assets/audio/play.mp3"
+      "audio": "pu3_u3_p35_assets/audio/play.mp3",
+      "audioPack": [
+        4,
+        33929,
+        5093
+      ]
     },
     "rest": {
       "id": "rest",
       "text": "rest",
       "translation": "休息",
       "kind": "word",
-      "audio": "pu3_u3_p35_assets/audio/rest.mp3"
+      "audio": "pu3_u3_p35_assets/audio/rest.mp3",
+      "audioPack": [
+        4,
+        44846,
+        5824
+      ]
     },
     "dont": {
       "id": "dont",
       "text": "don't",
       "translation": "do not 的缩写",
       "kind": "word",
-      "audio": "pu3_u3_p35_assets/audio/dont.mp3"
+      "audio": "pu3_u3_p35_assets/audio/dont.mp3",
+      "audioPack": [
+        5,
+        0,
+        5406
+      ]
     },
     "doesnt": {
       "id": "doesnt",
       "text": "doesn't",
       "translation": "does not 的缩写",
       "kind": "word",
-      "audio": "pu3_u3_p35_assets/audio/doesnt.mp3"
+      "audio": "pu3_u3_p35_assets/audio/doesnt.mp3",
+      "audioPack": [
+        5,
+        5406,
+        4048
+      ]
     },
     "do": {
       "id": "do",
       "text": "do",
       "translation": "助动词 do",
       "kind": "word",
-      "audio": "pu3_u3_p35_assets/audio/do.mp3"
+      "audio": "pu3_u3_p35_assets/audio/do.mp3",
+      "audioPack": [
+        5,
+        27164,
+        4884
+      ]
     },
     "does": {
       "id": "does",
       "text": "does",
       "translation": "助动词 does",
       "kind": "word",
-      "audio": "pu3_u3_p35_assets/audio/does.mp3"
+      "audio": "pu3_u3_p35_assets/audio/does.mp3",
+      "audioPack": [
+        5,
+        32048,
+        3317
+      ]
     },
     "but": {
       "id": "but",
       "text": "but",
       "translation": "但是",
       "kind": "word",
-      "audio": "pu3_u3_p35_assets/audio/but.mp3"
+      "audio": "pu3_u3_p35_assets/audio/but.mp3",
+      "audioPack": [
+        6,
+        0,
+        3526
+      ]
     },
     "want": {
       "id": "want",
       "text": "want",
       "translation": "想要",
       "kind": "word",
-      "audio": "pu3_u3_p35_assets/audio/want.mp3"
+      "audio": "pu3_u3_p35_assets/audio/want.mp3",
+      "audioPack": [
+        4,
+        28418,
+        5511
+      ]
     },
     "wants": {
       "id": "wants",
       "text": "wants",
       "translation": "想要（第三人称单数）",
       "kind": "word",
-      "audio": "pu3_u3_p35_assets/audio/wants.mp3"
+      "audio": "pu3_u3_p35_assets/audio/wants.mp3",
+      "audioPack": [
+        4,
+        70469,
+        4257
+      ]
     },
     "need": {
       "id": "need",
       "text": "need",
       "translation": "需要",
       "kind": "word",
-      "audio": "pu3_u3_p35_assets/audio/need.mp3"
+      "audio": "pu3_u3_p35_assets/audio/need.mp3",
+      "audioPack": [
+        4,
+        39022,
+        5824
+      ]
     },
     "needs": {
       "id": "needs",
       "text": "needs",
       "translation": "需要（第三人称单数）",
       "kind": "word",
-      "audio": "pu3_u3_p35_assets/audio/needs.mp3"
+      "audio": "pu3_u3_p35_assets/audio/needs.mp3",
+      "audioPack": [
+        4,
+        74726,
+        6451
+      ]
     },
     "have-cough": {
       "id": "have-cough",
       "text": "I've got a cough.",
       "translation": "我咳嗽了。",
       "kind": "sentence",
-      "audio": "pu3_u3_p35_assets/audio/have-cough.mp3"
+      "audio": "pu3_u3_p35_assets/audio/have-cough.mp3",
+      "audioPack": [
+        1,
+        6556,
+        6347
+      ]
     },
     "has-temperature": {
       "id": "has-temperature",
       "text": "She's got a temperature.",
       "translation": "她发烧了。",
       "kind": "sentence",
-      "audio": "pu3_u3_p35_assets/audio/has-temperature.mp3"
+      "audio": "pu3_u3_p35_assets/audio/has-temperature.mp3",
+      "audioPack": [
+        1,
+        17578,
+        8332
+      ]
     },
     "have-sore-throat": {
       "id": "have-sore-throat",
       "text": "I've got a sore throat.",
       "translation": "我喉咙痛。",
       "kind": "sentence",
-      "audio": "pu3_u3_p35_assets/audio/have-sore-throat.mp3"
+      "audio": "pu3_u3_p35_assets/audio/have-sore-throat.mp3",
+      "audioPack": [
+        1,
+        30794,
+        8437
+      ]
     },
     "has-cold": {
       "id": "has-cold",
       "text": "He's got a cold.",
       "translation": "他感冒了。",
       "kind": "sentence",
-      "audio": "pu3_u3_p35_assets/audio/has-cold.mp3"
+      "audio": "pu3_u3_p35_assets/audio/has-cold.mp3",
+      "audioPack": [
+        2,
+        5302,
+        6869
+      ]
     },
     "back-hurts": {
       "id": "back-hurts",
       "text": "My back hurts.",
       "translation": "我的背疼。",
       "kind": "sentence",
-      "audio": "pu3_u3_p35_assets/audio/back-hurts.mp3"
+      "audio": "pu3_u3_p35_assets/audio/back-hurts.mp3",
+      "audioPack": [
+        2,
+        17995,
+        7392
+      ]
     },
     "have-stomach-ache": {
       "id": "have-stomach-ache",
       "text": "I've got a stomach-ache.",
       "translation": "我肚子痛。",
       "kind": "sentence",
-      "audio": "pu3_u3_p35_assets/audio/have-stomach-ache.mp3"
+      "audio": "pu3_u3_p35_assets/audio/have-stomach-ache.mp3",
+      "audioPack": [
+        2,
+        33406,
+        8332
+      ]
     },
     "have-headache": {
       "id": "have-headache",
       "text": "I've got a headache.",
       "translation": "我头痛。",
       "kind": "sentence",
-      "audio": "pu3_u3_p35_assets/audio/have-headache.mp3"
+      "audio": "pu3_u3_p35_assets/audio/have-headache.mp3",
+      "audioPack": [
+        3,
+        5406,
+        6660
+      ]
     },
     "has-toothache": {
       "id": "has-toothache",
       "text": "She's got a toothache.",
       "translation": "她牙痛。",
       "kind": "sentence",
-      "audio": "pu3_u3_p35_assets/audio/has-toothache.mp3"
+      "audio": "pu3_u3_p35_assets/audio/has-toothache.mp3",
+      "audioPack": [
+        3,
+        18517,
+        7392
+      ]
     },
     "feel-ill": {
       "id": "feel-ill",
       "text": "I feel ill.",
       "translation": "我觉得不舒服。",
       "kind": "sentence",
-      "audio": "pu3_u3_p35_assets/audio/feel-ill.mp3"
+      "audio": "pu3_u3_p35_assets/audio/feel-ill.mp3",
+      "audioPack": [
+        3,
+        25909,
+        6451
+      ]
     },
     "matter": {
       "id": "matter",
       "text": "What's the matter?",
       "translation": "怎么了？",
       "kind": "sentence",
-      "audio": "pu3_u3_p35_assets/audio/matter.mp3"
+      "audio": "pu3_u3_p35_assets/audio/matter.mp3",
+      "audioPack": [
+        3,
+        43278,
+        6660
+      ]
     },
     "knee-hurts": {
       "id": "knee-hurts",
       "text": "My knee hurts.",
       "translation": "我的膝盖疼。",
       "kind": "sentence",
-      "audio": "pu3_u3_p35_assets/audio/knee-hurts.mp3"
+      "audio": "pu3_u3_p35_assets/audio/knee-hurts.mp3",
+      "audioPack": [
+        3,
+        49938,
+        6974
+      ]
     },
     "fly-kite": {
       "id": "fly-kite",
       "text": "I want to fly my kite.",
       "translation": "我想放风筝。",
       "kind": "sentence",
-      "audio": "pu3_u3_p35_assets/audio/fly-kite.mp3"
+      "audio": "pu3_u3_p35_assets/audio/fly-kite.mp3",
+      "audioPack": [
+        4,
+        9664,
+        9377
+      ]
     },
     "finish-homework": {
       "id": "finish-homework",
       "text": "I need to finish my homework.",
       "translation": "我需要完成作业。",
       "kind": "sentence",
-      "audio": "pu3_u3_p35_assets/audio/finish-homework.mp3"
+      "audio": "pu3_u3_p35_assets/audio/finish-homework.mp3",
+      "audioPack": [
+        4,
+        19041,
+        9377
+      ]
     },
     "draw-picture": {
       "id": "draw-picture",
       "text": "She wants to draw a picture.",
       "translation": "她想画一幅画。",
       "kind": "sentence",
-      "audio": "pu3_u3_p35_assets/audio/draw-picture.mp3"
+      "audio": "pu3_u3_p35_assets/audio/draw-picture.mp3",
+      "audioPack": [
+        4,
+        50670,
+        9586
+      ]
     },
     "get-paper": {
       "id": "get-paper",
       "text": "She needs to get some paper.",
       "translation": "她需要拿一些纸。",
       "kind": "sentence",
-      "audio": "pu3_u3_p35_assets/audio/get-paper.mp3"
+      "audio": "pu3_u3_p35_assets/audio/get-paper.mp3",
+      "audioPack": [
+        4,
+        60256,
+        10213
+      ]
     },
     "dont-football": {
       "id": "dont-football",
       "text": "I don't want to play football.",
       "translation": "我不想踢足球。",
       "kind": "sentence",
-      "audio": "pu3_u3_p35_assets/audio/dont-football.mp3"
+      "audio": "pu3_u3_p35_assets/audio/dont-football.mp3",
+      "audioPack": [
+        5,
+        9454,
+        9064
+      ]
     },
     "doesnt-sing": {
       "id": "doesnt-sing",
       "text": "She doesn't want to sing.",
       "translation": "她不想唱歌。",
       "kind": "sentence",
-      "audio": "pu3_u3_p35_assets/audio/doesnt-sing.mp3"
+      "audio": "pu3_u3_p35_assets/audio/doesnt-sing.mp3",
+      "audioPack": [
+        5,
+        18518,
+        8646
+      ]
     },
     "want-read": {
       "id": "want-read",
       "text": "Do you want to read?",
       "translation": "你想读书吗？",
       "kind": "sentence",
-      "audio": "pu3_u3_p35_assets/audio/want-read.mp3"
+      "audio": "pu3_u3_p35_assets/audio/want-read.mp3",
+      "audioPack": [
+        5,
+        35365,
+        6451
+      ]
     },
     "yes-do": {
       "id": "yes-do",
       "text": "Yes, I do.",
       "translation": "是的，我想。",
       "kind": "sentence",
-      "audio": "pu3_u3_p35_assets/audio/yes-do.mp3"
+      "audio": "pu3_u3_p35_assets/audio/yes-do.mp3",
+      "audioPack": [
+        5,
+        41816,
+        7392
+      ]
     },
     "want-dance": {
       "id": "want-dance",
       "text": "Does she want to dance?",
       "translation": "她想跳舞吗？",
       "kind": "sentence",
-      "audio": "pu3_u3_p35_assets/audio/want-dance.mp3"
+      "audio": "pu3_u3_p35_assets/audio/want-dance.mp3",
+      "audioPack": [
+        5,
+        49208,
+        7914
+      ]
     },
     "no-doesnt": {
       "id": "no-doesnt",
       "text": "No, she doesn't.",
       "translation": "不，她不想。",
       "kind": "sentence",
-      "audio": "pu3_u3_p35_assets/audio/no-doesnt.mp3"
+      "audio": "pu3_u3_p35_assets/audio/no-doesnt.mp3",
+      "audioPack": [
+        5,
+        57122,
+        8750
+      ]
     },
     "what-want": {
       "id": "what-want",
       "text": "What do you want to do?",
       "translation": "你想做什么？",
       "kind": "sentence",
-      "audio": "pu3_u3_p35_assets/audio/what-want.mp3"
+      "audio": "pu3_u3_p35_assets/audio/what-want.mp3",
+      "audioPack": [
+        5,
+        65872,
+        7914
+      ]
     },
     "play-game": {
       "id": "play-game",
       "text": "I want to play a game.",
       "translation": "我想玩游戏。",
       "kind": "sentence",
-      "audio": "pu3_u3_p35_assets/audio/play-game.mp3"
+      "audio": "pu3_u3_p35_assets/audio/play-game.mp3",
+      "audioPack": [
+        5,
+        73786,
+        8437
+      ]
     },
     "what-need": {
       "id": "what-need",
       "text": "What do you need to do?",
       "translation": "你需要做什么？",
       "kind": "sentence",
-      "audio": "pu3_u3_p35_assets/audio/what-need.mp3"
+      "audio": "pu3_u3_p35_assets/audio/what-need.mp3",
+      "audioPack": [
+        5,
+        82223,
+        7601
+      ]
     },
     "pack-bag": {
       "id": "pack-bag",
       "text": "I need to pack my bag.",
       "translation": "我需要整理书包。",
       "kind": "sentence",
-      "audio": "pu3_u3_p35_assets/audio/pack-bag.mp3"
+      "audio": "pu3_u3_p35_assets/audio/pack-bag.mp3",
+      "audioPack": [
+        5,
+        89824,
+        8332
+      ]
     },
     "outside-raining": {
       "id": "outside-raining",
       "text": "I want to play outside, but it's raining.",
       "translation": "我想在外面玩，但是正在下雨。",
       "kind": "sentence",
-      "audio": "pu3_u3_p35_assets/audio/outside-raining.mp3"
+      "audio": "pu3_u3_p35_assets/audio/outside-raining.mp3",
+      "audioPack": [
+        6,
+        3526,
+        13661
+      ]
     },
     "play-homework": {
       "id": "play-homework",
       "text": "She wants to play, but she needs to finish her homework.",
       "translation": "她想玩，但是她需要完成作业。",
       "kind": "sentence",
-      "audio": "pu3_u3_p35_assets/audio/play-homework.mp3"
+      "audio": "pu3_u3_p35_assets/audio/play-homework.mp3",
+      "audioPack": [
+        6,
+        17187,
+        17005
+      ]
     },
     "have-cold": {
       "id": "have-cold",
       "text": "I've got a cold.",
       "translation": "我感冒了。",
       "kind": "sentence",
-      "audio": "pu3_u3_p35_assets/audio/have-cold.mp3"
+      "audio": "pu3_u3_p35_assets/audio/have-cold.mp3",
+      "audioPack": [
+        6,
+        34192,
+        6869
+      ]
     },
     "play-ill": {
       "id": "play-ill",
       "text": "I want to play, but I feel ill.",
       "translation": "我想玩，但是我觉得不舒服。",
       "kind": "sentence",
-      "audio": "pu3_u3_p35_assets/audio/play-ill.mp3"
+      "audio": "pu3_u3_p35_assets/audio/play-ill.mp3",
+      "audioPack": [
+        6,
+        41061,
+        11989
+      ]
     },
     "need-rest": {
       "id": "need-rest",
       "text": "You need to rest.",
       "translation": "你需要休息。",
       "kind": "sentence",
-      "audio": "pu3_u3_p35_assets/audio/need-rest.mp3"
+      "audio": "pu3_u3_p35_assets/audio/need-rest.mp3",
+      "audioPack": [
+        6,
+        53050,
+        6869
+      ]
     }
   }
 };root.InteractiveNotesData=lesson;if(typeof module!=='undefined'&&module.exports)module.exports=lesson;})(typeof window!=='undefined'?window:globalThis);

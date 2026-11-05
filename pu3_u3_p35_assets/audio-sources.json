@@ -5,7 +5,8 @@
     "kind": "word",
     "source": "Youdao British English (type=1)",
     "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=cough",
-    "bytes": 12717
+    "bytes": 6556,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "temperature",
@@ -13,7 +14,8 @@
     "kind": "word",
     "source": "Youdao British English (type=1)",
     "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=temperature",
-    "bytes": 8613
+    "bytes": 4675,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "sore-throat",
@@ -21,7 +23,8 @@
     "kind": "word",
     "source": "Youdao British English (type=1)",
     "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=sore+throat",
-    "bytes": 34489
+    "bytes": 4884,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "cold",
@@ -29,7 +32,8 @@
     "kind": "word",
     "source": "Youdao British English (type=1)",
     "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=cold",
-    "bytes": 10221
+    "bytes": 5302,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "backache",
@@ -37,7 +41,8 @@
     "kind": "word",
     "source": "Youdao British English (type=1)",
     "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=backache",
-    "bytes": 22701
+    "bytes": 5824,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "stomach-ache",
@@ -45,7 +50,8 @@
     "kind": "word",
     "source": "Youdao British English (type=1)",
     "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=stomach-ache",
-    "bytes": 31533
+    "bytes": 8019,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "headache",
@@ -53,7 +59,8 @@
     "kind": "word",
     "source": "Youdao British English (type=1)",
     "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=headache",
-    "bytes": 10029
+    "bytes": 5406,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "toothache",
@@ -61,7 +68,8 @@
     "kind": "word",
     "source": "Youdao British English (type=1)",
     "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=toothache",
-    "bytes": 12717
+    "bytes": 6451,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "ill",
@@ -69,7 +77,8 @@
     "kind": "word",
     "source": "Youdao British English (type=1)",
     "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=ill",
-    "bytes": 9645
+    "bytes": 4780,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "sick",
@@ -77,7 +86,8 @@
     "kind": "word",
     "source": "Youdao British English (type=1)",
     "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=sick",
-    "bytes": 11757
+    "bytes": 6138,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "want-to",
@@ -85,7 +95,8 @@
     "kind": "word",
     "source": "Youdao British English (type=1)",
     "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=want+to",
-    "bytes": 31801
+    "bytes": 4675,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "need-to",
@@ -93,7 +104,8 @@
     "kind": "word",
     "source": "Youdao British English (type=1)",
     "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=need+to",
-    "bytes": 47142
+    "bytes": 4989,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "play",
@@ -101,7 +113,8 @@
     "kind": "word",
     "source": "Youdao British English (type=1)",
     "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=play",
-    "bytes": 9837
+    "bytes": 5093,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "rest",
@@ -109,7 +122,8 @@
     "kind": "word",
     "source": "Youdao British English (type=1)",
     "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=rest",
-    "bytes": 11373
+    "bytes": 5824,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "dont",
@@ -117,7 +131,8 @@
     "kind": "word",
     "source": "Youdao British English (type=1)",
     "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=don%27t",
-    "bytes": 10467
+    "bytes": 5406,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "doesnt",
@@ -125,7 +140,8 @@
     "kind": "word",
     "source": "Youdao British English (type=1)",
     "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=doesn%27t",
-    "bytes": 7359
+    "bytes": 4048,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "do",
@@ -133,7 +149,8 @@
     "kind": "word",
     "source": "Youdao British English (type=1)",
     "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=do",
-    "bytes": 9453
+    "bytes": 4884,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "does",
@@ -141,7 +158,8 @@
     "kind": "word",
     "source": "Youdao British English (type=1)",
     "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=does",
-    "bytes": 14400
+    "bytes": 3317,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "but",
@@ -149,7 +167,8 @@
     "kind": "word",
     "source": "Youdao British English (type=1)",
     "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=but",
-    "bytes": 6314
+    "bytes": 3526,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "want",
@@ -157,7 +176,8 @@
     "kind": "word",
     "source": "Youdao British English (type=1)",
     "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=want",
-    "bytes": 10605
+    "bytes": 5511,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "wants",
@@ -165,7 +185,8 @@
     "kind": "word",
     "source": "Youdao British English (type=1)",
     "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=wants",
-    "bytes": 29488
+    "bytes": 4257,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "need",
@@ -173,7 +194,8 @@
     "kind": "word",
     "source": "Youdao British English (type=1)",
     "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=need",
-    "bytes": 11373
+    "bytes": 5824,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "needs",
@@ -181,7 +203,8 @@
     "kind": "word",
     "source": "Youdao British English (type=1)",
     "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=needs",
-    "bytes": 25389
+    "bytes": 6451,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "have-cough",
@@ -189,7 +212,8 @@
     "kind": "sentence",
     "source": "Sound of Text en-GB",
     "sourceUrl": "https://files.soundoftext.com/26764cb0-d8ea-11f1-9564-05a2f3b61c77.mp3",
-    "bytes": 11904
+    "bytes": 6347,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "has-temperature",
@@ -197,7 +221,8 @@
     "kind": "sentence",
     "source": "Sound of Text en-GB",
     "sourceUrl": "https://files.soundoftext.com/25fd2510-d8ea-11f1-9564-05a2f3b61c77.mp3",
-    "bytes": 15744
+    "bytes": 8332,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "have-sore-throat",
@@ -205,7 +230,8 @@
     "kind": "sentence",
     "source": "Sound of Text en-GB",
     "sourceUrl": "https://files.soundoftext.com/28b78a20-d8ea-11f1-9564-05a2f3b61c77.mp3",
-    "bytes": 15936
+    "bytes": 8437,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "has-cold",
@@ -213,7 +239,8 @@
     "kind": "sentence",
     "source": "Sound of Text en-GB",
     "sourceUrl": "https://files.soundoftext.com/281bbf50-d8ea-11f1-9564-05a2f3b61c77.mp3",
-    "bytes": 12864
+    "bytes": 6869,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "back-hurts",
@@ -221,7 +248,8 @@
     "kind": "sentence",
     "source": "Sound of Text en-GB",
     "sourceUrl": "https://files.soundoftext.com/28ca27c0-d8ea-11f1-9564-05a2f3b61c77.mp3",
-    "bytes": 13824
+    "bytes": 7392,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "have-stomach-ache",
@@ -229,7 +257,8 @@
     "kind": "sentence",
     "source": "Sound of Text en-GB",
     "sourceUrl": "https://files.soundoftext.com/28c9b290-d8ea-11f1-9564-05a2f3b61c77.mp3",
-    "bytes": 15744
+    "bytes": 8332,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "have-headache",
@@ -237,7 +266,8 @@
     "kind": "sentence",
     "source": "Sound of Text en-GB",
     "sourceUrl": "https://files.soundoftext.com/29789030-d8ea-11f1-9564-05a2f3b61c77.mp3",
-    "bytes": 12480
+    "bytes": 6660,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "has-toothache",
@@ -245,7 +275,8 @@
     "kind": "sentence",
     "source": "Sound of Text en-GB",
     "sourceUrl": "https://files.soundoftext.com/2b861370-d8ea-11f1-9564-05a2f3b61c77.mp3",
-    "bytes": 13824
+    "bytes": 7392,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "feel-ill",
@@ -253,7 +284,8 @@
     "kind": "sentence",
     "source": "Sound of Text en-GB",
     "sourceUrl": "https://files.soundoftext.com/2bb40140-d8ea-11f1-9564-05a2f3b61c77.mp3",
-    "bytes": 12096
+    "bytes": 6451,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "matter",
@@ -261,7 +293,8 @@
     "kind": "sentence",
     "source": "Sound of Text en-GB",
     "sourceUrl": "https://files.soundoftext.com/2cdfd710-d8ea-11f1-9564-05a2f3b61c77.mp3",
-    "bytes": 12480
+    "bytes": 6660,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "knee-hurts",
@@ -269,7 +302,8 @@
     "kind": "sentence",
     "source": "Sound of Text en-GB",
     "sourceUrl": "https://files.soundoftext.com/2d429080-d8ea-11f1-9564-05a2f3b61c77.mp3",
-    "bytes": 13056
+    "bytes": 6974,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "fly-kite",
@@ -277,7 +311,8 @@
     "kind": "sentence",
     "source": "Sound of Text en-GB",
     "sourceUrl": "https://files.soundoftext.com/2d1f2a00-d8ea-11f1-9564-05a2f3b61c77.mp3",
-    "bytes": 17856
+    "bytes": 9377,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "finish-homework",
@@ -285,7 +320,8 @@
     "kind": "sentence",
     "source": "Sound of Text en-GB",
     "sourceUrl": "https://files.soundoftext.com/2efd86f0-d8ea-11f1-9564-05a2f3b61c77.mp3",
-    "bytes": 17856
+    "bytes": 9377,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "draw-picture",
@@ -293,7 +329,8 @@
     "kind": "sentence",
     "source": "Sound of Text en-GB",
     "sourceUrl": "https://files.soundoftext.com/2f9a8a40-d8ea-11f1-9564-05a2f3b61c77.mp3",
-    "bytes": 18240
+    "bytes": 9586,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "get-paper",
@@ -301,7 +338,8 @@
     "kind": "sentence",
     "source": "Sound of Text en-GB",
     "sourceUrl": "https://files.soundoftext.com/30190910-d8ea-11f1-9564-05a2f3b61c77.mp3",
-    "bytes": 19584
+    "bytes": 10213,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "dont-football",
@@ -309,7 +347,8 @@
     "kind": "sentence",
     "source": "Sound of Text en-GB",
     "sourceUrl": "https://files.soundoftext.com/3067ec60-d8ea-11f1-9564-05a2f3b61c77.mp3",
-    "bytes": 17280
+    "bytes": 9064,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "doesnt-sing",
@@ -317,7 +356,8 @@
     "kind": "sentence",
     "source": "Sound of Text en-GB",
     "sourceUrl": "https://files.soundoftext.com/314776f0-d8ea-11f1-9564-05a2f3b61c77.mp3",
-    "bytes": 16320
+    "bytes": 8646,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "want-read",
@@ -325,7 +365,8 @@
     "kind": "sentence",
     "source": "Sound of Text en-GB",
     "sourceUrl": "https://files.soundoftext.com/31a24120-d8ea-11f1-9564-05a2f3b61c77.mp3",
-    "bytes": 12096
+    "bytes": 6451,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "yes-do",
@@ -333,7 +374,8 @@
     "kind": "sentence",
     "source": "Sound of Text en-GB",
     "sourceUrl": "https://files.soundoftext.com/706a30c0-caa8-11f1-9564-05a2f3b61c77.mp3",
-    "bytes": 13824
+    "bytes": 7392,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "want-dance",
@@ -341,7 +383,8 @@
     "kind": "sentence",
     "source": "Sound of Text en-GB",
     "sourceUrl": "https://files.soundoftext.com/32e87cc0-d8ea-11f1-9564-05a2f3b61c77.mp3",
-    "bytes": 14976
+    "bytes": 7914,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "no-doesnt",
@@ -349,7 +392,8 @@
     "kind": "sentence",
     "source": "Sound of Text en-GB",
     "sourceUrl": "https://files.soundoftext.com/33da56d0-d8ea-11f1-9564-05a2f3b61c77.mp3",
-    "bytes": 16704
+    "bytes": 8750,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "what-want",
@@ -357,7 +401,8 @@
     "kind": "sentence",
     "source": "Sound of Text en-GB",
     "sourceUrl": "https://files.soundoftext.com/35991dd0-d8ea-11f1-9564-05a2f3b61c77.mp3",
-    "bytes": 14976
+    "bytes": 7914,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "play-game",
@@ -365,7 +410,8 @@
     "kind": "sentence",
     "source": "Sound of Text en-GB",
     "sourceUrl": "https://files.soundoftext.com/36643600-d8ea-11f1-9564-05a2f3b61c77.mp3",
-    "bytes": 15936
+    "bytes": 8437,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "what-need",
@@ -373,7 +419,8 @@
     "kind": "sentence",
     "source": "Sound of Text en-GB",
     "sourceUrl": "https://files.soundoftext.com/35f65900-d8ea-11f1-9564-05a2f3b61c77.mp3",
-    "bytes": 14400
+    "bytes": 7601,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "pack-bag",
@@ -381,7 +428,8 @@
     "kind": "sentence",
     "source": "Sound of Text en-GB",
     "sourceUrl": "https://files.soundoftext.com/360d6370-d8ea-11f1-9564-05a2f3b61c77.mp3",
-    "bytes": 15744
+    "bytes": 8332,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "outside-raining",
@@ -389,7 +437,8 @@
     "kind": "sentence",
     "source": "Sound of Text en-GB",
     "sourceUrl": "https://files.soundoftext.com/37142510-d8ea-11f1-9564-05a2f3b61c77.mp3",
-    "bytes": 26496
+    "bytes": 13661,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "play-homework",
@@ -397,7 +446,8 @@
     "kind": "sentence",
     "source": "Sound of Text en-GB",
     "sourceUrl": "https://files.soundoftext.com/37ae1b20-d8ea-11f1-9564-05a2f3b61c77.mp3",
-    "bytes": 33024
+    "bytes": 17005,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "have-cold",
@@ -405,7 +455,8 @@
     "kind": "sentence",
     "source": "Sound of Text en-GB",
     "sourceUrl": "https://files.soundoftext.com/385fb7e0-d8ea-11f1-9564-05a2f3b61c77.mp3",
-    "bytes": 12864
+    "bytes": 6869,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "play-ill",
@@ -413,7 +464,8 @@
     "kind": "sentence",
     "source": "Sound of Text en-GB",
     "sourceUrl": "https://files.soundoftext.com/3ac19cb0-d8ea-11f1-9564-05a2f3b61c77.mp3",
-    "bytes": 23040
+    "bytes": 11989,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   },
   {
     "id": "need-rest",
@@ -421,6 +473,7 @@
     "kind": "sentence",
     "source": "Sound of Text en-GB",
     "sourceUrl": "https://files.soundoftext.com/38ec4070-d8ea-11f1-9564-05a2f3b61c77.mp3",
-    "bytes": 12864
+    "bytes": 6869,
+    "encoding": "MP3 mono 22050 Hz 32 kbit/s; same source voice"
   }
 ]

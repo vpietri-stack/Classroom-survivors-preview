@@ -42,6 +42,7 @@
     { prefix: 'images/vocab/', token: 'vocab-v1' },
     { prefix: 'think_parks_assets/', token: 'think-parks-v1' },
     { prefix: 'pu2_race_assets/', token: 'pu2-race-v1' },
+    { prefix: 'pu3_u3_p35_assets/', token: 'pu3-u3-p35-v2' },
     { prefix: 'audio_mp3/',    token: 'audio-v1' },
     { prefix: 'music/',        token: 'music-v1' },
     { prefix: 'sfx/',          token: 'sfx-v1' }
@@ -223,7 +224,29 @@
 
   function log(msg) { if (global.__speechLog) global.__speechLog('Assets: ' + msg); }
 
-  function fetchAndCache(path, srcs) {
+  function fetchAndCache(path, srcs, options) {
+    // Interactive assets can race the mirror and origin after a cache miss.
+    if (options && options.race && srcs.length > 1) {
+      return new Promise(function (resolve, reject) {
+        var controllers = [], timers = [], remaining = srcs.length, settled = false;
+        srcs.forEach(function (source) {
+          var controller = new AbortController(); controllers.push(controller);
+          var timer = setTimeout(function () { controller.abort(); }, FETCH_TIMEOUT_MS); timers.push(timer);
+          fetch(source + encodePath(path), { signal: controller.signal }).then(function (response) {
+            if (!response.ok) throw new Error('HTTP ' + response.status);
+            return response.blob();
+          }).then(function (blob) {
+            if (settled) return;
+            settled = true; timers.forEach(clearTimeout);
+            controllers.forEach(function (other) { if (other !== controller) other.abort(); });
+            urlMap[path] = URL.createObjectURL(blob); cachePut(path, blob); resolve(urlMap[path]);
+          }).catch(function () {
+            clearTimeout(timer);
+            if (--remaining === 0 && !settled) reject(new Error('all sources failed'));
+          });
+        });
+      });
+    }
     var attempt = function (i) {
       if (i >= srcs.length) return Promise.reject(new Error('all sources failed'));
       return fetchWithTimeout(srcs[i] + encodePath(path)).then(function (r) {
@@ -251,13 +274,13 @@
   // memory → IndexedDB → mirror download. Resolves null when every source
   // fails (e.g. the file simply doesn't exist) — callers fall back to the
   // plain path / next audio source, exactly like before this module existed.
-  function getBlobUrl(path) {
+  function getBlobUrl(path, options) {
     if (urlMap[path]) return Promise.resolve(urlMap[path]);
     if (missing[path]) return Promise.resolve(null);
     if (inflight[path]) return inflight[path];
     inflight[path] = getCached(path).then(function (u) {
       if (u) return u;
-      return fetchAndCache(path, sources()).catch(function () {
+      return fetchAndCache(path, sources(), options).catch(function () {
         missing[path] = true;
         return null;
       });

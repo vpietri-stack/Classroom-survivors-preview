@@ -2,31 +2,31 @@
   "A1-health-problems": {
     "source": "A1-health-problems.png",
     "sourceSha256": "febf97b1415058b6014a2618b03e6acf1a0c9087eab72f0b65a0546f74875576",
-    "webpSha256": "7887564869dda9dafaa3992a064b651b76352beb5556af7573066ae59da7a0a4"
+    "webpSha256": "c2cb1492d22f1e22442e034d1fda1824c57ca2944f2527fd5d1963622ab1742b"
   },
   "A2-aches-and-colds": {
     "source": "A2-aches-and-colds.png",
     "sourceSha256": "aafb46726e020997f96f9b56939528a92d897d344bebbda7df23603f11eda439",
-    "webpSha256": "6e0e340261b4a7d558dc358899e334727adc4a95f01246e1741a9b39a71e4cac"
+    "webpSha256": "f5df6cd6bad1720298b8d4bcaa980256a6d8c6bec8c72004204989cc2f780280"
   },
   "A3-more-useful-language": {
     "source": "A3-more-useful-language.png",
     "sourceSha256": "3965d61421b7194369e9ee670b30059c55d4a9664a82cae44964bb148c4fdf05",
-    "webpSha256": "eae6a7e22717423158b95d4defcb27f1cc76294c05428ab410df10a8b6a77c93"
+    "webpSha256": "0ae74596f9802ef39ea15af1fb66fe2b64b5d6840c697b995fa97b12a3d8b617"
   },
   "B1-wants-and-needs": {
     "source": "B1-wants-and-needs.png",
     "sourceSha256": "a1d9e28a78d687deb2c5ca1a2ba5de523eb2785b9375ab77e45feff77385111a",
-    "webpSha256": "43cef7217d9816a5399f16e18dbdd252541f33a5da2258ab2e3b5a3537b00ee0"
+    "webpSha256": "e04a7bb87bb9cfad2fe04a0f06689f8a49d09b3d376b3c930d9aeddb2badfbaa"
   },
   "B2-negatives-and-questions": {
     "source": "B2-negatives-and-questions.png",
     "sourceSha256": "d4a783835506d22590b6903f359b332bec6b267ae93829c2f0e84b1cc023a935",
-    "webpSha256": "3a38fcf0af8a2f3603354d8156c5389486baf0e2482e681154ee57fc5056707b"
+    "webpSha256": "1049fd1bd0023c8de2d9c0c68f0381575574620d67b910dd90e6b48743c3b860"
   },
   "B3-but-and-dialogue": {
     "source": "B3-but-and-dialogue.png",
     "sourceSha256": "1905424f1482afe2e0fbb2ad97120756f458b084ba437f32af9d720b3a829573",
-    "webpSha256": "d2230f24ea650e864d100b02511564691d0be296b08cdaf04ce6c69526f3c461"
+    "webpSha256": "cb31e929f14bd497ca29e4523360b017ebcda8f17ed434959494dc174c33fbac"
   }
 }

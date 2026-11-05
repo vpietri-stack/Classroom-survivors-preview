@@ -13,10 +13,10 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+new 
   await page.route('**/*',route=>{const url=route.request().url();return url.startsWith(base)&&!url.includes('/api/')&&!url.includes('/models/')?route.continue():route.abort();});
   await page.addInitScript(()=>{const Native=window.Audio;window.Audio=function(...args){const audio=new Native(...args);window.__lastAudio=audio;return audio;};});
   await page.goto(base+'pu3_u3_p35_notes.html?v=media-check');await page.waitForFunction(()=>window.InteractiveNotesPOC&&window.NotesSpeech);
-  for(let i=0;i<6;i++){const image=page.locator('.page-image').nth(i);await image.scrollIntoViewIfNeeded();await image.evaluate(image=>image.decode());await page.locator('.paper').nth(i).screenshot({path:path.join(qa,'page-'+(i+1)+'.png')});}
+  for(let i=0;i<6;i++){const image=page.locator('.page-image').nth(i);await image.scrollIntoViewIfNeeded();await image.evaluate(image=>image.complete&&image.naturalWidth?true:new Promise((resolve,reject)=>{image.onload=resolve;image.onerror=reject;}));await image.evaluate(image=>image.decode());await page.locator('.paper').nth(i).screenshot({path:path.join(qa,'page-'+(i+1)+'.png')});}
   const clips=await page.evaluate(()=>Object.keys(InteractiveNotesData.clips));assert.equal(clips.length,53);
   for(const id of clips){await page.locator('.hotspot[data-clip="'+id+'"]').first().tap();await page.waitForFunction(id=>InteractiveNotesPOC.snapshot().currentClip===id&&window.__lastAudio?.currentTime>.03&&!window.__lastAudio.paused,id,{timeout:10000});await page.evaluate(()=>InteractiveNotesPOC.pause());}
-  assert.equal(mp3.length,0,'tap audio uses bundle without media requests');
+  assert.equal(mp3.length,0,'tap audio uses cached packs without individual MP3 requests');
   await page.locator('.hotspot[data-clip="cough"]').first().tap();await page.locator('#speed').selectOption('0.8');
   assert.equal(await page.evaluate(()=>__lastAudio.playbackRate),.8);await page.locator('#replay').click();await page.waitForFunction(()=>__lastAudio.currentTime>.03);await page.locator('#stop').click();
   assert.equal(await page.locator('.notes-speech button').first().isEnabled(),true,'selected word enables optional pronunciation');
