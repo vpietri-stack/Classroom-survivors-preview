@@ -1,0 +1,52 @@
+[
+  {
+    "source": "D:\\coding\\worksheets\\PU1-U7-p86-p87-preview-v2\\vocab-1-hit-and-sports.png",
+    "sha256": "67ac9e19a8145da5acadc04aa8dc07060c7848c99adbe918eb2caadfcfddfcb8",
+    "output": "vocab-1-hit-and-sports.webp",
+    "bytes": 182332,
+    "dimensions": [
+      1054,
+      1492
+    ]
+  },
+  {
+    "source": "D:\\coding\\worksheets\\PU1-U7-p86-p87-preview-v2\\vocab-2-ride-skateboard-run.png",
+    "sha256": "01c9426a2459aff8983dc9d19b80386057b0e0a6ff8a09133d22729760fb27a0",
+    "output": "vocab-2-ride-skateboard-run.webp",
+    "bytes": 198730,
+    "dimensions": [
+      1054,
+      1492
+    ]
+  },
+  {
+    "source": "D:\\coding\\worksheets\\PU1-U7-p86-p87-preview-v2\\vocab-3-kick-throw-catch.png",
+    "sha256": "39fdc9d6f52c2c7f9a7c88dfe0c19326afbe7125c27ad7d6d2b9d31c2a3f1d3e",
+    "output": "vocab-3-kick-throw-catch.webp",
+    "bytes": 180112,
+    "dimensions": [
+      1054,
+      1492
+    ]
+  },
+  {
+    "source": "D:\\coding\\worksheets\\PU1-U7-p86-p87-preview-v2\\grammar-1-can-i-can-we.png",
+    "sha256": "743fa66d7533a4580d4671b9e525ff405c46c6df7c538910295b7089aa18675d",
+    "output": "grammar-1-can-i-can-we.webp",
+    "bytes": 191768,
+    "dimensions": [
+      1054,
+      1493
+    ]
+  },
+  {
+    "source": "D:\\coding\\worksheets\\PU1-U7-p86-p87-preview-v2\\grammar-2-you-can-but.png",
+    "sha256": "cccb2d8f8d1a5ab32be266dda5475f8b0d0b07adc3ec261a89304fd2589f37ba",
+    "output": "grammar-2-you-can-but.webp",
+    "bytes": 233170,
+    "dimensions": [
+      1054,
+      1492
+    ]
+  }
+]

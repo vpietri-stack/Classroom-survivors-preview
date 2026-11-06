@@ -1,0 +1,582 @@
+[
+  {
+    "id": "hit",
+    "text": "hit",
+    "translation": "击打",
+    "kind": "word",
+    "audio": "pu1_u7_p87_assets/audio/hit.mp3",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=hit",
+    "bytes": 8877
+  },
+  {
+    "id": "hitting",
+    "text": "hitting",
+    "translation": "正在击打",
+    "kind": "word",
+    "audio": "pu1_u7_p87_assets/audio/hitting.mp3",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=hitting",
+    "bytes": 22701
+  },
+  {
+    "id": "hitting-ball",
+    "text": "He's hitting the ball.",
+    "translation": "他正在击球。",
+    "kind": "sentence",
+    "audio": "pu1_u7_p87_assets/audio/hitting-ball.mp3",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/e7210a50-d9bb-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 13824
+  },
+  {
+    "id": "tennis",
+    "text": "tennis",
+    "translation": "网球",
+    "kind": "word",
+    "audio": "pu1_u7_p87_assets/audio/tennis.mp3",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=tennis",
+    "bytes": 12141
+  },
+  {
+    "id": "racket",
+    "text": "racket",
+    "translation": "球拍",
+    "kind": "word",
+    "audio": "pu1_u7_p87_assets/audio/racket.mp3",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=racket",
+    "bytes": 26361
+  },
+  {
+    "id": "ball",
+    "text": "ball",
+    "translation": "球",
+    "kind": "word",
+    "audio": "pu1_u7_p87_assets/audio/ball.mp3",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=ball",
+    "bytes": 10049
+  },
+  {
+    "id": "hockey",
+    "text": "hockey",
+    "translation": "曲棍球；冰球",
+    "kind": "word",
+    "audio": "pu1_u7_p87_assets/audio/hockey.mp3",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=hockey",
+    "bytes": 10221
+  },
+  {
+    "id": "puck",
+    "text": "puck",
+    "translation": "冰球",
+    "kind": "word",
+    "audio": "pu1_u7_p87_assets/audio/puck.mp3",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=puck",
+    "bytes": 20781
+  },
+  {
+    "id": "stick",
+    "text": "stick",
+    "translation": "球杆",
+    "kind": "word",
+    "audio": "pu1_u7_p87_assets/audio/stick.mp3",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=stick",
+    "bytes": 10221
+  },
+  {
+    "id": "baseball",
+    "text": "baseball",
+    "translation": "棒球",
+    "kind": "word",
+    "audio": "pu1_u7_p87_assets/audio/baseball.mp3",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=baseball",
+    "bytes": 11511
+  },
+  {
+    "id": "bat",
+    "text": "bat",
+    "translation": "球棒",
+    "kind": "word",
+    "audio": "pu1_u7_p87_assets/audio/bat.mp3",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=bat",
+    "bytes": 9069
+  },
+  {
+    "id": "play-tennis",
+    "text": "When we play tennis, we hit the ball with a racket.",
+    "translation": "打网球时，我们用球拍击球。",
+    "kind": "sentence",
+    "audio": "pu1_u7_p87_assets/audio/play-tennis.mp3",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/ed4882a0-d9bb-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 30144
+  },
+  {
+    "id": "play-hockey",
+    "text": "When we play hockey, we hit the ball or the puck with a stick.",
+    "translation": "打曲棍球或冰球时，我们用球杆击球。",
+    "kind": "sentence",
+    "audio": "pu1_u7_p87_assets/audio/play-hockey.mp3",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/ec6bde40-d9bb-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 34560
+  },
+  {
+    "id": "field-hockey",
+    "text": "Field hockey",
+    "translation": "陆地曲棍球",
+    "kind": "word",
+    "audio": "pu1_u7_p87_assets/audio/field-hockey.mp3",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/5eb8e290-d9bc-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 12096
+  },
+  {
+    "id": "ice-hockey",
+    "text": "Ice hockey",
+    "translation": "冰球运动",
+    "kind": "word",
+    "audio": "pu1_u7_p87_assets/audio/ice-hockey.mp3",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/5fc9dd60-d9bc-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 9984
+  },
+  {
+    "id": "play-baseball",
+    "text": "When we play baseball, we hit the ball with a bat.",
+    "translation": "打棒球时，我们用球棒击球。",
+    "kind": "sentence",
+    "audio": "pu1_u7_p87_assets/audio/play-baseball.mp3",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/ed9c6f00-d9bb-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 28800
+  },
+  {
+    "id": "ride",
+    "text": "ride",
+    "translation": "骑",
+    "kind": "word",
+    "audio": "pu1_u7_p87_assets/audio/ride.mp3",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=ride",
+    "bytes": 11565
+  },
+  {
+    "id": "riding",
+    "text": "riding",
+    "translation": "正在骑",
+    "kind": "word",
+    "audio": "pu1_u7_p87_assets/audio/riding.mp3",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=riding",
+    "bytes": 11757
+  },
+  {
+    "id": "skateboard",
+    "text": "skateboard",
+    "translation": "滑板；滑滑板",
+    "kind": "word",
+    "audio": "pu1_u7_p87_assets/audio/skateboard.mp3",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=skateboard",
+    "bytes": 17517
+  },
+  {
+    "id": "skateboarding",
+    "text": "skateboarding",
+    "translation": "正在滑滑板",
+    "kind": "word",
+    "audio": "pu1_u7_p87_assets/audio/skateboarding.mp3",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=skateboarding",
+    "bytes": 14637
+  },
+  {
+    "id": "run",
+    "text": "run",
+    "translation": "跑",
+    "kind": "word",
+    "audio": "pu1_u7_p87_assets/audio/run.mp3",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=run",
+    "bytes": 29222
+  },
+  {
+    "id": "running",
+    "text": "running",
+    "translation": "正在跑",
+    "kind": "word",
+    "audio": "pu1_u7_p87_assets/audio/running.mp3",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=running",
+    "bytes": 11949
+  },
+  {
+    "id": "ride-horse",
+    "text": "She's riding a horse.",
+    "translation": "她正在骑马。",
+    "kind": "sentence",
+    "audio": "pu1_u7_p87_assets/audio/ride-horse.mp3",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/f3726bf0-d9bb-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 16320
+  },
+  {
+    "id": "horse",
+    "text": "horse",
+    "translation": "马",
+    "kind": "word",
+    "audio": "pu1_u7_p87_assets/audio/horse.mp3",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=horse",
+    "bytes": 10605
+  },
+  {
+    "id": "ride-bikes",
+    "text": "They're riding bikes.",
+    "translation": "他们正在骑自行车。",
+    "kind": "sentence",
+    "audio": "pu1_u7_p87_assets/audio/ride-bikes.mp3",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/f4800b60-d9bb-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 14400
+  },
+  {
+    "id": "bikes",
+    "text": "bikes",
+    "translation": "自行车",
+    "kind": "word",
+    "audio": "pu1_u7_p87_assets/audio/bikes.mp3",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=bikes",
+    "bytes": 10675
+  },
+  {
+    "id": "ride-skateboards",
+    "text": "They're riding their skateboards.",
+    "translation": "他们正在滑滑板。",
+    "kind": "sentence",
+    "audio": "pu1_u7_p87_assets/audio/ride-skateboards.mp3",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/f6fd4060-d9bb-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 19200
+  },
+  {
+    "id": "they-skateboard",
+    "text": "They're skateboarding.",
+    "translation": "他们正在滑滑板。",
+    "kind": "sentence",
+    "audio": "pu1_u7_p87_assets/audio/they-skateboard.mp3",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/f86beb90-d9bb-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 12864
+  },
+  {
+    "id": "run-park",
+    "text": "He's running in the park.",
+    "translation": "他正在公园里跑步。",
+    "kind": "sentence",
+    "audio": "pu1_u7_p87_assets/audio/run-park.mp3",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/f99158c0-d9bb-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 15744
+  },
+  {
+    "id": "park",
+    "text": "park",
+    "translation": "公园",
+    "kind": "word",
+    "audio": "pu1_u7_p87_assets/audio/park.mp3",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=park",
+    "bytes": 14061
+  },
+  {
+    "id": "kick",
+    "text": "kick",
+    "translation": "踢",
+    "kind": "word",
+    "audio": "pu1_u7_p87_assets/audio/kick.mp3",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=kick",
+    "bytes": 11373
+  },
+  {
+    "id": "kicking",
+    "text": "kicking",
+    "translation": "正在踢",
+    "kind": "word",
+    "audio": "pu1_u7_p87_assets/audio/kicking.mp3",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=kicking",
+    "bytes": 26541
+  },
+  {
+    "id": "football",
+    "text": "football",
+    "translation": "足球",
+    "kind": "word",
+    "audio": "pu1_u7_p87_assets/audio/football.mp3",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=football",
+    "bytes": 11757
+  },
+  {
+    "id": "throw",
+    "text": "throw",
+    "translation": "投；扔",
+    "kind": "word",
+    "audio": "pu1_u7_p87_assets/audio/throw.mp3",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=throw",
+    "bytes": 10884
+  },
+  {
+    "id": "throwing",
+    "text": "throwing",
+    "translation": "正在投；正在扔",
+    "kind": "word",
+    "audio": "pu1_u7_p87_assets/audio/throwing.mp3",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=throwing",
+    "bytes": 33250
+  },
+  {
+    "id": "basketball",
+    "text": "basketball",
+    "translation": "篮球",
+    "kind": "word",
+    "audio": "pu1_u7_p87_assets/audio/basketball.mp3",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=basketball",
+    "bytes": 36311
+  },
+  {
+    "id": "hoop",
+    "text": "hoop",
+    "translation": "篮筐",
+    "kind": "word",
+    "audio": "pu1_u7_p87_assets/audio/hoop.mp3",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=hoop",
+    "bytes": 9837
+  },
+  {
+    "id": "catch",
+    "text": "catch",
+    "translation": "接住",
+    "kind": "word",
+    "audio": "pu1_u7_p87_assets/audio/catch.mp3",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=catch",
+    "bytes": 11949
+  },
+  {
+    "id": "catching",
+    "text": "catching",
+    "translation": "正在接住",
+    "kind": "word",
+    "audio": "pu1_u7_p87_assets/audio/catching.mp3",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=catching",
+    "bytes": 16320
+  },
+  {
+    "id": "glove",
+    "text": "glove",
+    "translation": "手套",
+    "kind": "word",
+    "audio": "pu1_u7_p87_assets/audio/glove.mp3",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=glove",
+    "bytes": 10221
+  },
+  {
+    "id": "kick-football",
+    "text": "He's kicking the football.",
+    "translation": "他正在踢足球。",
+    "kind": "sentence",
+    "audio": "pu1_u7_p87_assets/audio/kick-football.mp3",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/63663e00-d9bc-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 14784
+  },
+  {
+    "id": "throw-hoop",
+    "text": "She's throwing the basketball into the hoop.",
+    "translation": "她正在把篮球投进篮筐。",
+    "kind": "sentence",
+    "audio": "pu1_u7_p87_assets/audio/throw-hoop.mp3",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/62cbf9d0-d9bc-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 24960
+  },
+  {
+    "id": "catch-baseball",
+    "text": "She's catching the baseball in her glove.",
+    "translation": "她正在用棒球手套接球。",
+    "kind": "sentence",
+    "audio": "pu1_u7_p87_assets/audio/catch-baseball.mp3",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/62ee75f0-d9bc-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 23040
+  },
+  {
+    "id": "can-i-hockey",
+    "text": "Can I play hockey?",
+    "translation": "我可以打曲棍球吗？",
+    "kind": "sentence",
+    "audio": "pu1_u7_p87_assets/audio/can-i-hockey.mp3",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/6397fc60-d9bc-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 13824
+  },
+  {
+    "id": "can-we-tennis",
+    "text": "Can we play tennis?",
+    "translation": "我们可以打网球吗？",
+    "kind": "sentence",
+    "audio": "pu1_u7_p87_assets/audio/can-we-tennis.mp3",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/644860a0-d9bc-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 14976
+  },
+  {
+    "id": "yes-you-can",
+    "text": "Yes, you can.",
+    "translation": "可以。",
+    "kind": "sentence",
+    "audio": "pu1_u7_p87_assets/audio/yes-you-can.mp3",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/b59cbc60-d284-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 14016
+  },
+  {
+    "id": "no-you-cant",
+    "text": "No, you can't.",
+    "translation": "不可以。",
+    "kind": "sentence",
+    "audio": "pu1_u7_p87_assets/audio/no-you-cant.mp3",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/4e0a7120-d516-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 14400
+  },
+  {
+    "id": "can",
+    "text": "can",
+    "translation": "可以",
+    "kind": "word",
+    "audio": "pu1_u7_p87_assets/audio/can.mp3",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=can",
+    "bytes": 10413
+  },
+  {
+    "id": "cannot",
+    "text": "cannot",
+    "translation": "不可以",
+    "kind": "word",
+    "audio": "pu1_u7_p87_assets/audio/cannot.mp3",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=cannot",
+    "bytes": 11949
+  },
+  {
+    "id": "can-we-park",
+    "text": "Can we go to the park?",
+    "translation": "我们可以去公园吗？",
+    "kind": "sentence",
+    "audio": "pu1_u7_p87_assets/audio/can-we-park.mp3",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/68223f70-d9bc-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 14976
+  },
+  {
+    "id": "tennis-court",
+    "text": "You can play tennis on the sports court.",
+    "translation": "你们可以在运动场打网球。",
+    "kind": "sentence",
+    "audio": "pu1_u7_p87_assets/audio/tennis-court.mp3",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/68abbac0-d9bc-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 24000
+  },
+  {
+    "id": "not-garden",
+    "text": "You can't play tennis in the garden.",
+    "translation": "你们不能在花园里打网球。",
+    "kind": "sentence",
+    "audio": "pu1_u7_p87_assets/audio/not-garden.mp3",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/691a8220-d9bc-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 21120
+  },
+  {
+    "id": "can-but",
+    "text": "Yes, you can, but you can't play here.",
+    "translation": "可以，但是你们不能在这里玩。",
+    "kind": "sentence",
+    "audio": "pu1_u7_p87_assets/audio/can-but.mp3",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/69cc1ee0-d9bc-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 27264
+  },
+  {
+    "id": "mum-football",
+    "text": "Mum, can we play football?",
+    "translation": "妈妈，我们可以踢足球吗？",
+    "kind": "sentence",
+    "audio": "pu1_u7_p87_assets/audio/mum-football.mp3",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/6b566860-d9bc-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 22080
+  },
+  {
+    "id": "yes-not-garden",
+    "text": "Yes, you can, but you can't play in the garden.",
+    "translation": "可以，但是你们不能在花园里踢。",
+    "kind": "sentence",
+    "audio": "pu1_u7_p87_assets/audio/yes-not-garden.mp3",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/6b711c50-d9bc-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 31680
+  },
+  {
+    "id": "park-please",
+    "text": "Can we go to the park, please?",
+    "translation": "请问，我们可以去公园吗？",
+    "kind": "sentence",
+    "audio": "pu1_u7_p87_assets/audio/park-please.mp3",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/6c101b70-d9bc-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 20160
+  },
+  {
+    "id": "good-idea",
+    "text": "That's a good idea. Let's go to the park.",
+    "translation": "好主意。我们去公园吧！",
+    "kind": "sentence",
+    "audio": "pu1_u7_p87_assets/audio/good-idea.mp3",
+    "source": "Sound of Text en-GB",
+    "sourceUrl": "https://files.soundoftext.com/6cbbebd0-d9bc-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 26880
+  },
+  {
+    "id": "please",
+    "text": "please",
+    "translation": "请",
+    "kind": "word",
+    "audio": "pu1_u7_p87_assets/audio/please.mp3",
+    "source": "Youdao British English (type=1)",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?type=1&audio=please",
+    "bytes": 10605
+  }
+]
