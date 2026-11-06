@@ -14,7 +14,7 @@ var authActiveUser = null;
 // The version watchdog (startVersionWatchdog) compares this to the live
 // version.json; a mismatch means stale WeChat builds never self-heal or
 // permanently nag. See DEPLOY_VERSION_STAMP.md. Bump BOTH together.
-const APP_VERSION = '2026-11-06c';
+const APP_VERSION = '2026-11-06d';
 
 // --- SESSION TOKEN (c) design) ---
 // The server mints a signed token on login. We store it in localStorage
@@ -1908,9 +1908,24 @@ function finishLogin() {
     } else {
         targetBanner.classList.add('hidden');
     }
-    const gameLookup = window.GameRecovery ? GameRecovery.onLogin(() => {},true) : Promise.resolve();
-    if (window.StudyRecovery) StudyRecovery.onLogin(() => { gameLookup.then(()=>{if(window.GameRecovery)GameRecovery.showOfferOr(()=>{if(window.PreviewNotes)PreviewNotes.onLogin();});else if(window.PreviewNotes)PreviewNotes.onLogin();}); });
-    else if (window.PreviewNotes) PreviewNotes.onLogin();
+    // Refresh the notes button immediately; recovery prompts get the first turn.
+    const loginUser = authActiveUser;
+    if (window.PreviewNotes) PreviewNotes.onLogin({ defer: true });
+    const continueNotes = () => {
+        if (authActiveUser === loginUser && window.PreviewNotes) PreviewNotes.continueLogin();
+    };
+    const gameLookup = window.GameRecovery ? GameRecovery.onLogin(() => {}, true) : Promise.resolve();
+    const afterStudy = resumed => {
+        if (authActiveUser !== loginUser) return;
+        if (resumed) { continueNotes(); return; }
+        gameLookup.then(() => {
+            if (authActiveUser !== loginUser) return;
+            if (window.GameRecovery) GameRecovery.showOfferOr(continueNotes);
+            else continueNotes();
+        });
+    };
+    if (window.StudyRecovery) StudyRecovery.onLogin(afterStudy);
+    else afterStudy(false);
 }
 
 /**

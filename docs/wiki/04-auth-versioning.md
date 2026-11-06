@@ -1,3 +1,15 @@
+## Resume prompts and automatic notes (6 November 2026)
+
+Login refreshes the eligible 预习笔记 button before recovery lookups. Study is
+prompted first, then Game after Study is declined. Declining either prompt keeps
+its saved session/button and advances the login continuation. Notes open only
+after all offered sessions are declined. Accepting either session releases the
+notes continuation but defers display until `goBackFromGameSelection` returns to
+the main greeting; the game-selection screen itself does not count. Automatic
+notes are consumed once per login, use the current assigned page, and recheck
+completion. Recovery continuations are cleared on detach/new login and guarded
+against account changes. Existing note eligibility and completion rules remain.
+
 ## Student startup stages
 
 The student entry point can authenticate before its lesson runtime finishes loading. The authorized account is held until the runtime is ready. The shell displays course loading and a reload option if startup stalls or a required resource fails. The dashboard keeps its existing startup path.

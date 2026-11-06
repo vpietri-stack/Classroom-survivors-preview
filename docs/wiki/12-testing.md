@@ -1,3 +1,14 @@
+## Resume/notes interaction coverage (6 November 2026)
+
+`test_resume_notes_browser.js` creates real Study/Gomoku checkpoints and exercises
+the real login, prompt buttons, restoration and main-menu navigation against
+isolated mocked APIs. It checks each decline, both declines in order, both
+acceptance paths with deferred notes, delayed Game lookup, preserved resume
+buttons and snapshots, assigned-page restoration, menu ordering, once-per-login
+automatic display, and unchanged completion/library eligibility. It saves the
+combined-menu screenshot under `.checks/resume-notes/` and runs in the full and
+notes suites. Fixtures do not use real student accounts or recordings.
+
 ## Student startup coverage
 
 The startup browser fixture holds lesson scripts and styles, checks the real form reaches a mocked login endpoint, then releases the assets and verifies the assigned lesson and distinct timing marks.

@@ -2387,6 +2387,7 @@ function goBackFromGameSelection() {
     const stepContainers = document.querySelectorAll('.step-container');
     stepContainers.forEach(container => container.classList.add('hidden'));
     document.getElementById('step-greeting').classList.remove('hidden');
+    if (window.PreviewNotes) PreviewNotes.onMainMenu();
 }
 
 

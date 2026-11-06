@@ -1,3 +1,9 @@
+## Greeting menu order (6 November 2026)
+
+The student greeting always orders its buttons as 我想直接练习, 我想边学边玩,
+预习笔记 (when eligible), then Game/Study resume buttons (when available).
+Notes button visibility is refreshed independently of resume prompt decisions.
+
 ## PU3 Unit 3 lesson grouping (5 November 2026)
 
 Preview assignments use pages 31 (body vocabulary), 33 (printed pp.32–33,

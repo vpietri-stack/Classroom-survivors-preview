@@ -2,7 +2,7 @@
     'use strict';
     const core = window.PreviewNotesState;
     if (!core) return; // A missing optional note asset must not break login.
-    let viewer = null, opening = null;
+    let viewer = null, opening = null, pendingLogin = null, loginReady = false;
     function enabled() {
         const host = location.hostname;
         return /^\/Classroom-survivors-preview(?:\/|$)/i.test(location.pathname)
@@ -75,15 +75,31 @@
         });
         overlay.append(list);
     }
-    function onLogin() {
+    function continueLogin() {
+        loginReady = true;
+        onMainMenu();
+    }
+    function onMainMenu() {
+        if (!loginReady || !pendingLogin || user() !== pendingLogin) return;
+        if (document.getElementById('startScreen')?.classList.contains('hidden')
+            || document.getElementById('step-greeting')?.classList.contains('hidden')
+            || document.getElementById('study-resume-dialog') || document.getElementById('game-resume-dialog')
+            || window.StudyRecovery?.active() || window.GameRecovery?.active()) return;
+        const student = pendingLogin;
+        pendingLogin = null;
+        const note = core.atPage(student);
+        if (note && !complete(student, note.id)) openNote(note.id, false);
+    }
+    function onLogin({ defer = false } = {}) {
         close(); const student = user(), button = document.getElementById('preview-notes-button');
         const active = enabled() && isStudent(student) && !(typeof isTestMode !== 'undefined' && isTestMode);
         if (button) button.classList.toggle('hidden', !active || Object.keys(progress(student)).length === 0);
+        pendingLogin = active ? student : null; loginReady = !defer;
         if (!active) return;
         student.previewNotes = progress(student);
         const note = core.atPage(student);
         if (note?.id === 'think0-u4-p44' && window.ThinkParks) ThinkParks.prefetchAudio('words');
-        if (note && !complete(student, note.id)) openNote(note.id, false);
+        onMainMenu();
     }
     function prepareStudy(id) {
         const student = user(), note = core.find(id);
@@ -134,5 +150,5 @@
             else current.frame.contentWindow.postMessage({ action: 'note-study-error', request: current.request }, location.origin);
         }
     });
-    window.PreviewNotes = { isReader: frame => !!opening && opening.frame.contentWindow === frame && user()?.id === opening.owner, onLogin, close, openLibrary, openNote, blocksAdvance, prepareStudy, completeStudy, markComplete, enabled, remapPlacement };
+    window.PreviewNotes = { isReader: frame => !!opening && opening.frame.contentWindow === frame && user()?.id === opening.owner, onLogin, continueLogin, onMainMenu, close, openLibrary, openNote, blocksAdvance, prepareStudy, completeStudy, markComplete, enabled, remapPlacement };
 })();

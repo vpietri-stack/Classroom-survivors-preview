@@ -144,7 +144,7 @@
         }, 12000);
     </script>
     <script src="config.js?v=2026-11-01d"></script>
-    <script src="frontend_auth.js?v=2026-11-06c"></script>
+    <script src="frontend_auth.js?v=2026-11-06d"></script>
     <script>
         if (typeof startStudentShell === 'function') startStudentShell();
     </script>
@@ -258,10 +258,10 @@
                         onclick="initStudyMode()">我想直接练习</button>
                     <button class="game-btn text-2xl bg-orange-600 hover:bg-orange-500 w-full"
                         onclick="showGameSelection()">我想边学边玩</button>
-                    <button id="game-resume-button" class="game-btn text-xl bg-green-600 w-full hidden" onclick="GameRecovery.resume()">继续上次游戏</button>
-                    <button id="study-resume-button" class="game-btn text-xl bg-green-600 w-full hidden" onclick="StudyRecovery.resume()">继续上次学习</button>
                     <button id="preview-notes-button" class="game-btn text-xl bg-teal-700 hover:bg-teal-600 w-full hidden"
                         onclick="PreviewNotes.openLibrary()">预习笔记</button>
+                    <button id="game-resume-button" class="game-btn text-xl bg-green-600 w-full hidden" onclick="GameRecovery.resume()">继续上次游戏</button>
+                    <button id="study-resume-button" class="game-btn text-xl bg-green-600 w-full hidden" onclick="StudyRecovery.resume()">继续上次学习</button>
                 </div>
             </div>
 
@@ -784,8 +784,8 @@
     <script defer fetchpriority="low" data-student-runtime src="practice_telemetry.js?v=2026-11-01c"></script>
     <script defer fetchpriority="low" data-student-runtime src="api/src/functions/shared/studyResumeCore.js?v=2026-11-01c"></script>
     <script defer fetchpriority="low" data-student-runtime src="api/src/functions/shared/gameResumeCore.js?v=2026-11-01f"></script>
-    <script defer fetchpriority="low" data-student-runtime src="game_recovery.js?v=2026-11-05c"></script>
-    <script defer fetchpriority="low" data-student-runtime src="study_recovery.js?v=2026-11-05c"></script>
+    <script defer fetchpriority="low" data-student-runtime src="game_recovery.js?v=2026-11-06d"></script>
+    <script defer fetchpriority="low" data-student-runtime src="study_recovery.js?v=2026-11-06d"></script>
     <link rel="stylesheet" href="study_recovery.css?v=2026-11-01c">
     <script defer fetchpriority="low" data-student-runtime src="teaching_content.js?v=2026-11-05h"></script>
     <script defer fetchpriority="low" data-student-runtime src="content_pu1.js?v=2026-11-06b"></script>
@@ -799,7 +799,7 @@
     <script defer fetchpriority="low" data-student-runtime src="non_spelling_content.js?v=2026-11-06b"></script>
     <script defer fetchpriority="low" data-student-runtime src="non_spelling_widget.js?v=2026-11-01d"></script>
     <script defer fetchpriority="low" data-student-runtime src="api/src/functions/shared/previewNotesCore.js?v=2026-11-06c"></script>
-    <script defer fetchpriority="low" data-student-runtime src="preview_notes.js?v=2026-11-06a"></script>
+    <script defer fetchpriority="low" data-student-runtime src="preview_notes.js?v=2026-11-06d"></script>
     <link rel="stylesheet" href="preview_notes.css?v=1">
     <script defer fetchpriority="low" data-student-runtime src="class_config.js?v=2026-11-03b"></script>
     <script defer fetchpriority="low" data-student-runtime src="boot.js?v=startup-1"></script>
@@ -945,7 +945,7 @@
         .td-play-again-btn:hover { background: #66bb6a; }
     </style>
 
-    <script defer fetchpriority="low" data-student-runtime src="game.js?v=startup-1"></script>
+    <script defer fetchpriority="low" data-student-runtime src="game.js?v=2026-11-06d"></script>
     <script defer fetchpriority="low" data-student-runtime src="non_spelling_flow.js?v=2026-11-01d"></script>
     <!-- Mirror-aware asset cache: prefetch + IndexedDB for TD sprites, vocab
          images and hand-recorded MP3s (fast first load in CN; survives WeChat

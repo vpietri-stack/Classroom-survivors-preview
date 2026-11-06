@@ -4,6 +4,7 @@
     const core = w.StudyResumeCore;
     let owner = '', active = false, restoring = false, offer = null, snapshot = null, version = 0;
     let action = null, supersedes = null, busy = false, blocked = false, generation = 0, timer = null;
+    let afterOffer = null;
     let known = [], lastSaved = 0, dialog = null, menuContent = null, observed = false, choice = 0, handshake = false, brandNew = false, finalAt = 0, finalState = '';
     const writer = uid(), scope = location.pathname.replace(/index\.html$/i, '').replace(/\/+$/, '').replace(/[^a-z0-9]/gi, '_');
     function uid() { return Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,10); }
@@ -127,8 +128,13 @@
         closePrompt(); restoreMenuContent(); menu(); schedule(0);
     }
     function closePrompt() { if (dialog) dialog.remove(); dialog = null; }
-    function prompt() {
+    function finishOffer(resumed) {
+        const next = afterOffer; afterOffer = null;
+        if (next && own()) next(resumed);
+    }
+    function prompt(normal) {
         if (!own() || !offer || active) return;
+        afterOffer = normal || null;
         closePrompt(); if (w.PreviewNotes) PreviewNotes.close();
         dialog = document.createElement('section'); dialog.id = 'study-resume-dialog'; dialog.className = 'study-resume-dialog';
         dialog.setAttribute('role','dialog'); dialog.setAttribute('aria-modal','true'); dialog.setAttribute('aria-labelledby','study-resume-question');
@@ -138,7 +144,7 @@
         const yes=document.createElement('button'),no=document.createElement('button');yes.type=no.type='button';
         yes.id='study-resume-yes';no.id='study-resume-no';yes.textContent='是，继续学习';no.textContent='否，返回主菜单';
         yes.className='game-btn bg-green-600';no.className='game-btn bg-gray-500';
-        yes.onclick=()=>resume();no.onclick=()=>{choice++;closePrompt();menu();document.getElementById('study-resume-button')?.focus();};
+        yes.onclick=()=>resume();no.onclick=()=>{choice++;closePrompt();menu();document.getElementById('study-resume-button')?.focus();finishOffer(false);};
         buttons.append(yes,no);card.append(heading,text,buttons);dialog.append(card);document.body.append(dialog);yes.focus();
         dialog.onkeydown=e=>{if(e.key==='Escape'){e.preventDefault();no.click();}if(e.key==='Tab'){e.preventDefault();(document.activeElement===yes?no:yes).focus();}};
     }
@@ -151,7 +157,7 @@
             if(ticket!==generation||attempt!==choice||!own())return false;
             if(r.ok&&r.data.enabled){
                 version=r.data.version||0;remoteKnown=true;remoteRun=r.data.runId||r.data.snapshot&&r.data.snapshot.runId||null;
-                if(!core.pending(chosen,r.data.completed)||r.data.closedRunId===chosen.runId) { remember(r.data.completed&&r.data.completed.runId);offer=null;closePrompt();menu();return false; }
+                if(!core.pending(chosen,r.data.completed)||r.data.closedRunId===chosen.runId) { remember(r.data.completed&&r.data.completed.runId);offer=null;closePrompt();menu();finishOffer(false);return false; }
                 const remote=r.data.snapshot;
                 if(remote&&remote.runId===chosen.runId&&remote.seq>chosen.seq)chosen=remote;
                 else if(remote&&remote.runId!==chosen.runId&&remote.createdAt>chosen.createdAt)chosen=remote;
@@ -168,9 +174,9 @@
         active=true;restoring=true;blocked=false;brandNew=false;action=remoteKnown&&remoteRun!==snapshot.runId?'begin':'claim';supersedes=remoteRun;handshake=!remoteKnown;
         try { StudyRuntime.restore(snapshot); } catch (_) {
             StudyRuntime.suspend();active=false;offer=chosen;restoreMenuContent();document.getElementById('startScreen').classList.remove('hidden');
-            if(typeof showStudyNotice==='function')showStudyNotice('这次的进度暂时无法恢复，可以返回主菜单再试。');menu();return false;
+            if(typeof showStudyNotice==='function')showStudyNotice('这次的进度暂时无法恢复，可以返回主菜单再试。');menu();finishOffer(false);return false;
         } finally { restoring=false; }
-        capture();schedule(0);menu();return true;
+        capture();schedule(0);menu();finishOffer(true);return true;
     }
     function finalSave() {
         if(!own()||!snapshot||!action||blocked||handshake)return;
@@ -203,7 +209,7 @@
         const u=user();
         if(!enabled()||!u||['teacher','BM','admin'].includes(u.role)){normal();return;}
         if(owner===u.id&&active)return;
-        generation++;choice++;closePrompt();owner=u.id;active=false;handshake=false;offer=null;action=null;blocked=false;clearTimeout(timer);timer=null;
+        generation++;choice++;closePrompt();afterOffer=null;owner=u.id;active=false;handshake=false;offer=null;action=null;blocked=false;clearTimeout(timer);timer=null;
         menuContent=JSON.parse(JSON.stringify(typeof selectedClassContent!=='undefined'&&selectedClassContent||{}));
         observe();
         const ticket=generation, local=read();known=local&&local.known||[];version=local&&local.version||0;
@@ -228,12 +234,12 @@
         }catch(_){/* server downtime must not prevent login or local continuation */}
         if(ticket!==generation||!own()||active)return;
         offer=candidate;observe();menu();
-        if(offer)prompt();else normal();
+        if(offer)prompt(normal);else normal(false);
     }
     function detach() {
         if(active)capture();active=false;generation++;choice++;closePrompt();clearTimeout(timer);timer=null;
         if(w.StudyRuntime&&typeof STUDY_STATE!=='undefined'&&STUDY_STATE.active)StudyRuntime.suspend();
-        owner='';offer=null;snapshot=null;action=null;menu();
+        afterOffer=null;owner='';offer=null;snapshot=null;action=null;menu();
     }
     w.StudyRecovery={onLogin,begin,capture,pause,complete,decorate,resume,detach,restoreMenuContent,
         runId:()=>snapshot&&snapshot.runId||null,active:()=>active,flush,enabled};
