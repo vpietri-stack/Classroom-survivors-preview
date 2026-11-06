@@ -44,6 +44,19 @@ function checkNotesImages() {
             continue;
         }
 
+        if (note.id === 'pu3-u1-p14') {
+            const folder = path.join(root, 'pu3_circus_assets');
+            const index = JSON.parse(fs.readFileSync(path.join(folder, 'image-index.json')));
+            assert.equal(Object.keys(index).length, 27);
+            const groups = new Map(); let total = 0;
+            for (let i=1;i<=4;i++) { const bytes=fs.readFileSync(path.join(folder, `story-${i}.webp`)); webpDimensions(bytes); assert.ok(bytes.length<=PAGE_LIMIT); total+=bytes.length; }
+            for (const [name,[g,o,n]] of Object.entries(index)) {
+                if (!groups.has(g)) { const b=fs.readFileSync(path.join(folder, `images-${g}.bin`)); assert.ok(b.length<=PAGE_LIMIT); groups.set(g,b); total+=b.length; }
+                const b=fs.readFileSync(path.join(folder,name+'.webp')); webpDimensions(b); assert.ok(groups.get(g).subarray(o,o+n).equals(b));
+            }
+            assert.ok(total<=LESSON_LIMIT, 'Circus Child image budget');
+            console.log(note.id+': four story images, 27 vocabulary images, '+total+' bytes'); continue;
+        }
         if (note.id === 'pu2-u1-p14') {
             const folder = path.join(root, 'pu2_race_assets');
             const imageIndex = JSON.parse(fs.readFileSync(path.join(folder, 'image-index.json'), 'utf8'));

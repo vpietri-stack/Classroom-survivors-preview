@@ -42,6 +42,7 @@
     { prefix: 'images/vocab/', token: 'vocab-v1' },
     { prefix: 'think_parks_assets/', token: 'think-parks-v1' },
     { prefix: 'pu2_race_assets/', token: 'pu2-race-v1' },
+    { prefix: 'pu3_circus_assets/', token: 'pu3-circus-v1' },
     { prefix: 'pu3_u3_p35_assets/', token: 'pu3-u3-p35-v2' },
     { prefix: 'audio_mp3/',    token: 'audio-v1' },
     { prefix: 'music/',        token: 'music-v1' },

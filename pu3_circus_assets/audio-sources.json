@@ -1,0 +1,376 @@
+{
+  "story": "Cambridge Power Up 3 Pupil’s Book CD1 track 15, local PU3 T1 PB P14-15.mp3",
+  "cuts": [
+    {
+      "clip": 1,
+      "start": 8.400000000000002,
+      "end": 13.0,
+      "text": "Can you imagine being in a circus?"
+    },
+    {
+      "clip": 2,
+      "start": 13.0,
+      "end": 24.36,
+      "text": "Travelling all over the world, playing with clowns, flying through the air on a trapeze, or jumping on trampolines all day?"
+    },
+    {
+      "clip": 3,
+      "start": 24.36,
+      "end": 28.490000000000002,
+      "text": "No? Well, let me tell you about it."
+    },
+    {
+      "clip": 4,
+      "start": 28.490000000000002,
+      "end": 31.17,
+      "text": "My name is Anastasia."
+    },
+    {
+      "clip": 5,
+      "start": 31.17,
+      "end": 33.730000000000004,
+      "text": "I was born in the circus."
+    },
+    {
+      "clip": 6,
+      "start": 33.730000000000004,
+      "end": 47.36,
+      "text": "My parents are Russian acrobats with Captain Adventure’s Travelling Circus and my dream was always to be just like them and perform on stage."
+    },
+    {
+      "clip": 7,
+      "start": 47.36,
+      "end": 53.53,
+      "text": "Every day I wanted to ask Dad when I could go on stage with him."
+    },
+    {
+      "clip": 8,
+      "start": 53.53,
+      "end": 56.08,
+      "text": "But I was afraid to."
+    },
+    {
+      "clip": 9,
+      "start": 56.08,
+      "end": 58.75,
+      "text": "I didn’t know if I was ready."
+    },
+    {
+      "clip": 10,
+      "start": 58.75,
+      "end": 64.15,
+      "text": "In the mornings I had classes with a teacher online."
+    },
+    {
+      "clip": 11,
+      "start": 64.15,
+      "end": 67.13,
+      "text": "They started at nine o’clock."
+    },
+    {
+      "clip": 12,
+      "start": 67.13,
+      "end": 71.09,
+      "text": "My parents said I had to do well at school."
+    },
+    {
+      "clip": 13,
+      "start": 71.09,
+      "end": 77.17,
+      "text": "In the afternoons I practised acrobatics with my dad for hours."
+    },
+    {
+      "clip": 14,
+      "start": 77.17,
+      "end": 81.72,
+      "text": "We practised until dinner at half past seven."
+    },
+    {
+      "clip": 15,
+      "start": 81.72,
+      "end": 86.61,
+      "text": "My dad helped me improve and learn new moves."
+    },
+    {
+      "clip": 16,
+      "start": 86.61,
+      "end": 93.03,
+      "text": "“Let’s try a backflip,” he said one day, ready to catch me if I fell."
+    },
+    {
+      "clip": 17,
+      "start": 93.03,
+      "end": 97.9,
+      "text": "I couldn’t do backflips then, but I can now."
+    },
+    {
+      "clip": 18,
+      "start": 97.9,
+      "end": 103.71,
+      "text": "“Great! Again! Fantastic! Again!” he told me."
+    },
+    {
+      "clip": 19,
+      "start": 103.71,
+      "end": 105.91,
+      "text": "I practised a lot."
+    },
+    {
+      "clip": 20,
+      "start": 105.91,
+      "end": 108.46000000000001,
+      "text": "I really wanted to do it."
+    },
+    {
+      "clip": 21,
+      "start": 108.46000000000001,
+      "end": 114.75999999999999,
+      "text": "After training, my friend Yuri usually came over to give me support."
+    },
+    {
+      "clip": 22,
+      "start": 114.75999999999999,
+      "end": 119.39,
+      "text": "“Soon,” he always said, and hugged me."
+    },
+    {
+      "clip": 23,
+      "start": 119.39,
+      "end": 128.39,
+      "text": "I practised really hard every day for years, then last month it finally happened."
+    },
+    {
+      "clip": 24,
+      "start": 128.39,
+      "end": 135.11,
+      "text": "Dad said, “I think you are ready to go on stage now. How about Saturday?”"
+    },
+    {
+      "clip": 25,
+      "start": 135.11,
+      "end": 140.2,
+      "text": "“Really?” I shouted and jumped up and down."
+    },
+    {
+      "clip": 26,
+      "start": 140.2,
+      "end": 144.98000000000002,
+      "text": "Immediately, I ran to tell Yuri the good news."
+    },
+    {
+      "clip": 27,
+      "start": 144.98000000000002,
+      "end": 148.79,
+      "text": "“I told you!” he laughed."
+    },
+    {
+      "clip": 28,
+      "start": 148.79,
+      "end": 153.55,
+      "text": "“You practised a lot, and practice makes perfect.”"
+    },
+    {
+      "clip": 29,
+      "start": 153.55,
+      "end": 157.28,
+      "text": "And that was how my dream came true."
+    },
+    {
+      "clip": 30,
+      "start": 157.28,
+      "end": 160.94,
+      "text": "Now I perform in the circus every week."
+    }
+  ],
+  "vocabulary": [
+    {
+      "term": "imagine",
+      "spoken": "imagine",
+      "file": "word-imagine.mp3",
+      "source": "Youdao British English",
+      "url": "https://dict.youdao.com/dictvoice?type=1&audio=imagine"
+    },
+    {
+      "term": "travel all over the world",
+      "spoken": "travel all over the world",
+      "file": "word-travel-all-over-the-world.mp3",
+      "source": "Youdao British English",
+      "url": "https://dict.youdao.com/dictvoice?type=1&audio=travel+all+over+the+world"
+    },
+    {
+      "term": "trapeze",
+      "spoken": "trapeze",
+      "file": "word-trapeze.mp3",
+      "source": "Youdao British English",
+      "url": "https://dict.youdao.com/dictvoice?type=1&audio=trapeze"
+    },
+    {
+      "term": "trampoline",
+      "spoken": "trampoline",
+      "file": "word-trampoline.mp3",
+      "source": "Youdao British English",
+      "url": "https://dict.youdao.com/dictvoice?type=1&audio=trampoline"
+    },
+    {
+      "term": "be born / was born",
+      "spoken": "be born, was born",
+      "file": "word-was-born.mp3",
+      "source": "Sound of Text en-GB",
+      "url": "https://files.soundoftext.com/55f85300-d973-11f1-9564-05a2f3b61c77.mp3"
+    },
+    {
+      "term": "Russian",
+      "spoken": "Russian",
+      "file": "word-russian.mp3",
+      "source": "Youdao British English",
+      "url": "https://dict.youdao.com/dictvoice?type=1&audio=Russian"
+    },
+    {
+      "term": "acrobat / acrobatics",
+      "spoken": "acrobat, acrobatics",
+      "file": "word-acrobat-acrobatics.mp3",
+      "source": "Sound of Text en-GB",
+      "url": "https://files.soundoftext.com/56e80a30-d973-11f1-9564-05a2f3b61c77.mp3"
+    },
+    {
+      "term": "dream",
+      "spoken": "dream",
+      "file": "word-dream.mp3",
+      "source": "Youdao British English",
+      "url": "https://dict.youdao.com/dictvoice?type=1&audio=dream"
+    },
+    {
+      "term": "just like",
+      "spoken": "just like",
+      "file": "word-just-like.mp3",
+      "source": "Youdao British English",
+      "url": "https://dict.youdao.com/dictvoice?type=1&audio=just+like"
+    },
+    {
+      "term": "perform / perform on stage",
+      "spoken": "perform on stage",
+      "file": "word-perform-on-stage.mp3",
+      "source": "Youdao British English",
+      "url": "https://dict.youdao.com/dictvoice?type=1&audio=perform+on+stage"
+    },
+    {
+      "term": "ready",
+      "spoken": "ready",
+      "file": "word-ready.mp3",
+      "source": "Youdao British English",
+      "url": "https://dict.youdao.com/dictvoice?type=1&audio=ready"
+    },
+    {
+      "term": "online",
+      "spoken": "online",
+      "file": "word-online.mp3",
+      "source": "Youdao British English",
+      "url": "https://dict.youdao.com/dictvoice?type=1&audio=online"
+    },
+    {
+      "term": "do well at school",
+      "spoken": "do well at school",
+      "file": "word-do-well-at-school.mp3",
+      "source": "Youdao British English",
+      "url": "https://dict.youdao.com/dictvoice?type=1&audio=do+well+at+school"
+    },
+    {
+      "term": "practise / practised",
+      "spoken": "practise, practised",
+      "file": "word-practise.mp3",
+      "source": "Sound of Text en-GB",
+      "url": "https://files.soundoftext.com/59935410-d973-11f1-9564-05a2f3b61c77.mp3"
+    },
+    {
+      "term": "improve",
+      "spoken": "improve",
+      "file": "word-improve.mp3",
+      "source": "Youdao British English",
+      "url": "https://dict.youdao.com/dictvoice?type=1&audio=improve"
+    },
+    {
+      "term": "moves",
+      "spoken": "moves",
+      "file": "word-moves.mp3",
+      "source": "Youdao British English",
+      "url": "https://dict.youdao.com/dictvoice?type=1&audio=moves"
+    },
+    {
+      "term": "backflip",
+      "spoken": "backflip",
+      "file": "word-backflip.mp3",
+      "source": "Youdao British English",
+      "url": "https://dict.youdao.com/dictvoice?type=1&audio=backflip"
+    },
+    {
+      "term": "training",
+      "spoken": "training",
+      "file": "word-training.mp3",
+      "source": "Youdao British English",
+      "url": "https://dict.youdao.com/dictvoice?type=1&audio=training"
+    },
+    {
+      "term": "give someone support",
+      "spoken": "give someone support",
+      "file": "word-give-someone-support.mp3",
+      "source": "Sound of Text en-GB",
+      "url": "https://files.soundoftext.com/5b1b2c90-d973-11f1-9564-05a2f3b61c77.mp3"
+    },
+    {
+      "term": "hug / hugged",
+      "spoken": "hug, hugged",
+      "file": "word-hug.mp3",
+      "source": "Sound of Text en-GB",
+      "url": "https://files.soundoftext.com/5b2da320-d973-11f1-9564-05a2f3b61c77.mp3"
+    },
+    {
+      "term": "hard",
+      "spoken": "hard",
+      "file": "word-hard.mp3",
+      "source": "Youdao British English",
+      "url": "https://dict.youdao.com/dictvoice?type=1&audio=hard"
+    },
+    {
+      "term": "finally",
+      "spoken": "finally",
+      "file": "word-finally.mp3",
+      "source": "Youdao British English",
+      "url": "https://dict.youdao.com/dictvoice?type=1&audio=finally"
+    },
+    {
+      "term": "happen / happened",
+      "spoken": "happen, happened",
+      "file": "word-happen.mp3",
+      "source": "Sound of Text en-GB",
+      "url": "https://files.soundoftext.com/5c0872c0-d973-11f1-9564-05a2f3b61c77.mp3"
+    },
+    {
+      "term": "immediately",
+      "spoken": "immediately",
+      "file": "word-immediately.mp3",
+      "source": "Youdao British English",
+      "url": "https://dict.youdao.com/dictvoice?type=1&audio=immediately"
+    },
+    {
+      "term": "good news",
+      "spoken": "good news",
+      "file": "word-good-news.mp3",
+      "source": "Youdao British English",
+      "url": "https://dict.youdao.com/dictvoice?type=1&audio=good+news"
+    },
+    {
+      "term": "practice makes perfect",
+      "spoken": "practice makes perfect",
+      "file": "word-practice-makes-perfect.mp3",
+      "source": "Youdao British English",
+      "url": "https://dict.youdao.com/dictvoice?type=1&audio=practice+makes+perfect"
+    },
+    {
+      "term": "my dream came true",
+      "spoken": "my dream came true",
+      "file": "word-my-dream-came-true.mp3",
+      "source": "Sound of Text en-GB",
+      "url": "https://files.soundoftext.com/5f23bc80-d973-11f1-9564-05a2f3b61c77.mp3"
+    }
+  ]
+}

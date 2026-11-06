@@ -404,3 +404,5 @@ onset-preserving capture, contractions and rejection of punctuation-only targets
 Production is unchanged.
 
 The notes image budget gate runs in the full and notes checks. It discovers manifests from the registered readers and enforces WebP, matching dimensions, 450 KB per image and 1.5 MB per lesson. See [image export and visual review](../interactive-notes-poc.md#image-publishing-workflow).
+
+`node test_pu3_circus_preview_browser.js` checks the PU3 U1 p14 article reader, all 27 recognition items including the short final set, four gap-fill boards, restored answers, completion credit and unchanged SR. External requests are intercepted.

@@ -595,3 +595,7 @@ Next login asks 看起来你上次的学习还没有完成，要继续吗？ wit
 ## PU2 Unit 1 The Race preview (preview)
 
 Page 14 opens the literature reader for pages 14–15, with 14 illustrated vocabulary items and five original story sections. Recognition uses three groups (5, 5, 4), followed by five paragraph gap-fills with full reset on error. Completion records 14 words and five exercises, earns Study credit, supports the existing checkpoint recovery, and leaves SR untouched. The story recording is split into 26 clips and bundled for lazy, mirror-aware loading; images use lazy grouped packs. Youdao supplies vocabulary audio except for two Sound of Text fallbacks. The unit also includes ordinary Study/game material at its actual page 14 placement.
+
+## PU3 Unit 1 The Circus Child preview
+
+The page-14 article lesson registers `pu3-u1-p14`: all 27 approved words in six recognition sets, followed by four story gap-fill boards. The final recognition set has two words. It reuses article Study credit, completion and recovery without adding SR entries. Four cropped textbook sections and 30 original narration clips support the reader. Page 16 remains available.

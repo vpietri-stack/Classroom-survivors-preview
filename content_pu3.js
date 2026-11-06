@@ -1152,7 +1152,7 @@ TEACHING_CONTENT["PU3"] = {
 
 AVAILABLE_CONTENT["PU3"] = {
     "0": [5],
-    "1": [16],
+    "1": [14, 16],
     "2": [28],
     "3": [31, 33, 35, 36],
     "4": [54],
@@ -1162,3 +1162,6 @@ AVAILABLE_CONTENT["PU3"] = {
     "8": [95, 97, 98, 99],
     "9": [107, 109, 110, 111, 112]
 };
+
+// Article Study owns recognition and story exercises; no new SR items.
+TEACHING_CONTENT.PU3["1"]["14"] = { vocab: [], sentences: [], sentencePairs: [] };

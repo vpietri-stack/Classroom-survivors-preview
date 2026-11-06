@@ -194,3 +194,5 @@ The functional recovery container now also holds id game / type game_resume per 
 Local key csGameResume_v1_<deployment path>_<studentId> holds snapshot/version/completion receipts. State contains logical cards/board/turns, remaining clocks and a bounded serializable continuation; the UI portion contains the current exercise/partial inputs and SR outcomes. No token, password, HTML, audio, scene object or graphics. Cloud saves are coalesced around five seconds; local input saves are immediate. An offline-only save remains on its device until uploaded. This data is separate from optional diagnostic retention.
 
 Completion ordering: gameRecoveryCredits retains the last 40 run IDs whose SR counter increment actually applied. The completion event receipt alone never suppresses a delayed first increment; duplicate/newer-sequence deliveries cannot grant it twice. Event-first and progress-first cases are checked separately.
+
+The shared preview-note catalog includes `pu3-u1-p14`, version 1, with wordCount 27 and exerciseCount 4; frontend and API must ship the same catalog.

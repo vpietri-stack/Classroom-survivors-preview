@@ -70,5 +70,11 @@ async function save(events,extra={}) {
   const p59Count=stored.sessionCount;
   await save([p59Event],{srState:{vocab:{}},srSeq:5,srDelta:true,incrementSession:true});
   ok(stored.sessionCount===p59Count,'PU1 page 59 retry does not double-credit Study');
+  const circusEvent={...event,eventId:'circus-note-study',data:{...event.data,previewNote:{...marker,id:'pu3-u1-p14',book:'PU3',unit:'1',page:'14',wordCount:27,exerciseCount:4}}};
+  response=await save([circusEvent],{srState:{vocab:{}},srSeq:6,srDelta:true,incrementSession:true});
+  ok(response.status===200 && stored.previewNotes['pu3-u1-p14'],'Circus Child completion survives server normalization');
+  const circusCount=stored.sessionCount;
+  await save([circusEvent],{srState:{vocab:{}},srSeq:6,srDelta:true,incrementSession:true});
+  ok(stored.sessionCount===circusCount,'Circus Child retry does not double-credit Study');
   console.log(checks+' preview-note API checks passed');
 })().catch(error=>{console.error(error);process.exitCode=1;});
