@@ -463,7 +463,7 @@ for (const [unit, lastPage, missing, fixes, pages] of [
     [4, 54, 22, 32, [[45,5,6],[47,7,10],[48,4,6],[54,6,10]]],
     [5, 63, 28, 36, [[57,5,6],[59,8,10],[60,5,6],[61,6,8],[63,4,6]]],
     [6, 81, 32, 46, [[78,28,40],[81,4,6]]],
-    [7, 92, 28, 36, [[83,8,8],[85,8,12],[92,12,16]]]
+    [7, 92, 28, 36, [[83,8,9],[85,12,17],[87,8,9],[91,0,1],[92,0,0]]]
 ]) {
     const items = content.buildPool('PU1', unit, lastPage).entries.filter(e => e.item.id && e.item.unit === String(unit)).map(e => e.item);
     pu1Approved.push(...items);
@@ -573,6 +573,17 @@ const pu1Unit7 = pu1Approved.filter(e => e.unit === '7');
 assert.deepEqual(pu1Unit7.filter(e => e.answers).map(e => e.id).sort(), Array.from({length: 28}, (_, i) => 'M' + (i + 1)).sort());
 assert.deepEqual(pu1Unit7.filter(e => e.answer).map(e => e.id).sort(), Array.from({length: 36}, (_, i) => 'F' + (i + 1)).sort());
 assert.equal(new Set(pu1Unit7.filter(e => e.answer).map(e => e.sentence)).size, 36);
+// Page reassignment must not reset any of the October typed-board SR records.
+for (const item of pu1Unit7) {
+    const number = Number(item.id.slice(1));
+    const oldPage = number <= 8 ? 83
+        : number <= (item.answers ? 16 : 20) ? 84 : 92;
+    assert.equal(item.key, `non-spelling:${item.type}:pu1:7:${oldPage}:${item.id.toLowerCase()}`);
+}
+const retiredReview = vm.runInContext('TEACHING_CONTENT.PU1[7][92]', sandbox);
+assert.equal(retiredReview.vocab.length, 0);
+assert.equal(retiredReview.nonSpellingExercises.length, 0, 'p92 keeps a cumulative boundary but owns no direct content');
+
 assert.deepEqual(Array.from(pu1Unit7.find(e => e.id === 'M1').prefixes), ['f','b']);
 assert.deepEqual(Array.from(pu1Unit7.find(e => e.id === 'M3').sentences), ['I can play ___ on the ___ or on a ___.']);
 assert.deepEqual(Array.from(pu1Unit7.find(e => e.id === 'M3').answers), ['music','piano','guitar']);

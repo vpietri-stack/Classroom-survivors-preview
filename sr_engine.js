@@ -42,6 +42,7 @@ const SR_LEECH_LAPSES = 4;
 
 // Exact legacy vocabulary labels, retained so renamed items keep their SR history.
 const VOCAB_SR_LEGACY_KEYS = Object.freeze({
+    "watch television": ["watch tv"],
     "you - your": ["your"],
     "i - my": ["my"],
     "get - got": ["get got","got"],

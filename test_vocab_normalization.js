@@ -58,7 +58,7 @@ for (const e of entries) {
     const key = sandbox.itemKey(e.word);
     if (e.book === 'PU1' && Number(e.unit) <= 3 && ['my', 'your', 'got'].includes(key)) continue;
     // Bare base verbs and the picture noun still intentionally exist elsewhere.
-    if (['cut', 'put', 'read', 'painting'].includes(key)) continue;
+    if (['cut', 'put', 'read', 'painting', 'watch tv'].includes(key)) continue;
     assert(!legacyLabels.has(key), `Unconverted vocabulary: ${JSON.stringify(e)}`);
 }
 for (const [canonical, legacy] of Object.entries(aliases)) {

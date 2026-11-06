@@ -57,7 +57,7 @@ Think0 Unit 4 page 44 uses the normal preview catalog and opens automatically fo
 
 `pu1-u7-p85` opens `pu1_u7_p85_notes.html` on first page-85 login or SR advancement. It preserves all three approved present-continuous infographics, with 41 locally saved word/phrase/sentence clips bundled with the reader to avoid stalled MP3 requests during playback, replay, slow playback, zoom and optional existing adaptive pronunciation practice. The shared reader now derives image paths, accessible labels and page totals from lesson data; PU3 defaults remain compatible. The heading is static artwork. Start studying has no listening or speaking gate.
 
-The following regular Study chooses five distinct vocabulary entries and five distinct non-spelling boards strictly from page 85, using the unchanged content moved from page 84 (including eight missing-word and twelve find/fix boards). Full completion earns one normal Study credit and unlocks the review library; interruption, first-attempt SR, account isolation and acknowledged saving retain the existing contracts. The shared browser/server note catalog includes this new ID at version 1.
+The following regular Study chooses five distinct vocabulary entries and five distinct non-spelling boards strictly from page 85, using the page-85 content (expanded on 6 November to twelve missing-word and seventeen find/fix boards). Full completion earns one normal Study credit and unlocks the review library; interruption, first-attempt SR, account isolation and acknowledged saving retain the existing contracts. The shared browser/server note catalog includes this new ID at version 1.
 
 # Study Mode (UI Rounds A–D + Match; internal functions A/C/D/E/F)
 
@@ -599,3 +599,9 @@ Page 14 opens the literature reader for pages 14–15, with 14 illustrated vocab
 ## PU3 Unit 1 The Circus Child preview
 
 The page-14 article lesson registers `pu3-u1-p14`: all 27 approved words in six recognition sets, followed by four story gap-fill boards. The final recognition set has two words. It reuses article Study credit, completion and recovery without adding SR entries. Four cropped textbook sections and 30 original narration clips support the reader. Page 16 remains available.
+
+## PU1 Unit 7 approved redistribution (6 November 2026, preview)
+
+The former page-92 review bundle is redistributed by the approved item-level map: initial hobbies on p83, present-continuous practice on p85, newer sports/equipment/actions and permission on p87, and jump/smile story vocabulary on p91. All original p85 content stays on p85. Exact duplicates merge at their destination; "watch TV" consolidates with "watch television". Page 92 retains an empty content entry and its cumulative review boundary for existing assignments; it owns no direct exercises. The available sequence is 83, 85, 87, 91, 92. No new p86/p87 infographic lesson is introduced by this change.
+
+All 28 missing-word and 36 find/fix boards from the October preview remain available. M17-M28 and F21-F36 retain item-level `srPage: '92'` after moving; the earlier p85 boards retain `srPage: '84'`. Normalization respects an item's explicit SR page before the destination page's default, preserving existing typed-board history. Vocabulary, scramble and pair identities continue to use their established content keys.

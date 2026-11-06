@@ -1341,11 +1341,32 @@ TEACHING_CONTENT["PU1"] = {
     },
     "7": {
         "83": {
-            vocab: [
-                'sports', 'music', 'play tennis', 'play football', 'play the guitar', 'play the piano', 'watch television', 'ride a bike', 'swim', 'play basketball',
-                'want', 'to', "let's", 'fun', 'favourite', 'is'
+            "vocab": [
+                "sports",
+                "music",
+                "play tennis",
+                "play football",
+                "play the guitar",
+                "play the piano",
+                "watch television",
+                "ride a bike",
+                "swim",
+                "play basketball",
+                "want",
+                "to",
+                "let's",
+                "fun",
+                "favourite",
+                "is",
+                "play",
+                "football",
+                "basketball",
+                "tennis",
+                "guitar",
+                "piano",
+                "listen to music"
             ],
-            sentences: [
+            "sentences": [
                 "I want to play tennis.",
                 "I want to play football.",
                 "I want to play the guitar.",
@@ -1365,23 +1386,70 @@ TEACHING_CONTENT["PU1"] = {
                 "Tennis is fun.",
                 "Football is fun.",
                 "Music is my favourite.",
-                "Basketball is my favourite."
+                "Basketball is my favourite.",
+                "Let's ride our bikes."
             ],
-            sentencePairs: [
-                { a: "What do you want to do?", b: "I want to play tennis." },
-                { a: "Let's play the guitar.", b: "That's a good idea." },
-                { a: "Is tennis fun?", b: "Yes, it is." },
-                { a: "What's your favourite sport?", b: "Basketball is." }
+            "sentencePairs": [
+                {
+                    "a": "What do you want to do?",
+                    "b": "I want to play tennis."
+                },
+                {
+                    "a": "Let's play the guitar.",
+                    "b": "That's a good idea."
+                },
+                {
+                    "a": "Is tennis fun?",
+                    "b": "Yes, it is."
+                },
+                {
+                    "a": "What's your favourite sport?",
+                    "b": "Basketball is."
+                }
             ]
         },
         "85": {
-            // Keep the existing typed-board SR identities after the page correction.
-            srPage: '84',
-            vocab: [
-                "ride - riding", "swim - swimming", "watch - watching", "clean - cleaning", "play - playing", "paint - painting", "do - doing", "eat - eating", 'feet', 'Tom',
-                'what',  'is', 'she', 'are', 'you', "I'm", "they're", "isn't", "not"
+            "srPage": "84",
+            "vocab": [
+                "ride - riding",
+                "swim - swimming",
+                "watch - watching",
+                "clean - cleaning",
+                "play - playing",
+                "paint - painting",
+                "do - doing",
+                "eat - eating",
+                "feet",
+                "Tom",
+                "what",
+                "is",
+                "she",
+                "are",
+                "you",
+                "I'm",
+                "they're",
+                "isn't",
+                "not",
+                "ride a bike - riding a bike",
+                "watch TV - watching TV",
+                "eat",
+                "listen to music - listening to music",
+                "he is",
+                "he isn't",
+                "she is",
+                "she isn't",
+                "it is",
+                "it isn't",
+                "I am",
+                "I'm not",
+                "you are",
+                "you aren't",
+                "we are",
+                "we aren't",
+                "they are",
+                "they aren't"
             ],
-            sentences: [
+            "sentences": [
                 "What are you doing?",
                 "What's she eating?",
                 "Is she cleaning her feet?",
@@ -1390,37 +1458,7 @@ TEACHING_CONTENT["PU1"] = {
                 "They're swimming.",
                 "She's painting her feet.",
                 "No, she isn't.",
-                "No, I'm not."
-            ],
-            sentencePairs: [
-                { a: "What are you doing?", b: "I'm watching TV." },
-                { a: "What's she eating?", b: "She's eating an apple." },
-                { a: "Is she cleaning her feet?", b: "No, she isn't." },
-                { a: "Are you playing tennis?", b: "No, I'm not." },
-                { a: "What are they doing?", b: "They're swimming." }
-            ]
-        },
-        "92": {
-            vocab: [
-                "play", "play - playing", "football", "basketball", "tennis", "hockey", "badminton", "baseball", "music",
-                "tennis racket", "baseball bat", "hockey stick", "badminton racket",
-                "guitar", "piano",
-                "ride a bike", "ride a bike - riding a bike",
-                "swim", "swim - swimming",
-                "watch TV", "watch TV - watching TV",
-                "skateboard", "skateboard - skateboarding",
-                "run", "run - running",
-                "jump", "jump - jumping",
-                "eat", "eat - eating",
-                "smile", "smile - smiling",
-                "listen to music", "listen to music - listening to music",
-                "he is", "he isn't", "she is", "she isn't", "it is", "it isn't",
-                "I am", "I'm", "I'm not",
-                "you are", "you aren't", "we are", "we aren't", "they are", "they aren't",
-                "let's", "can", "can't"
-            ],
-            sentences: [
-                "What are you doing?",
+                "No, I'm not.",
                 "What are we doing?",
                 "What are they doing?",
                 "What is he doing?",
@@ -1428,42 +1466,140 @@ TEACHING_CONTENT["PU1"] = {
                 "Are you playing football?",
                 "Is she running?",
                 "Are they eating?",
-                "Yes, I am.", "No, I'm not.",
-                "Yes, we are.", "No, we aren't.",
-                "Yes, they are.", "No, they aren't.",
-                "Yes, he is.", "No, he isn't.",
-                "Yes, she is.", "No, she isn't.",
+                "Yes, I am.",
+                "Yes, we are.",
+                "No, we aren't.",
+                "Yes, they are.",
+                "No, they aren't.",
+                "Yes, he is.",
+                "No, he isn't.",
+                "Yes, she is.",
                 "I'm playing tennis.",
                 "I'm not watching TV.",
                 "He's riding a bike.",
                 "She isn't swimming.",
-                "They're listening to music.",
+                "They're listening to music."
+            ],
+            "sentencePairs": [
+                {
+                    "a": "What are you doing?",
+                    "b": "I'm watching TV."
+                },
+                {
+                    "a": "What's she eating?",
+                    "b": "She's eating an apple."
+                },
+                {
+                    "a": "Is she cleaning her feet?",
+                    "b": "No, she isn't."
+                },
+                {
+                    "a": "Are you playing tennis?",
+                    "b": "No, I'm not."
+                },
+                {
+                    "a": "What are they doing?",
+                    "b": "They're swimming."
+                },
+                {
+                    "a": "Are you playing football?",
+                    "b": "Yes, we are."
+                },
+                {
+                    "a": "Are you playing basketball?",
+                    "b": "No, we aren't. We're playing football."
+                },
+                {
+                    "a": "Is he riding a bike?",
+                    "b": "No, he isn't. He's riding a horse"
+                },
+                {
+                    "a": "Is he riding a horse?",
+                    "b": "Yes, he is."
+                },
+                {
+                    "a": "What is he doing?",
+                    "b": "He's riding a horse."
+                },
+                {
+                    "a": "What is she doing?",
+                    "b": "She's swimming."
+                },
+                {
+                    "a": "Is she dancing?",
+                    "b": "No, she isn't. She's swimming."
+                },
+                {
+                    "a": "Is she swimming?",
+                    "b": "Yes, she is."
+                },
+                {
+                    "a": "What are they doing?",
+                    "b": "They're playing tennis."
+                }
+            ]
+        },
+        "87": {
+            "vocab": [
+                "hockey",
+                "badminton",
+                "baseball",
+                "tennis racket",
+                "baseball bat",
+                "hockey stick",
+                "badminton racket",
+                "skateboard",
+                "skateboard - skateboarding",
+                "run",
+                "run - running",
+                "can",
+                "can't"
+            ],
+            "sentences": [
                 "We aren't playing baseball.",
                 "Can I play with you?",
                 "Can we go on the swings?",
                 "Can I watch television?",
                 "Yes, you can.",
-                "No, you can't.",
-                "Let's play basketball.",
-                "Let's ride our bikes."
+                "No, you can't."
             ],
-            sentencePairs: [
-                { a: "What are you doing?", b: "I'm watching TV." },
-                { a: "Are you playing football?", b: "Yes, we are." },
-                { a: "Are you playing basketball?", b: "No, we aren't. We're playing football." },
-                { a: "Is he riding a bike?", b: "No, he isn't. He's riding a horse" },
-                { a: "Is he riding a horse?", b: "Yes, he is." },
-                { a: "What is he doing?", b: "He's riding a horse." },
-                { a: "Can I play with you?", b: "Yes, of course." },
-                { a: "What is she doing?", b: "She's swimming." },
-                { a: "Is she dancing?", b: "No, she isn't. She's swimming." },
-                { a: "Is she swimming?", b: "Yes, she is." },
-                { a: "What are they doing?", b: "They're playing tennis." },
-                { a: "Are they hitting the ball?", b: "Yes, they are." },
-                { a: "Are they kicking the ball?", b: "No, they aren't. They're playing tennis." },
-                { a: "Can we hit the ball?", b: "No, you can't. We're playing football." },
-                { a: "Can we kick the ball?", b: "Yes, you can." }
+            "sentencePairs": [
+                {
+                    "a": "Can I play with you?",
+                    "b": "Yes, of course."
+                },
+                {
+                    "a": "Are they hitting the ball?",
+                    "b": "Yes, they are."
+                },
+                {
+                    "a": "Are they kicking the ball?",
+                    "b": "No, they aren't. They're playing tennis."
+                },
+                {
+                    "a": "Can we hit the ball?",
+                    "b": "No, you can't. We're playing football."
+                },
+                {
+                    "a": "Can we kick the ball?",
+                    "b": "Yes, you can."
+                }
             ]
+        },
+        "91": {
+            "vocab": [
+                "jump",
+                "jump - jumping",
+                "smile",
+                "smile - smiling"
+            ],
+            "sentences": [],
+            "sentencePairs": []
+        },
+        "92": {
+            "vocab": [],
+            "sentences": [],
+            "sentencePairs": []
         }
     },
     "8": {
@@ -1685,7 +1821,7 @@ AVAILABLE_CONTENT["PU1"] = {
     "4": [45, 47, 48, 54],
     "5": [57, 59, 60, 61, 63],
     "6": [78, 81],
-    "7": [83, 85, 92],
+    "7": [83, 85, 87, 91, 92],
     "8": [95, 97, 99],
     "9": [107, 108, 110, 111]
 };
