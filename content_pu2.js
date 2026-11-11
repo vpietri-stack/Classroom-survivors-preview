@@ -919,37 +919,36 @@ TEACHING_CONTENT["PU2"] = {
         "60": {
             vocab: [
                 'climb - climbing', 'fall - falling', 'fly - flying', 'get - getting', 'hide - hiding',
-                'jump - jumping', 'lose - losing', 'move - moving', 'run - running', 'walk - walking'
+                'jump - jumping', 'lose - losing', 'move - moving', 'run - running', 'walk - walking',
+                'above', 'below', 'near', 'opposite'
             ],
             sentences: [
                 "Snails can't move fast.",
                 "Kangaroos can jump but they can't run.",
                 "Penguins walk slowly but they can swim fast.",
                 "I think parrots are the prettiest birds.",
-                "You musn't lose your books."
-            ],
-            sentencePairs: [
-                { a: "Penguins walk slowly,", b: "but they can swim fast." }
-            ]
-        },
-        "62": {
-            vocab: [
-                'above', 'below', 'near', 'opposite',
-            ],
-            sentences: [
+                "You musn't lose your books.",
                 "The bat is above the tree.",
                 "The snail is below the flower.",
                 "The parrot is near the cage.",
-                "The zoo is opposite the park.",
+                "The zoo is opposite the park."
+            ],
+            sentencePairs: [
+                { a: "Penguins walk slowly,", b: "but they can swim fast." },
+                { a: "Where are the bats?", b: "They're above the tree." },
+                { a: "Where is the zoo?", b: "It's opposite the park." },
+                { a: "Where are the snails?", b: "They're below the flower." },
+                { a: "Where is the parrot?", b: "It's near the cage." }
+            ]
+        },
+        "62": {
+            vocab: [],
+            sentences: [
                 "Lions are carnivores.",
                 "Pandas are herbivores.",
                 "Dogs are omnivores."
             ],
             sentencePairs: [
-                { a: "Where are the bats?", b: "They're above the tree." },
-                { a: "Where is the zoo?", b: "It's opposite the park." },
-                { a: "Where are the snails?", b: "They're below the flower." },
-                { a: "Where is the parrot?", b: "It's near the cage." },
                 { a: "Lions and dolphins", b: "are carnivores." },
                 { a: "Pandas and rabbits", b: "are herbivores." },
                 { a: "Dogs and pigs", b: "are omnivores." }

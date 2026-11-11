@@ -275,7 +275,7 @@ const pu2Unit5 = content.buildPool('PU2', 5, 62).entries.filter(e => e.item.id &
 assert.equal(pu2Unit5.filter(e => e.answers).length, 28);
 assert.equal(pu2Unit5.filter(e => e.answer).length, 34);
 assert.equal(new Set([...pu2Unit1, ...pu2Unit2, ...pu2Unit3, ...pu2Unit4, ...pu2Unit5].map(e => e.key)).size, 281);
-for (const [page, missing, fix] of [[57,6,8],[59,10,14],[60,6,4],[62,6,8]]) {
+for (const [page, missing, fix] of [[57,6,8],[59,10,14],[60,8,8],[62,4,4]]) {
     const items = pu2Unit5.filter(e => e.page === String(page));
     assert.equal(items.filter(e => e.answers).length, missing);
     assert.equal(items.filter(e => e.answer).length, fix);

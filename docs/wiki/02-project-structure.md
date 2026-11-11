@@ -105,7 +105,7 @@ directly with a `?v=` cache-buster; files share state through the global JS name
 | `translations.js` | 5318 | One flat object `LOCAL_TRANSLATIONS` (~5.1k `"english": "中文"` entries), grouped by comment banners; consumed by `getLocalTranslation()` in `game.js:10`. |
 | `teaching_content.js` | 667 | Declares `TEACHING_CONTENT = {}` / `AVAILABLE_CONTENT = {}` + shared wizard state + per-account localStorage scoping + SR selection helpers (`getStudyContentSR`, `getGameItemSR`, …). |
 | `content_pu1.js` | 1689 | Pack PU1: `TEACHING_CONTENT["PU1"]` (units 0–9) + `AVAILABLE_CONTENT["PU1"]` (~1678). |
-| `content_pu2.js` | 1475 | Pack PU2 (units 0–9). |
+| `content_pu2.js` | 1493 | Pack PU2 (units 0–9). |
 | `content_pu3.js` | 939 | Pack PU3 (units 0–9). |
 | `content_think0.js` | 755 | Pack Think0 (units 0–4). |
 | `content_think1.js` | 624 | Pack Think1 (units 0–7). |

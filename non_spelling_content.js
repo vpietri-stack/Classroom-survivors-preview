@@ -983,29 +983,29 @@
                 {"id": "M19", "sentences": ["Rabbits can ___ behind rocks.", "Look! That rabbit is ___ behind a rock."], "answers": ["hide", "hiding"], "prefixes": ["h", "h"]},
                 {"id": "M20", "sentences": ["Lions can ___ fast.", "Look! That lion is ___ after its food."], "answers": ["run", "running"], "prefixes": ["r", "r"]},
                 {"id": "M21", "sentences": ["Keep your book in your bag so you don't ___ it.", "Look! A leaf is ___ from the tree."], "answers": ["lose", "falling"], "prefixes": ["l", "f"]},
-                {"id": "M22", "sentences": ["Look! The snail is ___ very slowly.", "The penguin is ___ on the ice."], "answers": ["moving", "walking"], "prefixes": ["m", "w"]}
+                {"id": "M22", "sentences": ["Look! The snail is ___ very slowly.", "The penguin is ___ on the ice."], "answers": ["moving", "walking"], "prefixes": ["m", "w"]},
+                {"id": "M23", "sentences": ["The plane is higher than the tree. It's ___ the tree.", "The snail is lower than the flower. It's ___ the flower."], "answers": ["above", "below"]},
+                {"id": "M24", "sentences": ["The zoo is across the road from the park. It's ___ the park.", "My house is only a minute's walk from school. It's ___ the school."], "answers": ["opposite", "near"], "prefixes": ["o", "n"]}
             ],
             fix: [
                 {"id": "F23", "sentence": "Bears can climbing trees.", "wrongWord": "climbing", "answer": "climb"},
                 {"id": "F24", "sentence": "Look! The lion is run after its food.", "wrongWord": "run", "answer": "running"},
                 {"id": "F25", "sentence": "The rabbits are hide behind the rocks.", "wrongWord": "hide", "answer": "hiding"},
-                {"id": "F26", "sentence": "Look! The bat is fly above the tree.", "wrongWord": "fly", "answer": "flying"}
+                {"id": "F26", "sentence": "Look! The bat is fly above the tree.", "wrongWord": "fly", "answer": "flying"},
+                {"id": "F27", "sentence": "The snail is lower than the flower. It's above the flower.", "wrongWord": "above", "answer": "below"},
+                {"id": "F28", "sentence": "The kite is higher than the roof. It's below the roof.", "wrongWord": "below", "answer": "above"},
+                {"id": "F29", "sentence": "The zoo is across the road from the park. It's between the park.", "wrongWord": "between", "answer": "opposite"},
+                {"id": "F30", "sentence": "The school is next to my house. It's opposite my house.", "wrongWord": "opposite", "answer": "near"}
             ]
         },
         62: {
             missing: [
-                {"id": "M23", "sentences": ["The plane is higher than the tree. It's ___ the tree.", "The snail is lower than the flower. It's ___ the flower."], "answers": ["above", "below"]},
-                {"id": "M24", "sentences": ["The zoo is across the road from the park. It's ___ the park.", "My house is only a minute's walk from school. It's ___ the school."], "answers": ["opposite", "near"], "prefixes": ["o", "n"]},
                 {"id": "M25", "sentences": ["Animals that eat only ___ and ___ are carnivores.", "Wolves, polar bears and penguins are ___."], "answers": ["meat", "fish", "carnivores"], "prefixes": ["m", "f", "c"]},
                 {"id": "M26", "sentences": ["Animals that eat both ___ and ___ are omnivores.", "People, pigs and dogs are ___."], "answers": ["meat", "plants", "omnivores"], "prefixes": ["m", "p", "o"]},
                 {"id": "M27", "sentences": ["Animals that only eat ___ are herbivores.", "Rabbits, pandas, and cows are ___."], "answers": ["plants", "herbivores"], "prefixes": ["p", "h"]},
                 {"id": "M28", "sentences": ["Brown ___ eat meat and plants. They're omnivores.", "___ ___ only eat meat and fish. They're carnivores."], "answers": ["bears", "polar", "bears"], "prefixes": ["b", "p", "b"]}
             ],
             fix: [
-                {"id": "F27", "sentence": "The snail is lower than the flower. It's above the flower.", "wrongWord": "above", "answer": "below"},
-                {"id": "F28", "sentence": "The kite is higher than the roof. It's below the roof.", "wrongWord": "below", "answer": "above"},
-                {"id": "F29", "sentence": "The zoo is across the road from the park. It's between the park.", "wrongWord": "between", "answer": "opposite"},
-                {"id": "F30", "sentence": "The school is next to my house. It's opposite my house.", "wrongWord": "opposite", "answer": "near"},
                 {"id": "F31", "sentence": "Lions eat plants. They're carnivores.", "wrongWord": "plants", "answer": "meat"},
                 {"id": "F32", "sentence": "Rabbits eat meat. They're herbivores.", "wrongWord": "meat", "answer": "plants"},
                 {"id": "F33", "sentence": "People eat both meat and poopoo. We're omnivores.", "wrongWord": "poopoo", "answer": "plants"},
