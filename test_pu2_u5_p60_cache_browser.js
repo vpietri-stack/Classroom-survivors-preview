@@ -39,5 +39,5 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+new 
   assert.equal(media.length,0,'reopened reader serves three images and all 28 clips from persistent cache with media network blocked');
   await context.close();
   console.log('PASS first-page-only downloads, origin/mirror fallback, 12 persistent assets, and offline reload of three images plus 28 audio clips.');
- }finally{await browser.close();}
-})().catch(e=>{console.error(e);process.exitCode=1});
+ }finally{await browser.close();server.close();}
+})().catch(e=>{console.error(e);server.close();process.exitCode=1});
