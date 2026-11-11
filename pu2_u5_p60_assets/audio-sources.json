@@ -1,0 +1,198 @@
+{
+  "run-running": {
+    "id": "run-running",
+    "text": "run, running",
+    "source": "soundoftext",
+    "sourceUrl": "https://files.soundoftext.com/9d4e5f90-dd99-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 14784
+  },
+  "climb-climbing": {
+    "id": "climb-climbing",
+    "text": "climb, climbing",
+    "source": "soundoftext",
+    "sourceUrl": "https://files.soundoftext.com/9f4881e0-dd99-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 14784
+  },
+  "jump-jumping": {
+    "id": "jump-jumping",
+    "text": "jump, jumping",
+    "source": "soundoftext",
+    "sourceUrl": "https://files.soundoftext.com/a0bcf970-dd99-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 14784
+  },
+  "hide-hiding": {
+    "id": "hide-hiding",
+    "text": "hide, hiding",
+    "source": "soundoftext",
+    "sourceUrl": "https://files.soundoftext.com/a26fb280-dd99-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 14784
+  },
+  "walk-walking": {
+    "id": "walk-walking",
+    "text": "walk, walking",
+    "source": "soundoftext",
+    "sourceUrl": "https://files.soundoftext.com/a3e19200-dd99-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 15936
+  },
+  "running-like-a-lion": {
+    "id": "running-like-a-lion",
+    "text": "He's running like a lion.",
+    "source": "soundoftext",
+    "sourceUrl": "https://files.soundoftext.com/a5755160-dd99-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 17280
+  },
+  "climbing-like-a-bear": {
+    "id": "climbing-like-a-bear",
+    "text": "She's climbing like a bear.",
+    "source": "soundoftext",
+    "sourceUrl": "https://files.soundoftext.com/a7427040-dd99-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 16896
+  },
+  "jumping-like-a-kangaroo": {
+    "id": "jumping-like-a-kangaroo",
+    "text": "He's jumping like a kangaroo.",
+    "source": "soundoftext",
+    "sourceUrl": "https://files.soundoftext.com/a9367810-dd99-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 20544
+  },
+  "kitten-hiding": {
+    "id": "kitten-hiding",
+    "text": "The kitten is hiding behind a tree.",
+    "source": "soundoftext",
+    "sourceUrl": "https://files.soundoftext.com/aae9a650-dd99-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 24000
+  },
+  "walking-like-a-penguin": {
+    "id": "walking-like-a-penguin",
+    "text": "She's walking like a penguin.",
+    "source": "soundoftext",
+    "sourceUrl": "https://files.soundoftext.com/aca56010-dd99-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 18240
+  },
+  "fly-flying": {
+    "id": "fly-flying",
+    "text": "fly, flying",
+    "source": "soundoftext",
+    "sourceUrl": "https://files.soundoftext.com/ae3e76a0-dd99-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 14976
+  },
+  "move-moving": {
+    "id": "move-moving",
+    "text": "move, moving",
+    "source": "soundoftext",
+    "sourceUrl": "https://files.soundoftext.com/afce8c80-dd99-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 14400
+  },
+  "get-getting": {
+    "id": "get-getting",
+    "text": "get, getting",
+    "source": "soundoftext",
+    "sourceUrl": "https://files.soundoftext.com/b17cffd0-dd99-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 14784
+  },
+  "lose-losing": {
+    "id": "lose-losing",
+    "text": "lose, losing",
+    "source": "soundoftext",
+    "sourceUrl": "https://files.soundoftext.com/b3bf27a0-dd99-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 14784
+  },
+  "fall-falling": {
+    "id": "fall-falling",
+    "text": "fall, falling",
+    "source": "soundoftext",
+    "sourceUrl": "https://files.soundoftext.com/b57451b0-dd99-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 15936
+  },
+  "bat-flying": {
+    "id": "bat-flying",
+    "text": "The bat is flying.",
+    "source": "soundoftext",
+    "sourceUrl": "https://files.soundoftext.com/b7a73740-dd99-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 14400
+  },
+  "snail-moving": {
+    "id": "snail-moving",
+    "text": "The snail is moving slowly.",
+    "source": "soundoftext",
+    "sourceUrl": "https://files.soundoftext.com/b9ceab20-dd99-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 21696
+  },
+  "parrot-getting": {
+    "id": "parrot-getting",
+    "text": "The parrot is getting food.",
+    "source": "soundoftext",
+    "sourceUrl": "https://files.soundoftext.com/bbbee260-dd99-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 18624
+  },
+  "parrot-losing": {
+    "id": "parrot-losing",
+    "text": "The parrot is losing its banana.",
+    "source": "soundoftext",
+    "sourceUrl": "https://files.soundoftext.com/bda44430-dd99-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 23040
+  },
+  "banana-falling": {
+    "id": "banana-falling",
+    "text": "The banana is falling.",
+    "source": "soundoftext",
+    "sourceUrl": "https://files.soundoftext.com/bfed97f0-dd99-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 16704
+  },
+  "above": {
+    "id": "above",
+    "text": "above",
+    "source": "youdao",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?audio=above&type=1",
+    "bytes": 123470
+  },
+  "below": {
+    "id": "below",
+    "text": "below",
+    "source": "youdao",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?audio=below&type=1",
+    "bytes": 10675
+  },
+  "near": {
+    "id": "near",
+    "text": "near",
+    "source": "youdao",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?audio=near&type=1",
+    "bytes": 109390
+  },
+  "opposite": {
+    "id": "opposite",
+    "text": "opposite",
+    "source": "youdao",
+    "sourceUrl": "https://dict.youdao.com/dictvoice?audio=opposite&type=1",
+    "bytes": 11093
+  },
+  "bat-above": {
+    "id": "bat-above",
+    "text": "The bat is above the tree.",
+    "source": "soundoftext",
+    "sourceUrl": "https://files.soundoftext.com/cd1c8850-dd99-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 16896
+  },
+  "snail-below": {
+    "id": "snail-below",
+    "text": "The snail is below the flower.",
+    "source": "soundoftext",
+    "sourceUrl": "https://files.soundoftext.com/cf019c00-dd99-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 20736
+  },
+  "parrot-near": {
+    "id": "parrot-near",
+    "text": "The parrot is near the cage.",
+    "source": "soundoftext",
+    "sourceUrl": "https://files.soundoftext.com/d0cd5b50-dd99-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 19584
+  },
+  "bus-stop-opposite": {
+    "id": "bus-stop-opposite",
+    "text": "The bus stop is opposite the zoo.",
+    "source": "soundoftext",
+    "sourceUrl": "https://files.soundoftext.com/d2653960-dd99-11f1-9564-05a2f3b61c77.mp3",
+    "bytes": 20736
+  }
+}

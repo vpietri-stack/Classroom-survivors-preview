@@ -1,0 +1,32 @@
+{
+  "01-move-like-an-animal.png": {
+    "file": "01-move-like-an-animal.png",
+    "sha256": "c4864f8072c5d5e68cce77888f6724ae17e870128c85cfc2a36bfad1da1b344b",
+    "bytes": 2882869
+  },
+  "01-move-like-an-animal.webp": {
+    "file": "01-move-like-an-animal.webp",
+    "sha256": "cd22ecdcf44d62074ed0b01d3420e693c9d615e8402dc629c13e6f3a4d6ca3dd",
+    "bytes": 373344
+  },
+  "02-more-animal-actions.png": {
+    "file": "02-more-animal-actions.png",
+    "sha256": "44b0c6d6da61a832cb1351000f6601f8693fbba124f63e44acd2202479afaba1",
+    "bytes": 2760617
+  },
+  "02-more-animal-actions.webp": {
+    "file": "02-more-animal-actions.webp",
+    "sha256": "74e27f20245f9a9b8a486e94771a2e1b166c7a925b676582a917db23019ad8b4",
+    "bytes": 320586
+  },
+  "03-where-is-it.png": {
+    "file": "03-where-is-it.png",
+    "sha256": "32bb5491ccaa445342bde5ed9c42a54e75aa08ac87b79f32a077651573351b0b",
+    "bytes": 2690342
+  },
+  "03-where-is-it.webp": {
+    "file": "03-where-is-it.webp",
+    "sha256": "43bdd84789f8616752376713efee61d6e8e771ab160d6d4451fc861d3a1722b6",
+    "bytes": 312432
+  }
+}
