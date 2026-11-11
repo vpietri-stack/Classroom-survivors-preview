@@ -1165,3 +1165,7 @@ AVAILABLE_CONTENT["PU3"] = {
 
 // Article Study owns recognition and story exercises; no new SR items.
 TEACHING_CONTENT.PU3["1"]["14"] = { vocab: [], sentences: [], sentencePairs: [] };
+
+// pu3-u9-p114 uses Article Study and contributes no new SR content.
+AVAILABLE_CONTENT["PU3"]["9"] = [107, 109, 110, 111, 112, 114];
+TEACHING_CONTENT["PU3"]["9"]["114"] = { vocab: [], sentences: [], sentencePairs: [] };

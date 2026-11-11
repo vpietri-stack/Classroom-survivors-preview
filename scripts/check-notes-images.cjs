@@ -109,6 +109,42 @@ function checkNotesImages() {
             console.log(note.id + ': scan and five image groups, ' + total + ' bytes');
             continue;
         }
+        if (note.reader.endsWith('_story.html')) {
+            const prefix = note.reader.slice(0, -5);
+            const folder = path.join(root, prefix + '_assets');
+            const context = { window: {} };
+            vm.runInNewContext(fs.readFileSync(path.join(root, prefix + '_lesson.js'), 'utf8'), context, { timeout: 1000 });
+            const lesson = context.window['Story_' + prefix];
+            const index = JSON.parse(fs.readFileSync(path.join(folder, 'image-index.json'), 'utf8'));
+            assert.equal(lesson.words.length, note.wordCount);
+            assert.equal(lesson.sections.length, note.exerciseCount);
+            assert.equal(Object.keys(index).length, note.wordCount);
+            const packs = new Map();
+            let total = 0;
+            for (const [, , key, file] of lesson.words) {
+                const image = fs.readFileSync(path.join(root, file));
+                webpDimensions(image);
+                assert.ok(image.length <= PAGE_LIMIT, file);
+                const [group, offset, length] = index[key];
+                if (!packs.has(group)) {
+                    const pack = fs.readFileSync(path.join(folder, 'images-' + group + '.bin'));
+                    assert.ok(pack.length <= PAGE_LIMIT, file);
+                    packs.set(group, pack);
+                }
+                assert.ok(packs.get(group).subarray(offset, offset + length).equals(image), file);
+                total += image.length;
+            }
+            for (const [i, section] of lesson.sections.entries()) {
+                const image = fs.readFileSync(path.join(folder, 'story-' + (i + 1) + '.webp'));
+                assert.ok(image.length <= PAGE_LIMIT, note.id);
+                assert.deepEqual(webpDimensions(image), Array.from(section.dimensions), note.id);
+                total += image.length;
+            }
+            assert.ok(total <= LESSON_LIMIT, note.id);
+            console.log(note.id + ': ' + (lesson.words.length + lesson.sections.length) + ' WebP images, ' + total + ' bytes');
+            continue;
+        }
+
         const reader = path.join(root, note.reader);
         const html = fs.readFileSync(reader, 'utf8');
         const script = html.match(/<script\b[^>]*\bsrc=["']([^"'?]*notes_data\.js)(?:\?[^"']*)?["']/i)?.[1];

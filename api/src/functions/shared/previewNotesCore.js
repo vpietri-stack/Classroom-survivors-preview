@@ -1,6 +1,7 @@
 (function (root) {
     'use strict';
-    const catalog = [{ id: 'pu3-u9-p111', book: 'PU3', unit: '9', page: '111', version: 1,
+    const catalog = [{"id": "pu3-u9-p114", "book": "PU3", "unit": "9", "page": "114", "version": 1, "title": "Power Up 3 · Unit 9 · 第114–115页 · The Story of Popocatepetl and Iztaccihuatl", "reader": "pu3_u9_p114_story.html", "wordCount": 21, "exerciseCount": 3},
+        { id: 'pu3-u9-p111', book: 'PU3', unit: '9', page: '111', version: 1,
         title: 'Power Up 3 · Unit 9 · 第111页', reader: 'interactive_notes_poc.html' },
         { id: 'pu1-u5-p59', book: 'PU1', unit: '5', page: '59', version: 1,
         title: 'Power Up 1 · Unit 5 · 第59页', reader: 'pu1_u5_p59_notes.html' },
