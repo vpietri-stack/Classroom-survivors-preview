@@ -57,9 +57,7 @@
     "test_vocab_normalization.js",
     "test_client_diagnostics.js",
     "test_client_diagnostics_browser.js",
-<<<<<<< HEAD
     "test_preview_notes_state.js",
-=======
     "test_preview_notes_browser.js",
     "test_think_parks_preview_browser.js",
     "test_pu2_race_preview_browser.js",
@@ -69,34 +67,20 @@
     "test_pu1_u7_preview.js",
     "test_pu1_u7_preview_browser.js",
     "scripts/checks.test.mjs",
-    "test_pu3_unit3_distribution.js",
->>>>>>> 5706922 (feat: PU2 Unit 5 page 60-61 preview (prepositions + -ing verbs, 3 images, 28 audio clips))
     "test_pu1_u5_p59_media_browser.js",
     "test_pu1_u5_p59_notes.js",
     "test_pu1_u5_p59_preview_browser.js",
-    "test_pu1_u7_preview.js",
-    "test_pu1_u7_preview_browser.js",
     "test_pu3_u3_p35_notes.js",
     "test_pu3_u3_p35_preview_browser.js",
     "test_pu3_u3_p35_media_browser.js",
     "test_pu3_u3_p35_cache_browser.js",
-<<<<<<< HEAD
     "test_preview_notes_api.js",
-    "test_preview_notes_browser.js",
     "test_resume_notes_browser.js",
-    "test_think_parks_preview_browser.js",
-    "test_pu2_race_preview_browser.js",
-    "test_pu3_circus_preview_browser.js",
-    "test_think_parks_audio.js",
-    "test_notes_speech_browser.js",
-    "scripts/checks.test.mjs",
     "test_pu1_u7_p87_notes.js",
     "test_pu1_u7_p87_preview_browser.js",
-    "test_pu1_u7_p87_cache_browser.js"
-=======
+    "test_pu1_u7_p87_cache_browser.js",
     "test_pu2_u5_p60_media_browser.js",
     "test_pu2_u5_p60_cache_browser.js"
->>>>>>> 5706922 (feat: PU2 Unit 5 page 60-61 preview (prepositions + -ing verbs, 3 images, 28 audio clips))
   ],
   "groups": {
     "content": {
@@ -192,19 +176,12 @@
         "test_pu3_circus_preview_browser.js",
         "test_think_parks_audio.js",
         "test_notes_speech_browser.js",
-<<<<<<< HEAD
         "test_pu1_u7_p87_notes.js",
         "test_pu1_u7_p87_preview_browser.js",
-        "test_pu1_u7_p87_cache_browser.js"
-=======
+        "test_pu1_u7_p87_cache_browser.js",
         "scripts/check-notes-images.cjs",
-        "test_pu3_u3_p35_notes.js",
-        "test_pu3_u3_p35_preview_browser.js",
-        "test_pu3_u3_p35_media_browser.js",
-        "test_pu3_u3_p35_cache_browser.js",
         "test_pu2_u5_p60_media_browser.js",
         "test_pu2_u5_p60_cache_browser.js"
->>>>>>> 5706922 (feat: PU2 Unit 5 page 60-61 preview (prepositions + -ing verbs, 3 images, 28 audio clips))
       ]
     },
     "api": {
