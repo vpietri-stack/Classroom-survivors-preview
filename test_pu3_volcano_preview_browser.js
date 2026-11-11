@@ -56,7 +56,7 @@ async function fixture(page,id='notes-a',placement=lesson.placement,notes={}){
   ok(await reader.locator('.race-part').count()===3,'reader has three story images');
   ok(await reader.locator('.story-tap[tabindex="0"], .story-tap:not([tabindex])').count()===37,'reader provides 37 individual story clips');
   await page.screenshot({path:path.join(qa,'reader-phone.png')});
-  ok(await reader.locator('#notes-mic').count()===0,'story is listening-only');
+  ok(await reader.locator('#notes-mic').count()===1,'story offers optional speaking practice');
   await reader.locator('.card').first().click();
   const frame=page.frames().find(f=>f.url().includes('pu3_u9_p114_story.html'));
   await frame.waitForFunction(()=>played.some(url=>url.endsWith('word-volcano.mp3')));
