@@ -9,3 +9,5 @@
 models/whisper-tiny.en/*.json text eol=lf
 speech_assets/adaptive-20261029a/*.json text eol=lf
 speech_assets/adaptive-20261029a/*.bin binary
+speech_option1/zipa/*.bin binary
+speech_option1/samples/*.wav binary

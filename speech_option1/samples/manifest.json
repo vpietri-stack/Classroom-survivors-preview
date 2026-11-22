@@ -1,0 +1,26 @@
+[
+  {
+    "id": "so_0138_spk0094",
+    "label": "Clear sample (9/10)",
+    "level": "high",
+    "text": "Is it the tiger then",
+    "humanScore": 9.0,
+    "url": "./speech_option1/samples/so_0138_spk0094.wav"
+  },
+  {
+    "id": "so_0055_spk0111",
+    "label": "Medium sample (7/10)",
+    "level": "medium",
+    "text": "Dora loves pea",
+    "humanScore": 7.0,
+    "url": "./speech_option1/samples/so_0055_spk0111.wav"
+  },
+  {
+    "id": "so_0000_spk1422",
+    "label": "Needs practice sample (3/10)",
+    "level": "low",
+    "text": "Jim will paint my house green",
+    "humanScore": 3.0,
+    "url": "./speech_option1/samples/so_0000_spk1422.wav"
+  }
+]

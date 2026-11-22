@@ -1,0 +1,571 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Classroom Survivors — Option 1 Speech Grader Preview</title>
+<style>
+  :root {
+    --bg: #f6f8fc;
+    --card: #ffffff;
+    --ink: #1e293b;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --primary: #2563eb;
+    --primary-soft: #eff6ff;
+    --green-bg: #dcfce7;
+    --green-ink: #166534;
+    --amber-bg: #fef3c7;
+    --amber-ink: #92400e;
+    --coral-bg: #fee2e2;
+    --coral-ink: #991b1b;
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 20px 14px 48px;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.45;
+  }
+  .wrap { max-width: 820px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+  header h1 { margin: 0 0 4px; font-size: 1.4rem; }
+  header p { margin: 0; color: var(--muted); font-size: 0.94rem; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+  }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .between { justify-content: space-between; }
+  .badge {
+    display: inline-block; padding: 3px 10px; border-radius: 999px;
+    font-size: 0.78rem; font-weight: 600; background: var(--primary-soft); color: var(--primary);
+  }
+  .badge.ok { background: var(--green-bg); color: var(--green-ink); }
+  .badge.warn { background: var(--amber-bg); color: var(--amber-ink); }
+  .progress-track {
+    width: 100%; height: 10px; background: #e2e8f0; border-radius: 999px; overflow: hidden; margin: 10px 0;
+  }
+  .progress-fill {
+    height: 100%; width: 0%; background: linear-gradient(90deg, #3b82f6, #10b981); transition: width 0.2s ease;
+  }
+  .stats-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 10px; margin-top: 10px;
+  }
+  .stat-box {
+    background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px;
+  }
+  .stat-box .lbl { font-size: 0.75rem; color: var(--muted); }
+  .stat-box .val { font-size: 1.02rem; font-weight: 700; margin-top: 2px; }
+  button {
+    border: 1px solid var(--border); background: #fff; color: var(--ink);
+    border-radius: 12px; padding: 9px 14px; font-size: 0.92rem; font-weight: 600;
+    cursor: pointer; transition: transform 0.08s ease, background 0.15s ease;
+  }
+  button:hover:not(:disabled) { background: #f8fafc; }
+  button:active:not(:disabled) { transform: scale(0.98); }
+  button:disabled { opacity: 0.55; cursor: not-allowed; }
+  button.rec { background: #ef4444; color: #fff; border-color: #ef4444; }
+  button.rec.active { animation: pulse 1.2s infinite; }
+  @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.45); } 50% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } }
+  .tabs { display: flex; flex-wrap: wrap; gap: 8px; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 14px; }
+  .tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .presets { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+  .chip { padding: 6px 12px; font-size: 0.86rem; border-radius: 999px; background: #f1f5f9; border-color: transparent; }
+  .chip.active { background: var(--primary-soft); color: var(--primary); border-color: #93c5fd; }
+  input[type="text"] {
+    flex: 1; min-width: 220px; padding: 10px 12px; font-size: 1rem;
+    border: 1px solid var(--border); border-radius: 12px;
+  }
+  .mic-meter {
+    height: 8px; width: 120px; background: #e2e8f0; border-radius: 999px; overflow: hidden;
+  }
+  .mic-meter > div { height: 100%; width: 0%; background: #10b981; transition: width 0.06s linear; }
+  .score-hero { display: flex; flex-wrap: wrap; gap: 18px; align-items: center; }
+  .ring {
+    width: 96px; height: 96px; border-radius: 50%; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; font-weight: 800; font-size: 1.65rem;
+    border: 7px solid #10b981; background: #ecfdf5; color: #065f46;
+  }
+  .ring.amber { border-color: #f59e0b; background: #fffbeb; color: #92400e; }
+  .ring.coral { border-color: #ef4444; background: #fef2f2; color: #991b1b; }
+  .ring small { font-size: 0.72rem; font-weight: 600; opacity: 0.8; }
+  .bars { flex: 1; min-width: 220px; display: flex; flex-direction: column; gap: 8px; }
+  .bar-row { display: flex; align-items: center; gap: 10px; font-size: 0.88rem; }
+  .bar-row .name { width: 110px; color: var(--muted); }
+  .bar-row .track { flex: 1; height: 9px; background: #e2e8f0; border-radius: 999px; overflow: hidden; }
+  .bar-row .fill { height: 100%; background: #3b82f6; border-radius: 999px; transition: width 0.3s ease; }
+  .bar-row .num { width: 38px; text-align: right; font-weight: 700; }
+  .word-cards { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .word-pill {
+    padding: 8px 13px; border-radius: 12px; font-size: 1.02rem; font-weight: 700;
+    border: 2px solid transparent; cursor: pointer;
+  }
+  .word-pill.green { background: var(--green-bg); color: var(--green-ink); }
+  .word-pill.amber { background: var(--amber-bg); color: var(--amber-ink); border-color: #fcd34d; }
+  .word-pill.coral { background: var(--coral-bg); color: var(--coral-ink); border-color: #fca5a5; }
+  .tip-box {
+    margin-top: 12px; padding: 10px 14px; border-radius: 12px; background: #f8fafc;
+    border: 1px solid var(--border); font-size: 0.92rem;
+  }
+  details { margin-top: 12px; color: var(--muted); font-size: 0.85rem; }
+  summary { cursor: pointer; font-weight: 600; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Classroom Survivors — Option 1 Speech Grader Preview</h1>
+    <p>Standalone browser test page (~112 MB cached once on device, ¥0/month). Separate from the live game.</p>
+  </header>
+
+  <section class="card" id="bench-card">
+    <div class="row between">
+      <div class="row">
+        <strong>Download &amp; Loading Speed</strong>
+        <span class="badge" id="load-badge">Starting…</span>
+      </div>
+      <div class="row">
+        <button id="btn-copy-speed" disabled>Copy Speed Report</button>
+        <button id="btn-clear-cache">Clear Saved Files &amp; Re-test</button>
+      </div>
+    </div>
+    <div id="load-stage" style="margin-top:8px;font-size:0.9rem;color:var(--muted);">Preparing browser speech files…</div>
+    <div class="progress-track"><div class="progress-fill" id="load-bar"></div></div>
+    <div class="stats-grid">
+      <div class="stat-box"><div class="lbl">Download Time</div><div class="val" id="stat-dl-time">—</div></div>
+      <div class="stat-box"><div class="lbl">Download Speed</div><div class="val" id="stat-dl-speed">—</div></div>
+      <div class="stat-box"><div class="lbl">Downloaded vs. Saved</div><div class="val" id="stat-dl-bytes">—</div></div>
+      <div class="stat-box"><div class="lbl">Startup Warm-up</div><div class="val" id="stat-boot-time">—</div></div>
+      <div class="stat-box"><div class="lbl">Total Ready Time</div><div class="val" id="stat-total-time">—</div></div>
+      <div class="stat-box"><div class="lbl">Last Check Speed</div><div class="val" id="stat-check-time">—</div></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="tabs">
+      <button class="tab active" data-mode="sentence">Sentences</button>
+      <button class="tab" data-mode="word">Single Words</button>
+      <button class="tab" data-mode="phonics">Single Sounds (Phonics)</button>
+    </div>
+
+    <div id="speech-controls">
+      <div class="presets" id="preset-list"></div>
+      <div class="row" style="margin-bottom:12px;">
+        <input type="text" id="target-input" value="Is it the tiger then" placeholder="Type any English word or sentence…" />
+        <button id="btn-listen">🔊 Listen</button>
+      </div>
+      <div class="row" style="margin-bottom:10px;">
+        <button class="rec" id="btn-record" disabled>🎤 Hold / Click to Record</button>
+        <div class="mic-meter"><div id="mic-level"></div></div>
+        <span id="rec-status" style="font-size:0.86rem;color:var(--muted);"></span>
+      </div>
+      <div class="row" id="sample-row">
+        <span style="font-size:0.84rem;color:var(--muted);">Or try a sample child recording:</span>
+      </div>
+    </div>
+
+    <div id="phonics-controls" class="hidden">
+      <p style="margin:0 0 10px;font-size:0.9rem;color:var(--muted);">
+        Uses the new loudness + breath detector so crisp consonants like <strong>/p/, /t/, /k/, /f/, /s/, /th/</strong> aren't dropped.
+      </p>
+      <div class="presets" id="phonics-list"></div>
+      <div class="row">
+        <button class="rec" id="btn-record-phonics" disabled>🎤 Record Selected Sound</button>
+        <div class="mic-meter"><div id="mic-level-phonics"></div></div>
+        <span id="rec-status-phonics" style="font-size:0.86rem;color:var(--muted);"></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="card hidden" id="result-card">
+    <div id="speech-result-view">
+      <div class="score-hero">
+        <div class="ring" id="res-ring"><span id="res-overall">—</span><small id="res-stars"></small></div>
+        <div style="flex:1;min-width:220px;">
+          <div style="font-size:1.12rem;font-weight:700;" id="res-headline">—</div>
+          <div class="bars" style="margin-top:10px;">
+            <div class="bar-row"><span class="name">Accuracy</span><div class="track"><div class="fill" id="bar-acc"></div></div><span class="num" id="num-acc">—</span></div>
+            <div class="bar-row"><span class="name">Completeness</span><div class="track"><div class="fill" id="bar-comp"></div></div><span class="num" id="num-comp">—</span></div>
+            <div class="bar-row"><span class="name">Smoothness</span><div class="track"><div class="fill" id="bar-flu"></div></div><span class="num" id="num-flu">—</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="word-cards" id="word-cards"></div>
+      <div class="tip-box" id="word-tip">Tap any colored word above to see a tip.</div>
+    </div>
+
+    <div id="phonics-result-view" class="hidden">
+      <div class="row between">
+        <div>
+          <div style="font-size:1.18rem;font-weight:700;" id="ph-headline">—</div>
+          <div style="margin-top:6px;color:var(--muted);font-size:0.92rem;" id="ph-top3">—</div>
+        </div>
+        <span class="badge" id="ph-badge">—</span>
+      </div>
+    </div>
+
+    <details>
+      <summary>Details (processing speed &amp; what was heard)</summary>
+      <pre id="res-details" style="white-space:pre-wrap;margin-top:8px;background:#f8fafc;padding:10px;border-radius:10px;"></pre>
+    </details>
+  </section>
+</div>
+
+<script type="module">
+import { resample } from './speech_word_core.js?v=1';
+
+const SENTENCE_PRESETS = [
+  'Is it the tiger then',
+  'Dora loves pea',
+  'Jim will paint my house green',
+  'I see three red apples',
+  'The cat sat on the mat',
+];
+const WORD_PRESETS = ['three', 'tiger', 'apple', 'love', 'very', 'water', 'red'];
+const PHONICS_SOUNDS = [
+  { arpabet: 'P', label: '/p/ (pen)' },
+  { arpabet: 'T', label: '/t/ (ten)' },
+  { arpabet: 'K', label: '/k/ (cat)' },
+  { arpabet: 'F', label: '/f/ (fan)' },
+  { arpabet: 'S', label: '/s/ (sun)' },
+  { arpabet: 'SH', label: '/sh/ (ship)' },
+  { arpabet: 'TH', label: '/th/ (thin)' },
+  { arpabet: 'V', label: '/v/ (van)' },
+  { arpabet: 'W', label: '/w/ (wet)' },
+  { arpabet: 'L', label: '/l/ (leg)' },
+  { arpabet: 'R', label: '/r/ (red)' },
+  { arpabet: 'AE', label: '/æ/ (cat)' },
+  { arpabet: 'IY', label: '/iː/ (see)' },
+];
+
+const worker = new Worker('./speech_option1/option1_worker.js?v=1', { type: 'module' });
+let nextMsgId = 1;
+const pending = new Map();
+let mode = 'sentence';
+let selectedPhonics = 'S';
+let lastLoadStats = null;
+let lastTimings = null;
+
+function callWorker(payload) {
+  return new Promise((resolve, reject) => {
+    const id = nextMsgId++;
+    pending.set(id, { resolve, reject });
+    worker.postMessage({ id, ...payload });
+  });
+}
+
+worker.onmessage = (e) => {
+  const msg = e.data;
+  if (msg.phase) {
+    document.getElementById('load-stage').textContent = msg.stage || 'Loading…';
+    if (Number.isFinite(msg.progress)) {
+      const pct = msg.phase === 'whisper'
+        ? Math.round(msg.progress * 0.4)
+        : msg.phase === 'zipa'
+          ? 40 + Math.round(msg.progress * 0.5)
+          : Math.max(92, msg.progress);
+      document.getElementById('load-bar').style.width = `${Math.min(100, pct)}%`;
+    }
+    return;
+  }
+  const slot = pending.get(msg.id);
+  if (!slot) return;
+  pending.delete(msg.id);
+  if (msg.error) slot.reject(new Error(msg.error));
+  else slot.resolve(msg);
+};
+
+const fmtSec = (ms) => `${(ms / 1000).toFixed(2)} s`;
+const fmtMb = (b) => `${(b / 1048576).toFixed(1)} MB`;
+
+async function bootModels() {
+  const badge = document.getElementById('load-badge');
+  badge.textContent = 'Loading…';
+  badge.className = 'badge warn';
+  try {
+    const res = await callWorker({ action: 'load' });
+    lastLoadStats = res.loadStats;
+    const dlMs = res.loadStats.whisperDownloadMs + res.loadStats.zipaDownloadMs;
+    document.getElementById('stat-dl-time').textContent = fmtSec(dlMs);
+    document.getElementById('stat-dl-speed').textContent = res.loadStats.totalNetworkBytes > 0
+      ? `${res.loadStats.downloadMbps} MB/s (${res.loadStats.zipaRoute})`
+      : 'Cached';
+    document.getElementById('stat-dl-bytes').textContent = `${fmtMb(res.loadStats.totalNetworkBytes)} new / ${fmtMb(res.loadStats.totalReusedBytes)} saved`;
+    document.getElementById('stat-boot-time').textContent = fmtSec(res.loadStats.engineStartupMs);
+    document.getElementById('stat-total-time').textContent = fmtSec(res.loadStats.totalLoadMs);
+    document.getElementById('load-bar').style.width = '100%';
+    document.getElementById('load-stage').textContent =
+      res.loadStats.totalNetworkBytes === 0
+        ? 'Ready! Reused all files saved on this device (0 MB downloaded).'
+        : 'Ready! Downloaded and saved files on this device for fast future visits.';
+    badge.textContent = res.loadStats.totalNetworkBytes === 0 ? 'Ready (Cached)' : 'Ready (Fresh Download)';
+    badge.className = 'badge ok';
+    document.getElementById('btn-record').disabled = false;
+    document.getElementById('btn-record-phonics').disabled = false;
+    document.getElementById('btn-copy-speed').disabled = false;
+    for (const b of document.querySelectorAll('.sample-btn')) b.disabled = false;
+  } catch (err) {
+    badge.textContent = 'Load Failed';
+    document.getElementById('load-stage').textContent = String(err.message || err);
+  }
+}
+
+document.getElementById('btn-clear-cache').onclick = async () => {
+  await callWorker({ action: 'clear_cache' });
+  location.reload();
+};
+
+document.getElementById('btn-copy-speed').onclick = async () => {
+  if (!lastLoadStats) return;
+  const txt = [
+    `Option 1 Preview Speed Report`,
+    `URL: ${location.href}`,
+    `Device: ${navigator.userAgent}`,
+    `Total Ready Time: ${fmtSec(lastLoadStats.totalLoadMs)} (Download: ${fmtSec(lastLoadStats.whisperDownloadMs + lastLoadStats.zipaDownloadMs)} @ ${lastLoadStats.downloadMbps} MB/s [${lastLoadStats.zipaRoute}], Startup: ${fmtSec(lastLoadStats.engineStartupMs)})`,
+    `Downloaded: ${fmtMb(lastLoadStats.totalNetworkBytes)} | Reused from device: ${fmtMb(lastLoadStats.totalReusedBytes)}`,
+    lastTimings ? `Last Check: ${lastTimings.totalMs} ms (Whisper ${lastTimings.whisperMs || 0} ms + ZIPA ${lastTimings.zipaMs || 0} ms)` : '',
+  ].filter(Boolean).join('\n');
+  await navigator.clipboard?.writeText(txt).catch(() => {});
+  const btn = document.getElementById('btn-copy-speed');
+  btn.textContent = 'Copied!';
+  setTimeout(() => { btn.textContent = 'Copy Speed Report'; }, 1500);
+};
+
+function renderPresets() {
+  const list = document.getElementById('preset-list');
+  list.innerHTML = '';
+  const items = mode === 'word' ? WORD_PRESETS : SENTENCE_PRESETS;
+  for (const text of items) {
+    const b = document.createElement('button');
+    b.className = 'chip';
+    b.textContent = text;
+    b.onclick = () => { document.getElementById('target-input').value = text; };
+    list.appendChild(b);
+  }
+  if (mode === 'word') document.getElementById('target-input').value = WORD_PRESETS[0];
+  else if (mode === 'sentence') document.getElementById('target-input').value = SENTENCE_PRESETS[0];
+}
+
+for (const t of document.querySelectorAll('.tab')) {
+  t.onclick = () => {
+    for (const x of document.querySelectorAll('.tab')) x.classList.remove('active');
+    t.classList.add('active');
+    mode = t.dataset.mode;
+    const isPh = mode === 'phonics';
+    document.getElementById('speech-controls').classList.toggle('hidden', isPh);
+    document.getElementById('phonics-controls').classList.toggle('hidden', !isPh);
+    if (!isPh) renderPresets();
+  };
+}
+
+const phList = document.getElementById('phonics-list');
+for (const ph of PHONICS_SOUNDS) {
+  const b = document.createElement('button');
+  b.className = `chip ${ph.arpabet === selectedPhonics ? 'active' : ''}`;
+  b.textContent = ph.label;
+  b.onclick = () => {
+    selectedPhonics = ph.arpabet;
+    for (const x of phList.querySelectorAll('.chip')) x.classList.remove('active');
+    b.classList.add('active');
+  };
+  phList.appendChild(b);
+}
+renderPresets();
+
+document.getElementById('btn-listen').onclick = () => {
+  const text = document.getElementById('target-input').value.trim();
+  if (!text || !window.speechSynthesis) return;
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-GB';
+  u.rate = 0.88;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(u);
+};
+
+function renderSpeechResult(res, transcript, vadMax, timings) {
+  lastTimings = timings;
+  document.getElementById('stat-check-time').textContent = `${timings.totalMs} ms`;
+  document.getElementById('result-card').classList.remove('hidden');
+  document.getElementById('speech-result-view').classList.remove('hidden');
+  document.getElementById('phonics-result-view').classList.add('hidden');
+
+  const ring = document.getElementById('res-ring');
+  ring.className = `ring ${res.overall >= 75 ? '' : res.overall >= 50 ? 'amber' : 'coral'}`;
+  document.getElementById('res-overall').textContent = res.overall;
+  document.getElementById('res-stars').textContent = res.stars ? '⭐'.repeat(res.stars) : '—';
+  document.getElementById('res-headline').textContent = res.headline;
+
+  for (const [idBar, idNum, val] of [
+    ['bar-acc', 'num-acc', res.accuracy],
+    ['bar-comp', 'num-comp', res.completeness],
+    ['bar-flu', 'num-flu', res.fluency],
+  ]) {
+    document.getElementById(idBar).style.width = `${val}%`;
+    document.getElementById(idNum).textContent = val;
+  }
+
+  const wc = document.getElementById('word-cards');
+  wc.innerHTML = '';
+  const tipBox = document.getElementById('word-tip');
+  tipBox.textContent = 'Tap any colored word above to see a tip.';
+
+  res.words.forEach((w) => {
+    const p = document.createElement('button');
+    p.className = `word-pill ${w.color}`;
+    p.textContent = `${w.text} (${w.score})`;
+    p.onclick = () => {
+      tipBox.textContent = `${w.text}: ${w.tip} (word score ${w.score}/100)`;
+    };
+    wc.appendChild(p);
+  });
+
+  document.getElementById('res-details').textContent = JSON.stringify({
+    transcript,
+    vadMax: Number((vadMax || 0).toFixed(3)),
+    timings,
+    words: res.words,
+  }, null, 2);
+}
+
+function renderPhonicsResult(msg) {
+  lastTimings = msg.timings;
+  document.getElementById('stat-check-time').textContent = `${msg.timings.totalMs} ms`;
+  document.getElementById('result-card').classList.remove('hidden');
+  document.getElementById('speech-result-view').classList.add('hidden');
+  document.getElementById('phonics-result-view').classList.remove('hidden');
+
+  const r = msg.result;
+  document.getElementById('ph-headline').textContent = r.headline;
+  document.getElementById('ph-top3').textContent = r.top3?.length
+    ? `Top sounds heard: ${r.top3.map((x) => `${x.friendly}`).join(' · ')}`
+    : 'No sound reached the microphone.';
+  const b = document.getElementById('ph-badge');
+  b.textContent = r.matched ? 'Nice match!' : (r.hasSpeech ? 'Try again' : 'No speech');
+  b.className = `badge ${r.matched ? 'ok' : 'warn'}`;
+  document.getElementById('res-details').textContent = JSON.stringify(msg, null, 2);
+}
+
+async function runCheckAudio(pcm16k) {
+  if (mode === 'phonics') {
+    const msg = await callWorker({ action: 'check_phonics', audio: pcm16k, target: selectedPhonics });
+    renderPhonicsResult(msg);
+    return msg;
+  }
+  const target = document.getElementById('target-input').value.trim();
+  const msg = await callWorker({ action: 'check_speech', audio: pcm16k, target });
+  renderSpeechResult(msg.result, msg.transcript, msg.vadMax, msg.timings);
+  return msg;
+}
+
+let recCtx = null, recStream = null, recChunks = [], recActive = false;
+async function toggleRecord(btnId, meterId, statusId) {
+  const btn = document.getElementById(btnId);
+  const status = document.getElementById(statusId);
+  const meter = document.getElementById(meterId);
+
+  if (!recActive) {
+    status.textContent = 'Opening mic…';
+    try {
+      recStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    } catch (err) {
+      status.textContent = 'Mic blocked on this address (use HTTPS or localhost, or click a sample clip).';
+      return;
+    }
+    recCtx = new AudioContext();
+    const src = recCtx.createMediaStreamSource(recStream);
+    const proc = recCtx.createScriptProcessor(4096, 1, 1);
+    recChunks = [];
+    recActive = true;
+    let heardFirstChunk = false;
+    btn.classList.add('active');
+    btn.textContent = '⏹ Stop & Grade';
+    proc.onaudioprocess = (ev) => {
+      if (!recActive) return;
+      if (!heardFirstChunk) {
+        heardFirstChunk = true;
+        status.textContent = '🔴 Listening — speak now!';
+      }
+      const d = ev.inputBuffer.getChannelData(0);
+      recChunks.push(new Float32Array(d));
+      let mx = 0;
+      for (let i = 0; i < d.length; i++) if (Math.abs(d[i]) > mx) mx = Math.abs(d[i]);
+      meter.style.width = `${Math.min(100, Math.round(mx * 280))}%`;
+    };
+    src.connect(proc);
+    proc.connect(recCtx.destination);
+    btn._cleanup = () => {
+      proc.disconnect();
+      src.disconnect();
+    };
+  } else {
+    recActive = false;
+    btn.classList.remove('active');
+    btn.textContent = btnId === 'btn-record' ? '🎤 Hold / Click to Record' : '🎤 Record Selected Sound';
+    meter.style.width = '0%';
+    btn._cleanup?.();
+    recStream?.getTracks().forEach((t) => t.stop());
+    const sr = recCtx.sampleRate;
+    await recCtx.close();
+    const total = recChunks.reduce((s, c) => s + c.length, 0);
+    const merged = new Float32Array(total);
+    let off = 0;
+    for (const c of recChunks) { merged.set(c, off); off += c.length; }
+    const pcm16 = resample(merged, sr);
+    status.textContent = 'Checking…';
+    try {
+      await runCheckAudio(pcm16);
+      status.textContent = '';
+    } catch (err) {
+      status.textContent = String(err.message || err);
+    }
+  }
+}
+
+document.getElementById('btn-record').onclick = () => toggleRecord('btn-record', 'mic-level', 'rec-status');
+document.getElementById('btn-record-phonics').onclick = () => toggleRecord('btn-record-phonics', 'mic-level-phonics', 'rec-status-phonics');
+
+async function loadSamples() {
+  const row = document.getElementById('sample-row');
+  const list = await fetch('./speech_option1/samples/manifest.json').then((r) => r.json());
+  for (const s of list) {
+    const b = document.createElement('button');
+    b.className = 'chip sample-btn';
+    b.disabled = true;
+    b.textContent = `▶ ${s.label}: "${s.text}"`;
+    b.onclick = async () => {
+      document.getElementById('target-input').value = s.text;
+      document.getElementById('rec-status').textContent = 'Grading sample…';
+      const ab = await fetch(s.url).then((r) => r.arrayBuffer());
+      const ctx = new AudioContext();
+      const decoded = await ctx.decodeAudioData(ab);
+      const pcm = resample(decoded.getChannelData(0), decoded.sampleRate);
+      await ctx.close();
+      await runCheckAudio(pcm);
+      document.getElementById('rec-status').textContent = '';
+    };
+    row.appendChild(b);
+  }
+}
+
+window.__protoTest = {
+  runPcm: (arr, targetText, testMode = 'speech') => {
+    mode = testMode;
+    if (testMode === 'phonics') selectedPhonics = targetText;
+    else document.getElementById('target-input').value = targetText;
+    return runCheckAudio(new Float32Array(arr));
+  },
+  getLoadStats: () => lastLoadStats,
+};
+
+loadSamples();
+bootModels();
+</script>
+</body>
+</html>

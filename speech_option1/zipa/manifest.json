@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "totalBytes": 70481402,
+  "totalSha256": "32fbb4f79d84d02e991a913b3a161b3c40a39908de472cf9cccd17d8188f5535",
+  "parts": [
+    {
+      "name": "model.w8.part0.bin",
+      "bytes": 17620351,
+      "sha256": "abf479459584109f02c93c6e8174e0627702605d384e751c5fdd915801cb934c"
+    },
+    {
+      "name": "model.w8.part1.bin",
+      "bytes": 17620351,
+      "sha256": "9f1f8ecfad2dd75483c527c5082afccc322191cf88bd5b9a1c036e9259a54e47"
+    },
+    {
+      "name": "model.w8.part2.bin",
+      "bytes": 17620351,
+      "sha256": "19dd4e71e0ab2187812e61f4b5a71e75cf162115d7cfaa0e5d29fff2bd8323a1"
+    },
+    {
+      "name": "model.w8.part3.bin",
+      "bytes": 17620349,
+      "sha256": "7fa4997f493c77e86031bd66865c60c1b611a90a000dbad11d74d62653dee356"
+    }
+  ]
+}
