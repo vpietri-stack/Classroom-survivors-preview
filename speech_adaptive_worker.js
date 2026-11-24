@@ -18,6 +18,7 @@ import {
 const ZIPA_CACHE_NAME='speech-option1-zipa-v1';
 const ZIPA_BASE=new URL('./speech_option1/zipa/',import.meta.url).href;
 const ZIPA_RAW_MIRROR='https://gh-proxy.com/https://raw.githubusercontent.com/vpietri-stack/Classroom-survivors-preview/main/speech_option1/zipa/';
+const TINY_WORDS=new Set(['a','an','the','to','of','in','on','at','is','it','am','are','be','do','for','or','and','but','as','by','up']);
 
 let runtime,pipe,vad,zipaModel,assets,lexicon,zipaVocab,zipaIdToTok,contextSeconds=8,loading;
 let zipaNetworkBytes=0,zipaReusedBytes=0,zipaTotalBytes=0;
@@ -231,10 +232,15 @@ self.onmessage=async e=>{
      pw.color=grade==='green'?'green':grade==='yellow'?'amber':'coral';
      return {...w,score:pw.score,grade,tip:pw.tip||''};
     });
-    const hasRed=targetResult.some(w=>w.grade==='red');
-    const hasYellow=targetResult.some(w=>w.grade==='yellow');
-    const greenOrYellow=targetResult.filter(w=>w.grade==='green'||w.grade==='yellow').length;
-    pronunciation.stars=(!hasRed&&!hasYellow)?3:((pronunciation.overall>=55||(greenOrYellow*2>=targetResult.length&&!targetResult.every(w=>w.grade==='red')))?2:1);
+    const redWords=targetResult.filter(w=>w.grade==='red');
+    const yellowWords=targetResult.filter(w=>w.grade==='yellow');
+    const greenOrYellow=targetResult.length-redWords.length;
+    const oneTinyYellowOk=targetResult.length>=4&&redWords.length===0&&yellowWords.length===1
+     &&TINY_WORDS.has(String(yellowWords[0].text||'').toLowerCase().replace(/[^a-z']/g,''))
+     &&pronunciation.overall>=80;
+    pronunciation.stars=(redWords.length===0&&(yellowWords.length===0||oneTinyYellowOk))
+     ?3
+     :((pronunciation.overall>=55||(greenOrYellow*2>=targetResult.length&&redWords.length<targetResult.length))?2:1);
    }catch(_){pronunciation=null;}
   }
   postMessage({id,status:'checked',targetWords:targetResult,transcript:result.transcript,pronunciation,phonicsInitials,phonicsWordTranscript,phonicsWordInitials,phonicsAlternatives,phonicsSoundUnassessed,audioStats,totalMs:performance.now()-started,contextMinimumSec:contextSeconds,vadMax:Math.max(...vadScores),sharedEncoderVerified:result.sharedEncoderVerifiedByRunCount,configuration:assets.config.id});

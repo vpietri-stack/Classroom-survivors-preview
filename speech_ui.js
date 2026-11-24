@@ -784,7 +784,7 @@ body .draggable.correct.speech-reading-tile.grade-red,body .draggable.speech-rea
         const hasYellow = meta.targetWords.some(w => w.grade === 'yellow');
         const starSpan = document.createElement('span'); starSpan.className = 'speech-stars'; starSpan.appendChild(buildInlineStars(s));
         const headSpan = document.createElement('span'); headSpan.className = 'speech-stars-headline';
-        headSpan.textContent = s === 3 ? '太棒了！每个词都很清楚' : s === 2 ? (hasRed && hasYellow ? '不错！黄色和红色的词可以再清楚一点' : hasRed ? '不错！红色的词可以再清楚一点' : '不错！黄色的词可以再清楚一点') : '加油！再读一次会更清楚';
+        headSpan.textContent = s === 3 ? (hasYellow ? '太棒了！读得很流畅，黄色的词可以再清楚一点' : '太棒了！每个词都很清楚') : s === 2 ? (hasRed && hasYellow ? '不错！黄色和红色的词可以再清楚一点' : hasRed ? '不错！红色的词可以再清楚一点' : '不错！黄色的词可以再清楚一点') : '加油！再读一次会更清楚';
         starsBar.replaceChildren(starSpan, headSpan);
         starsBar.hidden = false;
         if (global.SpeechStarFx) global.SpeechStarFx.play(s);
