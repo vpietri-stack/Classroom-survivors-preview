@@ -38,8 +38,8 @@
 .speech-word-tip{margin:6px auto 0;max-width:420px;padding:6px 12px;border-radius:10px;background:rgba(254,249,195,.95);color:#713f12;font-size:13px;font-weight:600;}
 .speech-reading-tile.speech-reading-neutral{background:linear-gradient(180deg,#818cf8,#6366f1)!important;color:white!important;border-color:#4338ca!important;box-shadow:0 3px 0 #4338ca!important;animation:none!important;}
 .speech-reading-tile.correct{background:linear-gradient(180deg,#4ade80,#16a34a)!important;color:white!important;border-color:#15803d!important;box-shadow:0 3px 0 #15803d!important;animation:none!important;}
-.study-word-tile.speech-reading-tile.grade-yellow,.study-word-tile.placed.speech-reading-tile.grade-yellow,.speech-reading-tile.grade-yellow{background:linear-gradient(180deg,#fde047,#eab308)!important;color:#422006!important;border-color:#ca8a04!important;box-shadow:0 3px 0 #ca8a04!important;animation:none!important;}
-.study-word-tile.speech-reading-tile.grade-red,.study-word-tile.placed.speech-reading-tile.grade-red,.speech-reading-tile.grade-red{background:linear-gradient(180deg,#fca5a5,#ef4444)!important;color:#fff!important;border-color:#dc2626!important;box-shadow:0 3px 0 #dc2626!important;animation:none!important;}
+body .draggable.correct.speech-reading-tile.grade-yellow,body .draggable.speech-reading-tile.grade-yellow,body .study-word-tile.placed.speech-reading-tile.grade-yellow,body .study-word-tile.speech-reading-tile.grade-yellow,body .speech-reading-tile.grade-yellow{background:linear-gradient(180deg,#fde047,#eab308)!important;background-color:#eab308!important;color:#422006!important;border-color:#ca8a04!important;box-shadow:0 3px 0 #ca8a04!important;animation:none!important;}
+body .draggable.correct.speech-reading-tile.grade-red,body .draggable.speech-reading-tile.grade-red,body .study-word-tile.placed.speech-reading-tile.grade-red,body .study-word-tile.speech-reading-tile.grade-red,body .speech-reading-tile.grade-red{background:linear-gradient(180deg,#fca5a5,#ef4444)!important;background-color:#ef4444!important;color:#fff!important;border-color:#dc2626!important;box-shadow:0 3px 0 #dc2626!important;animation:none!important;}
 .speech-reading-heard,.speech-target-word.heard{position:relative;padding-right:27px!important;}
 .speech-reading-heard::after,.speech-target-word.heard::after{content:'✓';position:absolute;right:3px;bottom:3px;width:17px;height:17px;line-height:17px;border-radius:50%;background:#fff;color:#15803d;font:900 14px/17px sans-serif;text-align:center;box-shadow:0 1px 2px #16653455;}
 .speech-target-note{font-size:12px;margin:6px 0;}
@@ -780,9 +780,11 @@
       const pron = meta.pronunciation;
       if (pron && pron.hasSpeech && pron.stars > 0) {
         const s = Math.max(1, Math.min(3, Math.round(pron.stars)));
+        const hasRed = meta.targetWords.some(w => w.grade === 'red');
+        const hasYellow = meta.targetWords.some(w => w.grade === 'yellow');
         const starSpan = document.createElement('span'); starSpan.className = 'speech-stars'; starSpan.appendChild(buildInlineStars(s));
         const headSpan = document.createElement('span'); headSpan.className = 'speech-stars-headline';
-        headSpan.textContent = s === 3 ? '太棒了！每个词都很清楚' : s === 2 ? '不错！黄色和红色的词可以再清楚一点' : '加油！再读一次会更清楚';
+        headSpan.textContent = s === 3 ? '太棒了！每个词都很清楚' : s === 2 ? (hasRed && hasYellow ? '不错！黄色和红色的词可以再清楚一点' : hasRed ? '不错！红色的词可以再清楚一点' : '不错！黄色的词可以再清楚一点') : '加油！再读一次会更清楚';
         starsBar.replaceChildren(starSpan, headSpan);
         starsBar.hidden = false;
         if (global.SpeechStarFx) global.SpeechStarFx.play(s);

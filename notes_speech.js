@@ -39,6 +39,9 @@
     }
     caption.append(document.createTextNode(displayText.slice(offset)));
   }
+  function starFx() {
+    try { return window.SpeechStarFx || (parent !== window ? parent.SpeechStarFx : null); } catch (_) { return window.SpeechStarFx || null; }
+  }
   function script(src) {
     return new Promise((resolve, reject) => { const el = document.createElement('script'); el.src = src; el.onload = resolve; el.onerror = () => { el.remove(); reject(new Error('load')); }; document.head.append(el); });
   }
@@ -48,7 +51,7 @@
       if (!window.Recorder) await script('speech_recorder.js?v=2026-11-02c');
       if (!window.AdaptiveSpeech?.enabled) {
         if (typeof SPEECH_PRACTICE_ENABLED === 'undefined') await script('config.js?v=2026-11-02c');
-        await script('speech_adaptive_app.js?v=2026-11-24c');
+        await script('speech_adaptive_app.js?v=2026-11-24d');
       }
       if (!window.AdaptiveSpeech?.enabled) throw new Error('Adaptive speech unavailable');
       return { engine: window.AdaptiveSpeech, Recorder: window.Recorder };
@@ -73,9 +76,10 @@
         message('暂时没能检查这些词。可以听自己的录音，或再试一次。');
       } else if (result.pronunciation?.hasSpeech && result.pronunciation?.stars > 0) {
         const s = Math.max(1, Math.min(3, Math.round(result.pronunciation.stars)));
-        if (window.SpeechStarFx) window.SpeechStarFx.play(s);
-        if (window.SpeechStarFx?.renderInlineStars) {
-          status.replaceChildren(window.SpeechStarFx.renderInlineStars(s), document.createTextNode(' 绿色很清楚，黄色可再饱满一点，红色请再试一次。'));
+        const fx = starFx();
+        if (fx) fx.play(s);
+        if (fx?.renderInlineStars) {
+          status.replaceChildren(document.importNode(fx.renderInlineStars(s), true), document.createTextNode(' 绿色很清楚，黄色可再饱满一点，红色请再试一次。'));
         } else {
           message('绿色很清楚，黄色可再饱满一点，红色请再试一次。');
         }
@@ -86,7 +90,7 @@
     finally { if (ticket === generation) { clearTimeout(timer); assessment = null; idle(); } }
   }
   mic.addEventListener('click', async () => {
-    if (window.SpeechStarFx) window.SpeechStarFx.unlockAudio();
+    starFx()?.unlockAudio();
     if (phase === 'recording') { finish(generation, await engine()); return; }
     if (!canPractice() || phase !== 'idle') return;
     cancel(); const ticket = generation; discard(); render();

@@ -231,6 +231,10 @@ self.onmessage=async e=>{
      pw.color=grade==='green'?'green':grade==='yellow'?'amber':'coral';
      return {...w,score:pw.score,grade,tip:pw.tip||''};
     });
+    const hasRed=targetResult.some(w=>w.grade==='red');
+    const hasYellow=targetResult.some(w=>w.grade==='yellow');
+    const greenOrYellow=targetResult.filter(w=>w.grade==='green'||w.grade==='yellow').length;
+    pronunciation.stars=(!hasRed&&!hasYellow)?3:((pronunciation.overall>=55||(greenOrYellow*2>=targetResult.length&&!targetResult.every(w=>w.grade==='red')))?2:1);
    }catch(_){pronunciation=null;}
   }
   postMessage({id,status:'checked',targetWords:targetResult,transcript:result.transcript,pronunciation,phonicsInitials,phonicsWordTranscript,phonicsWordInitials,phonicsAlternatives,phonicsSoundUnassessed,audioStats,totalMs:performance.now()-started,contextMinimumSec:contextSeconds,vadMax:Math.max(...vadScores),sharedEncoderVerified:result.sharedEncoderVerifiedByRunCount,configuration:assets.config.id});
