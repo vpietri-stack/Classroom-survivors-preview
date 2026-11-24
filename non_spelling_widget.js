@@ -10,6 +10,7 @@
   const $ = id => document.getElementById(id);
   let session = [], cursor = 0, input = [], activeBox = 0, selectedWord = null, binnedWord = null;
   let letters = [], verdict = null, locked = false, solved = false, resetTimer = null, drag = null, resetDue = 0;
+  let speechGate = null, speechDone = false;
 
   function shuffle(items) {
     const copy = [...items];
@@ -62,9 +63,66 @@
     drag = null;
     $('bin').classList.remove('drag-over');
   }
+  function fixedSentence(exercise) {
+    const tokens = String(exercise.sentence || '').split(' ');
+    const idx = Number.isInteger(binnedWord) ? binnedWord : exercise.wrongIndex;
+    if (Number.isInteger(idx) && idx >= 0 && idx < tokens.length) {
+      const punct = (tokens[idx].match(/[.,!?]+$/) || [''])[0];
+      tokens[idx] = exercise.answer + punct;
+    }
+    return tokens.join(' ');
+  }
+  function clearSpeechGate() {
+    const host = $('nse-speech-gate');
+    if (host) host.remove();
+    speechGate = null;
+  }
+  function canFixSpeech(exercise) {
+    return Boolean(externalMode && exercise && exercise.type === 'fix' && window.SpeechUI && window.SpeechUI.makeSentenceGate && window.SpeechUI.completedWordTiles && window.SpeechUI.isReady());
+  }
+  function openFixSpeech(savedSpeech) {
+    cancelTimer();
+    clearSpeechGate();
+    const exercise = current();
+    const target = fixedSentence(exercise);
+    $('bin').hidden = true;
+    $('keyboard').hidden = true;
+    $('actions').hidden = true;
+    $('result-action').hidden = true;
+    const row = document.createElement('div');
+    row.className = 'nse-sentence' + (exercise.presentation === 'game' ? ' sentence-row' : '');
+    $('sentences').replaceChildren(row);
+    const tiles = window.SpeechUI.completedWordTiles(row, target);
+    const host = document.createElement('div');
+    host.id = 'nse-speech-gate';
+    speechGate = window.SpeechUI.makeSentenceGate({
+      target,
+      wordTiles: tiles,
+      mode: exercise.presentation === 'game' ? 'game' : 'study',
+      level: '1',
+      resumeState: savedSpeech || null,
+      onDone: () => {
+        clearSpeechGate();
+        speechDone = true;
+        if (exercise.presentation === 'study') {
+          next();
+        } else {
+          $('result-action').hidden = false;
+          requestAnimationFrame(() => {
+            if (!solved || !isActive()) return;
+            $('result-action').scrollIntoView({ block: 'nearest', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+          });
+        }
+      }
+    });
+    host.appendChild(speechGate);
+    $('result-action').before(host);
+  }
   function resetAnswer() {
     cancelTimer();
     clearDrag();
+    clearSpeechGate();
+    speechDone = false;
     input = current().type === 'missing' ? current().answers.map((_, index) => prefix(index)) : [''];
     activeBox = 0;
     selectedWord = binnedWord = null;
@@ -375,7 +433,9 @@
       exercise.firstAttempt = exercise.attempts === 1;
       renderProgress();
       message(exercise.firstAttempt ? '答对了！' : '答对了！稍后再复习这题。', 'success');
-      if (exercise.presentation === 'study') later(next, STUDY_ADVANCE_MS);
+      if (canFixSpeech(exercise)) {
+        openFixSpeech(null);
+      } else if (exercise.presentation === 'study') later(next, STUDY_ADVANCE_MS);
       else requestAnimationFrame(() => {
         if (current() !== exercise || !solved || !isActive()) return;
         $('result-action').scrollIntoView({ block: 'nearest', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
@@ -441,13 +501,19 @@
   function getState() { return { cursor, input: [...input], activeBox, selectedWord, binnedWord, locked, solved,
     letters:letters.slice(), verdict:verdict&&{...verdict}, attempts:current()&&current().attempts,
     firstAttempt:current()&&current().firstAttempt, remainingMs:resetDue?Math.max(0,resetDue-Date.now()):null,
+    speechActive:!!speechGate, speechDone:!!speechDone, speechState:speechGate&&speechGate.studyResumeState?speechGate.studyResumeState():null,
     message:$('feedback')&&$('feedback').textContent, messageKind:$('feedback')&&$('feedback').classList.contains('success')?'success':$('feedback')&&$('feedback').classList.contains('error')?'error':'' }; }
   function restoreState(saved) {
     if(!saved||!Array.isArray(saved.input))return;
-    cancelTimer();input=saved.input.slice();activeBox=saved.activeBox;selectedWord=saved.selectedWord;binnedWord=saved.binnedWord;
-    locked=!!saved.locked;solved=!!saved.solved;letters=saved.letters.slice();verdict=saved.verdict;
+    cancelTimer();clearSpeechGate();input=saved.input.slice();activeBox=saved.activeBox;selectedWord=saved.selectedWord;binnedWord=saved.binnedWord;
+    locked=!!saved.locked;solved=!!saved.solved;speechDone=!!saved.speechDone;letters=saved.letters.slice();verdict=saved.verdict;
     current().attempts=saved.attempts||0;current().firstAttempt=saved.firstAttempt;current().complete=solved;
     render();message(saved.message||'',saved.messageKind||'');
+    if(solved&&current().type==='fix'&&saved.speechActive){
+      if(canFixSpeech(current())){openFixSpeech(saved.speechState);return;}
+      if(current().presentation==='study')later(next,100);
+      return;
+    }
     if(locked&&(!solved||current().presentation==='study'))later(solved?next:resetAnswer,Math.max(0,Math.min(saved.remainingMs==null?100:saved.remainingMs,3000)));
   }
   function isActive() {
@@ -465,6 +531,8 @@
   }
   function destroy() {
     cancelTimer();
+    clearSpeechGate();
+    speechDone = false;
     if (widgetRoot) {
       clearDrag();
       widgetRoot.remove();
@@ -490,6 +558,7 @@
     if (cursor >= session.length || event.ctrlKey || event.metaKey || event.altKey) return;
     if (event.key === 'Enter' && event.target.closest && event.target.closest('#new-set, #themeToggleBtn, #bin, #clear, #backspace')) return;
     if (event.key === 'Enter') {
+      if (speechGate) return;
       event.preventDefault();
       if (solved) next(); else check();
     } else if (event.key === 'Backspace') {
