@@ -64,7 +64,7 @@
       return loadScript('pu3_u3_p35_assets.js?v=1');
     })
     .then(() => loadScript('interactive_notes_poc.js?v=pu3-p35-v2'))
-    .then(() => loadScript('notes_speech.js?v=2026-11-05j'))
+    .then(() => loadScript('notes_speech.js?v=2026-11-24a'))
     .then(() => root.InteractiveNotesData)
     .catch(() => {
       showNotice('这篇故事资源暂时没能加载，请检查网络或返回目录重试。');

@@ -36,7 +36,7 @@
   }
   function startWorker() {
     if (worker) return;
-    const instance = new Worker('speech_adaptive_worker.js?v=7' + (preferLocal ? '&local=1' : ''), { type: 'module' });
+    const instance = new Worker('speech_adaptive_worker.js?v=8' + (preferLocal ? '&local=1' : ''), { type: 'module' });
     worker = instance;
     instance.onmessage = e => {
       if (worker !== instance || !pending || e.data.id !== pending.id) return;
@@ -111,8 +111,8 @@
       if (signal?.aborted) throw error('Speech cancelled', 'SPEECH_ABORTED');
       abort = () => reset(error('Speech cancelled', 'SPEECH_ABORTED'));
       signal?.addEventListener('abort', abort, { once: true });
-      const r = await request('assess', { audio, target: options.target, assessmentProfile: options.assessmentProfile }, 5000);
-      const result = { text: r.transcript, targetWords: r.targetWords, targetStatus: r.status, targetCheckMs: r.totalMs, configuration: r.configuration };
+      const r = await request('assess', { audio, target: options.target, assessmentProfile: options.assessmentProfile }, 10000);
+      const result = { text: r.transcript, targetWords: r.targetWords, targetStatus: r.status, pronunciation: r.pronunciation, targetCheckMs: r.totalMs, configuration: r.configuration };
       if (!phonics) return result;
       const verified = phonics.verifyPhonics({ ...result, phonicsInitials: r.phonicsInitials, phonicsWordTranscript: r.phonicsWordTranscript, phonicsWordInitials: r.phonicsWordInitials, phonicsAlternatives: r.phonicsAlternatives }, audio, options.target, initialFocus);
       return r.phonicsSoundUnassessed ? { ...verified, targetStatus: 'unavailable', phonicsSoundUnassessed: true } : verified;
