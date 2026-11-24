@@ -48,7 +48,7 @@
       if (!window.Recorder) await script('speech_recorder.js?v=2026-11-02c');
       if (!window.AdaptiveSpeech?.enabled) {
         if (typeof SPEECH_PRACTICE_ENABLED === 'undefined') await script('config.js?v=2026-11-02c');
-        await script('speech_adaptive_app.js?v=2026-11-24a');
+        await script('speech_adaptive_app.js?v=2026-11-24c');
       }
       if (!window.AdaptiveSpeech?.enabled) throw new Error('Adaptive speech unavailable');
       return { engine: window.AdaptiveSpeech, Recorder: window.Recorder };
@@ -67,14 +67,26 @@
       const result = await api.engine.transcribe(blob, { target: target.text, assessmentProfile: target.assessmentProfile, signal: assessment.signal });
       if (ticket !== generation) return;
       render(target.pictureBookPage && window.PhonicsPictureBookContent ? PhonicsPictureBookContent.assess(result.text, PhonicsPictureBookContent.pages[target.pictureBookPage - 1], result) : result.targetWords);
-      const starsStr = result.pronunciation?.hasSpeech && result.pronunciation?.stars > 0
-        ? '★'.repeat(Math.max(1, Math.min(3, result.pronunciation.stars))) + '☆'.repeat(3 - Math.max(1, Math.min(3, result.pronunciation.stars)))
-        : '';
-      message(result.phonicsAudioDetected === false ? '没有听到清楚的声音，请靠近麦克风再读一次。' : result.targetStatus === 'unavailable' ? '暂时没能检查这些词。可以听自己的录音，或再试一次。' : starsStr ? `${starsStr} 绿色很清楚，黄色可再饱满一点，红色请再试一次。` : '绿色是听清的词。可以听自己的录音，或再读一次。');
+      if (result.phonicsAudioDetected === false) {
+        message('没有听到清楚的声音，请靠近麦克风再读一次。');
+      } else if (result.targetStatus === 'unavailable') {
+        message('暂时没能检查这些词。可以听自己的录音，或再试一次。');
+      } else if (result.pronunciation?.hasSpeech && result.pronunciation?.stars > 0) {
+        const s = Math.max(1, Math.min(3, Math.round(result.pronunciation.stars)));
+        if (window.SpeechStarFx) window.SpeechStarFx.play(s);
+        if (window.SpeechStarFx?.renderInlineStars) {
+          status.replaceChildren(window.SpeechStarFx.renderInlineStars(s), document.createTextNode(' 绿色很清楚，黄色可再饱满一点，红色请再试一次。'));
+        } else {
+          message('绿色很清楚，黄色可再饱满一点，红色请再试一次。');
+        }
+      } else {
+        message('绿色是听清的词。可以听自己的录音，或再试一次。');
+      }
     } catch (_) { if (ticket === generation) message('这次没听清。可以听自己的录音，或再试一次。'); }
     finally { if (ticket === generation) { clearTimeout(timer); assessment = null; idle(); } }
   }
   mic.addEventListener('click', async () => {
+    if (window.SpeechStarFx) window.SpeechStarFx.unlockAudio();
     if (phase === 'recording') { finish(generation, await engine()); return; }
     if (!canPractice() || phase !== 'idle') return;
     cancel(); const ticket = generation; discard(); render();

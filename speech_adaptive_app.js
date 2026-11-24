@@ -125,4 +125,112 @@
   }
   w.AdaptiveSpeech = { enabled, load, transcribe, isBusy: () => assessing, isReady: () => ready,
     resetLoad: () => { if (!assessing && !loading) reset(); } };
+
+  let starAudioCtx = null, starOverlayTimer = null, starCleanupTimer = null;
+  function starSvg(filled, size) {
+    const ns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(ns, 'svg');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('width', String(size));
+    svg.setAttribute('height', String(size));
+    svg.setAttribute('aria-hidden', 'true');
+    const path = document.createElementNS(ns, 'path');
+    path.setAttribute('d', 'M12 2.2l2.92 6.08 6.7.92-4.88 4.7 1.18 6.66L12 17.36 6.08 20.56l1.18-6.66L2.38 9.2l6.7-.92L12 2.2z');
+    path.setAttribute('fill', filled ? '#fbbf24' : 'rgba(148,163,184,0.22)');
+    path.setAttribute('stroke', filled ? '#d97706' : '#64748b');
+    path.setAttribute('stroke-width', '1.4');
+    path.setAttribute('stroke-linejoin', 'round');
+    svg.appendChild(path);
+    return svg;
+  }
+  function renderInlineStars(stars) {
+    const s = Math.max(0, Math.min(3, Math.round(Number(stars) || 0)));
+    const wrap = document.createElement('span');
+    wrap.className = 'speech-stars-inline';
+    wrap.style.cssText = 'display:inline-flex;align-items:center;gap:2px;vertical-align:-3px;';
+    wrap.setAttribute('aria-label', s + '颗星');
+    for (let i = 0; i < 3; i++) wrap.appendChild(starSvg(i < s, 18));
+    return wrap;
+  }
+  function unlockAudio() {
+    try {
+      const AC = w.AudioContext || w.webkitAudioContext;
+      if (!AC) return null;
+      if (!starAudioCtx) starAudioCtx = new AC();
+      if (starAudioCtx.state === 'suspended') starAudioCtx.resume().catch(() => {});
+      return starAudioCtx;
+    } catch (_) { return null; }
+  }
+  function isSfxMuted() {
+    try { return (typeof w.sfxMuted !== 'undefined' && !!w.sfxMuted) || localStorage.getItem('sfxMuted') === '1'; }
+    catch (_) { return false; }
+  }
+  function playChimes(stars) {
+    if (isSfxMuted()) return;
+    const ctx = unlockAudio();
+    if (!ctx) return;
+    const freqs = [1046.5, 1318.5, 1568.0];
+    const now = ctx.currentTime + 0.02;
+    for (let i = 0; i < stars; i++) {
+      const t = now + i * 0.22;
+      const osc = ctx.createOscillator(), harm = ctx.createOscillator(), gain = ctx.createGain();
+      osc.type = 'triangle'; osc.frequency.setValueAtTime(freqs[i], t);
+      harm.type = 'sine'; harm.frequency.setValueAtTime(freqs[i] * 2, t);
+      gain.gain.setValueAtTime(0.0001, t);
+      gain.gain.linearRampToValueAtTime(0.22, t + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.27);
+      const harmGain = ctx.createGain();
+      harmGain.gain.setValueAtTime(0.08, t);
+      osc.connect(gain); harm.connect(harmGain); harmGain.connect(gain); gain.connect(ctx.destination);
+      osc.start(t); harm.start(t);
+      osc.stop(t + 0.28); harm.stop(t + 0.28);
+    }
+  }
+  function ensureStarStyle() {
+    if (document.getElementById('speech-star-fx-style')) return;
+    const st = document.createElement('style');
+    st.id = 'speech-star-fx-style';
+    st.textContent =
+      '.speech-star-overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:99999;transition:opacity .24s ease,transform .24s ease;}' +
+      '.speech-star-overlay.leaving{opacity:0;transform:scale(.88);}' +
+      '.speech-star-burst{display:flex;align-items:center;gap:12px;padding:16px 26px;border-radius:24px;background:rgba(15,23,42,.88);border:1.5px solid rgba(251,191,36,.45);box-shadow:0 12px 36px rgba(0,0,0,.45);}' +
+      '.speech-star-item{opacity:0;transform:scale(.25);display:inline-flex;}' +
+      '.speech-star-item.lit{opacity:1;transform:scale(1);animation:speechStarPop .38s cubic-bezier(.2,1.5,.4,1) forwards;filter:drop-shadow(0 0 8px rgba(251,191,36,.6));}' +
+      '.speech-star-item.dim{opacity:.32;transform:scale(.88);transition:opacity .2s ease;}' +
+      '@keyframes speechStarPop{0%{opacity:0;transform:scale(.25);}65%{opacity:1;transform:scale(1.28);}100%{opacity:1;transform:scale(1);}}' +
+      '@media(prefers-reduced-motion:reduce){.speech-star-item.lit{animation:none;opacity:1;transform:scale(1);}.speech-star-overlay{transition:none;}}';
+    document.head.appendChild(st);
+  }
+  function playStarFx(stars) {
+    const s = Math.max(0, Math.min(3, Math.round(Number(stars) || 0)));
+    if (s < 1 || !document.body) return;
+    ensureStarStyle();
+    if (starOverlayTimer) { clearTimeout(starOverlayTimer); starOverlayTimer = null; }
+    if (starCleanupTimer) { clearTimeout(starCleanupTimer); starCleanupTimer = null; }
+    document.querySelectorAll('.speech-star-overlay').forEach(el => el.remove());
+    const overlay = document.createElement('div');
+    overlay.className = 'speech-star-overlay';
+    overlay.setAttribute('aria-hidden', 'true');
+    const burst = document.createElement('div');
+    burst.className = 'speech-star-burst';
+    const items = [];
+    for (let i = 0; i < 3; i++) {
+      const item = document.createElement('span');
+      item.className = 'speech-star-item' + (i < s ? '' : ' dim');
+      item.appendChild(starSvg(i < s, 44));
+      burst.appendChild(item);
+      items.push(item);
+    }
+    overlay.appendChild(burst);
+    document.body.appendChild(overlay);
+    for (let i = 0; i < s; i++) {
+      setTimeout(() => { if (overlay.isConnected) items[i].classList.add('lit'); }, i * 220);
+    }
+    playChimes(s);
+    starOverlayTimer = setTimeout(() => {
+      overlay.classList.add('leaving');
+      starCleanupTimer = setTimeout(() => overlay.remove(), 260);
+    }, 1150);
+  }
+  w.SpeechStarFx = { play: playStarFx, unlockAudio, renderInlineStars };
 })(window);

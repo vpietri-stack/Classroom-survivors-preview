@@ -38,8 +38,8 @@
 .speech-word-tip{margin:6px auto 0;max-width:420px;padding:6px 12px;border-radius:10px;background:rgba(254,249,195,.95);color:#713f12;font-size:13px;font-weight:600;}
 .speech-reading-tile.speech-reading-neutral{background:linear-gradient(180deg,#818cf8,#6366f1)!important;color:white!important;border-color:#4338ca!important;box-shadow:0 3px 0 #4338ca!important;animation:none!important;}
 .speech-reading-tile.correct{background:linear-gradient(180deg,#4ade80,#16a34a)!important;color:white!important;border-color:#15803d!important;box-shadow:0 3px 0 #15803d!important;animation:none!important;}
-.speech-reading-tile.grade-yellow{background:linear-gradient(180deg,#fde047,#eab308)!important;color:#422006!important;border-color:#ca8a04!important;box-shadow:0 3px 0 #ca8a04!important;animation:none!important;}
-.speech-reading-tile.grade-red{background:linear-gradient(180deg,#fca5a5,#ef4444)!important;color:#fff!important;border-color:#dc2626!important;box-shadow:0 3px 0 #dc2626!important;animation:none!important;}
+.study-word-tile.speech-reading-tile.grade-yellow,.study-word-tile.placed.speech-reading-tile.grade-yellow,.speech-reading-tile.grade-yellow{background:linear-gradient(180deg,#fde047,#eab308)!important;color:#422006!important;border-color:#ca8a04!important;box-shadow:0 3px 0 #ca8a04!important;animation:none!important;}
+.study-word-tile.speech-reading-tile.grade-red,.study-word-tile.placed.speech-reading-tile.grade-red,.speech-reading-tile.grade-red{background:linear-gradient(180deg,#fca5a5,#ef4444)!important;color:#fff!important;border-color:#dc2626!important;box-shadow:0 3px 0 #dc2626!important;animation:none!important;}
 .speech-reading-heard,.speech-target-word.heard{position:relative;padding-right:27px!important;}
 .speech-reading-heard::after,.speech-target-word.heard::after{content:'✓';position:absolute;right:3px;bottom:3px;width:17px;height:17px;line-height:17px;border-radius:50%;background:#fff;color:#15803d;font:900 14px/17px sans-serif;text-align:center;box-shadow:0 1px 2px #16653455;}
 .speech-target-note{font-size:12px;margin:6px 0;}
@@ -332,6 +332,7 @@
     document.addEventListener('visibilitychange', hiddenCapture);
 
     btn.addEventListener('click', function () {
+      if (global.SpeechStarFx) global.SpeechStarFx.unlockAudio();
       if (state === 'idle') startRecording();
       else if (state === 'recording') finishRecording();
       // 'busy' (transcribing): ignore taps.
@@ -735,8 +736,30 @@
     cont.className = 'speech-practice-continue game-btn bg-emerald-600 hover:bg-emerald-500 text-lg px-8 py-4 rounded-2xl shadow-lg';
     cont.textContent = '继续 ▶'; cont.hidden = true;
     const alive = function () { return !done && !disposed && wrap.isConnected; };
+    function buildInlineStars(s) {
+      if (global.SpeechStarFx && typeof global.SpeechStarFx.renderInlineStars === 'function') {
+        return global.SpeechStarFx.renderInlineStars(s);
+      }
+      const ns = 'http://www.w3.org/2000/svg';
+      const wrapStars = document.createElement('span');
+      wrapStars.className = 'speech-stars-inline';
+      wrapStars.style.cssText = 'display:inline-flex;align-items:center;gap:2px;vertical-align:-3px;';
+      wrapStars.setAttribute('aria-label', s + '颗星');
+      for (let i = 0; i < 3; i++) {
+        const svg = document.createElementNS(ns, 'svg');
+        svg.setAttribute('viewBox', '0 0 24 24'); svg.setAttribute('width', '18'); svg.setAttribute('height', '18'); svg.setAttribute('aria-hidden', 'true');
+        const path = document.createElementNS(ns, 'path');
+        path.setAttribute('d', 'M12 2.2l2.92 6.08 6.7.92-4.88 4.7 1.18 6.66L12 17.36 6.08 20.56l1.18-6.66L2.38 9.2l6.7-.92L12 2.2z');
+        path.setAttribute('fill', i < s ? '#fbbf24' : 'rgba(148,163,184,0.22)');
+        path.setAttribute('stroke', i < s ? '#d97706' : '#64748b');
+        path.setAttribute('stroke-width', '1.4'); path.setAttribute('stroke-linejoin', 'round');
+        svg.appendChild(path); wrapStars.appendChild(svg);
+      }
+      return wrapStars;
+    }
     function clearHints() {
       hintedWords = 0;
+      feedback.hidden = false;
       starsBar.hidden = true; starsBar.replaceChildren();
       if (wordTip) { wordTip.hidden = true; wordTip.textContent = ''; }
       if (wordTiles.length) {
@@ -756,12 +779,13 @@
       clearHints(); if (!meta || !Array.isArray(meta.targetWords) || !meta.targetWords.length) return;
       const pron = meta.pronunciation;
       if (pron && pron.hasSpeech && pron.stars > 0) {
-        const s = Math.max(1, Math.min(3, pron.stars));
-        const starSpan = document.createElement('span'); starSpan.className = 'speech-stars'; starSpan.textContent = '★'.repeat(s) + '☆'.repeat(3 - s);
+        const s = Math.max(1, Math.min(3, Math.round(pron.stars)));
+        const starSpan = document.createElement('span'); starSpan.className = 'speech-stars'; starSpan.appendChild(buildInlineStars(s));
         const headSpan = document.createElement('span'); headSpan.className = 'speech-stars-headline';
         headSpan.textContent = s === 3 ? '太棒了！每个词都很清楚' : s === 2 ? '不错！黄色和红色的词可以再清楚一点' : '加油！再读一次会更清楚';
         starsBar.replaceChildren(starSpan, headSpan);
         starsBar.hidden = false;
+        if (global.SpeechStarFx) global.SpeechStarFx.play(s);
       }
       if (wordTiles.length) {
         // Match in sentence order, including repeated words and punctuation.
@@ -777,11 +801,11 @@
           const heard = n > 0 && slice.every(w => w.heardClear);
           if (heard) {
             tile.classList.remove('speech-reading-neutral');
-            tile.classList.add('!bg-green-500', 'correct', 'speech-reading-heard');
             if (slice.some(w => w.grade === 'yellow')) {
-              tile.classList.add('grade-yellow');
+              tile.classList.add('correct', 'speech-reading-heard', 'grade-yellow');
               tile.setAttribute('aria-label', tile.textContent + '：差一点，再清楚一点');
             } else {
+              tile.classList.add('!bg-green-500', 'correct', 'speech-reading-heard');
               tile.setAttribute('aria-label', tile.textContent + '：这次听清了');
             }
           } else if (slice.some(w => w.grade === 'red')) {
@@ -829,7 +853,7 @@
     }
     function offer(message) {
       if (!alive()) return;
-      feedback.textContent = message; cont.hidden = false;
+      feedback.hidden = false; feedback.textContent = message; cont.hidden = false;
       if (opts.requireAllHeard) cont.hidden = hintedWords < expectedWordCount && gradedTries < 3 && errors === 0;
       if (opts.requiredWords) cont.textContent = errors ? '继续（只听） ▶' : hintedWords < expectedWordCount && gradedTries >= 3 ? '跳过这一页 ▶' : '继续 ▶';
       recBtn.setSpeechIdleText('🎙️ 再读一次');
@@ -842,7 +866,7 @@
       return '抱歉，这次我们没能听清你读的内容。你可以再试一次，也可以继续，由你决定！';
     }
     function technicalError(err, permission) {
-      if (!alive()) return; outcome = 'unassessed'; transcript.hidden = true;
+      if (!alive()) return; outcome = 'unassessed'; transcript.hidden = true; feedback.hidden = false;
       if (++errors <= 2) logSpeechEvent('error', mode, { target: target, level: level, flow: 'optional_practice_v1', message: String(err && err.message || err).slice(0, 200), ua: UA }, recordings || 1);
       if (permission && !wrap.querySelector('.mic-help')) wrap.insertAdjacentHTML('beforeend', micHelpHTML());
       offer(permission ? '麦克风还没有打开。可以按下方提示设置，也可以继续。' :
@@ -870,6 +894,7 @@
       onProgress: function (pct) { if (alive()) feedback.textContent = '正在准备朗读功能 ' + Math.round(pct) + (opts.requireAllHeard ? '%，请稍候。' : '%。可以切换到其他页面，也可以继续。'); },
       onStateChange: function (state) {
         if (!alive()) return;
+        feedback.hidden = false;
         if (state === 'starting') { clearHints(); transcript.hidden = true; cont.hidden = false; feedback.textContent = '正在打开麦克风…'; }
         if (state === 'recording') { cont.hidden = true; transcript.hidden = true; feedback.textContent = ''; clearHints(); }
         if (state === 'busy') { cont.hidden = false; outcome = 'unassessed'; feedback.textContent = '正在听你的录音…也可以直接继续。'; }
@@ -912,6 +937,9 @@
         capture(text, meta, result, 'graded');
         transcript.querySelector('p').textContent = '我听到的可能是：“' + String(text || '').slice(0, 1000) + '”'; transcript.hidden = false;
         offer(readingMessage());
+        if (meta && meta.pronunciation && meta.pronunciation.hasSpeech && meta.pronunciation.stars > 0) {
+          feedback.hidden = true; feedback.textContent = '';
+        }
         if (opts.onAssessment) opts.onAssessment(text, meta);
       },
       onGated: function (reason, meta) {
@@ -940,7 +968,7 @@
     }
     queryMicPermission().then(function (state) { if (alive() && state === 'denied') technicalError(new Error('Permission denied'), true); });
     wrap.studyResumeState = function () { return { recordings, gradedTries, errors, outcome, hintedWords,
-      recordingState:recBtn.dataset.speechState||'idle', message:feedback.textContent, transcript:transcript.querySelector('p').textContent,
+      recordingState:recBtn.dataset.speechState||'idle', message:feedback.textContent, feedbackHidden:feedback.hidden, transcript:transcript.querySelector('p').textContent,
       transcriptHidden:transcript.hidden, transcriptOpen:transcript.open, continueHidden:cont.hidden,
       starsHtml:starsBar.innerHTML, starsHidden:starsBar.hidden,
       tileClasses:wordTiles.map(tile=>tile.className), tileLabels:wordTiles.map(tile=>tile.getAttribute('aria-label')||'') }; };
@@ -948,7 +976,7 @@
       const saved=opts.resumeState;recordings=saved.recordings||0;gradedTries=saved.gradedTries||0;errors=saved.errors||0;
       outcome=saved.outcome||'not_recorded';hintedWords=saved.hintedWords||0;
       transcript.querySelector('p').textContent=saved.transcript||'';transcript.hidden=!!saved.transcriptHidden;transcript.open=!!saved.transcriptOpen;
-      cont.hidden=!!saved.continueHidden;feedback.textContent=saved.message||'';
+      cont.hidden=!!saved.continueHidden;feedback.textContent=saved.message||'';feedback.hidden=!!saved.feedbackHidden;
       starsBar.innerHTML=saved.starsHtml||'';starsBar.hidden=saved.starsHidden!==false;
       (saved.tileClasses||[]).forEach((cls,i)=>{if(wordTiles[i]){wordTiles[i].className=cls;if(saved.tileLabels&&saved.tileLabels[i])wordTiles[i].setAttribute('aria-label',saved.tileLabels[i]);}});
       if(['starting','recording','busy'].includes(saved.recordingState)) { cont.hidden=false;feedback.textContent='录音已中断，可以重新录音，也可以继续。'; }
